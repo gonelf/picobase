@@ -1,17 +1,7 @@
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { getSession } from '@/lib/auth-session'
-
-async function SignOutButton() {
-  return (
-    <Link
-      href="/auth/signout"
-      className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-    >
-      Sign out
-    </Link>
-  )
-}
+import { getSession } from '@/lib/session'
+import SignOutButton from '@/app/components/SignOutButton'
 
 export default async function DashboardLayout({
   children,
@@ -21,7 +11,7 @@ export default async function DashboardLayout({
   const session = await getSession()
 
   if (!session) {
-    redirect('/auth/signin')
+    redirect('/auth')
   }
 
   const displayName = session.user.firstName && session.user.lastName
