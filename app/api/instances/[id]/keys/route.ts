@@ -1,0 +1,45 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { auth } from '@/auth'
+import { createApiKey } from '@/lib/api-keys'
+import { db } from '@/lib/db'
+import { z } from 'zod'
+
+const createKeySchema = z.object({
+  name: z.string().min(1).max(100),
+})
+
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await auth()
+
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const result = await db.execute({
+      sql: 'SELECT user_id FROM instances WHERE id = ?',
+      args: [params.id],
+    })
+
+    if (result.rows.length === 0 || result.rows[0].user_id !== session.user.id) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+    }
+
+    const body = await request.json()
+    const { name } = createKeySchema.parse(body)
+
+    const apiKey = await createApiKey(params.id, name)
+
+    return NextResponse.json(apiKey, { status: 201 })
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: 'Invalid input' }, { status: 400 })
+    }
+
+    console.error('Create API key error:', error)
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+  }
+}
