@@ -1,14 +1,21 @@
 'use client'
 
-import { signOut } from 'supertokens-auth-react/recipe/session'
+import { signOut as supertokensSignOut } from 'supertokens-auth-react/recipe/session'
+import { signOut as nextAuthSignOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
+import { getAuthUrl } from '@/lib/auth-utils'
 
 export default function SignOutButton() {
     const router = useRouter()
+    const provider = process.env.NEXT_PUBLIC_AUTH_PROVIDER || 'supertokens'
 
     const onLogout = async () => {
-        await signOut()
-        router.push('/auth')
+        if (provider === 'nextauth') {
+            await nextAuthSignOut({ redirect: false })
+        } else {
+            await supertokensSignOut()
+        }
+        router.push(getAuthUrl('signin'))
     }
 
     return (
