@@ -44,3 +44,29 @@ export async function createUser(email: string, password: string, name?: string)
     updated_at: now,
   }
 }
+
+export async function syncUser(id: string, email: string, name?: string) {
+  const existingUser = await getUserById(id)
+  if (existingUser) {
+    return existingUser
+  }
+
+  const now = new Date().toISOString()
+
+  // We use a placeholder hash because auth is handled by SuperTokens
+  // but we need to satisfy the NOT NULL constraint
+  const passwordHash = 'managed_by_supertokens'
+
+  await db.execute({
+    sql: 'INSERT INTO users (id, email, password_hash, name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',
+    args: [id, email, passwordHash, name || null, now, now],
+  })
+
+  return {
+    id,
+    email,
+    name: name || null,
+    created_at: now,
+    updated_at: now,
+  }
+}

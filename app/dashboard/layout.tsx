@@ -1,36 +1,22 @@
-import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import { signOut } from '@/auth'
-
-async function SignOutButton() {
-  return (
-    <form
-      action={async () => {
-        'use server'
-        await signOut()
-      }}
-    >
-      <button
-        type="submit"
-        className="text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-      >
-        Sign out
-      </button>
-    </form>
-  )
-}
+import { getSession } from '@/lib/session'
+import SignOutButton from '@/app/components/SignOutButton'
 
 export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const session = await auth()
+  const session = await getSession()
 
   if (!session) {
-    redirect('/auth/signin')
+    redirect('/auth')
   }
+
+  const displayName = session.user.firstName && session.user.lastName
+    ? `${session.user.firstName} ${session.user.lastName}`
+    : session.user.email
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -51,7 +37,7 @@ export default async function DashboardLayout({
               </Link>
               <div className="flex items-center gap-4">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {session.user?.email}
+                  {displayName}
                 </span>
                 <SignOutButton />
               </div>

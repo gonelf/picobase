@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/auth'
+import { getSession } from '@/lib/session'
 import { deleteApiKey } from '@/lib/api-keys'
 import { db } from '@/lib/db'
 
@@ -8,7 +8,7 @@ export async function DELETE(
   { params }: { params: { id: string; keyId: string } }
 ) {
   try {
-    const session = await auth()
+    const session = await getSession()
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

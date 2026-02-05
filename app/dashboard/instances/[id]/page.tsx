@@ -1,4 +1,4 @@
-import { auth } from '@/auth'
+import { getSession } from '@/lib/session'
 import { redirect } from 'next/navigation'
 import { getInstanceStatus } from '@/lib/pocketbase'
 import { listApiKeys } from '@/lib/api-keys'
@@ -7,10 +7,10 @@ import InstanceActions from '@/components/InstanceActions'
 import ApiKeysList from '@/components/ApiKeysList'
 
 export default async function InstanceDetail({ params }: { params: { id: string } }) {
-  const session = await auth()
+  const session = await getSession()
 
   if (!session?.user?.id) {
-    redirect('/auth/signin')
+    redirect('/auth')
   }
 
   const instance = await getInstanceStatus(params.id)
@@ -40,13 +40,12 @@ export default async function InstanceDetail({ params }: { params: { id: string 
             </p>
           </div>
           <span
-            className={`px-3 py-1 text-sm font-medium rounded-full ${
-              instance.status === 'running'
+            className={`px-3 py-1 text-sm font-medium rounded-full ${instance.status === 'running'
                 ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
                 : instance.status === 'stopped'
-                ? 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400'
-                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
-            }`}
+                  ? 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400'
+                  : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+              }`}
           >
             {instance.status as string}
           </span>

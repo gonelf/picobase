@@ -1,10 +1,10 @@
-import { auth } from '@/auth'
+import { getSession } from '@/lib/session'
 import { listUserInstances } from '@/lib/pocketbase'
 import Link from 'next/link'
 import InstanceCard from '@/components/InstanceCard'
 
 export default async function Dashboard() {
-  const session = await auth()
+  const session = await getSession()
 
   if (!session?.user?.id) {
     return null
