@@ -16,7 +16,7 @@ A **Supabase alternative** that provides on-demand PocketBase instances with aut
 ### Tech Stack
 
 - **Frontend/Backend**: Next.js 14 with TypeScript
-- **Authentication**: NextAuth.js v5 (credentials provider)
+- **Authentication**: WorkOS AuthKit - hosted authentication
 - **Tenant Database**: Turso (LibSQL) - stores users, instances, API keys
 - **Storage**: Cloudflare R2 - persists PocketBase databases
 - **BaaS Engine**: PocketBase - individual instances per project
@@ -115,27 +115,32 @@ R2_ACCESS_KEY_ID=your-r2-access-key-id
 R2_SECRET_ACCESS_KEY=your-r2-secret-access-key
 R2_BUCKET_NAME=picobase-instances
 
-# NextAuth
-NEXTAUTH_URL=http://localhost:3000
-NEXTAUTH_SECRET=your-secret-here
+# WorkOS AuthKit
+WORKOS_API_KEY=sk_test_your_workos_api_key
+WORKOS_CLIENT_ID=client_your_workos_client_id
+WORKOS_REDIRECT_URI=http://localhost:3000/auth/callback
 
 # PocketBase Configuration
 POCKETBASE_BINARY_PATH=/usr/local/bin/pocketbase
 INSTANCES_BASE_PORT=8090
 ```
 
-Generate `NEXTAUTH_SECRET`:
-```bash
-openssl rand -base64 32
-```
+### 5. Set Up WorkOS AuthKit
 
-### 5. Run Database Migration
+1. Go to [WorkOS Dashboard](https://dashboard.workos.com/)
+2. Create a new project or use an existing one
+3. Navigate to "User Management" → "AuthKit"
+4. Get your API Key and Client ID
+5. Add `http://localhost:3000/auth/callback` as a redirect URI
+6. Update your `.env.local` with the credentials
+
+### 6. Run Database Migration
 
 ```bash
 npm run db:migrate
 ```
 
-### 6. Install PocketBase
+### 7. Install PocketBase
 
 ```bash
 # macOS/Linux
@@ -147,7 +152,7 @@ sudo mv pocketbase /usr/local/bin/
 # POCKETBASE_BINARY_PATH=/path/to/pocketbase
 ```
 
-### 7. Start Development Server
+### 8. Start Development Server
 
 ```bash
 npm run dev
@@ -159,9 +164,10 @@ Visit [http://localhost:3000](http://localhost:3000)
 
 ### Creating an Account
 
-1. Go to `/auth/signup`
-2. Enter your name, email, and password
-3. Sign in at `/auth/signin`
+1. Go to `/auth/signup` or `/auth/signin`
+2. You'll be redirected to WorkOS AuthKit's hosted sign-in page
+3. Create an account or sign in with your email and password
+4. After authentication, you'll be redirected back to the dashboard
 
 ### Creating a PocketBase Instance
 
@@ -188,8 +194,10 @@ Visit [http://localhost:3000](http://localhost:3000)
 ## 🔧 API Endpoints
 
 ### Authentication
-- `POST /api/auth/signup` - Register new user
-- `POST /api/auth/signin` - Sign in (NextAuth)
+- `GET /auth/signin` - Redirects to WorkOS AuthKit
+- `GET /auth/signup` - Redirects to WorkOS AuthKit (signup flow)
+- `GET /auth/callback` - OAuth callback handler
+- `GET /auth/signout` - Sign out and revoke session
 
 ### Instances
 - `POST /api/instances` - Create new instance
@@ -241,9 +249,8 @@ git push origin main
 picobase/
 ├── app/
 │   ├── api/
-│   │   ├── auth/          # Authentication endpoints
 │   │   └── instances/     # Instance management APIs
-│   ├── auth/              # Sign in/up pages
+│   ├── auth/              # Auth routes (signin, signup, callback, signout)
 │   ├── dashboard/         # Dashboard pages
 │   ├── globals.css
 │   ├── layout.tsx
@@ -255,12 +262,13 @@ picobase/
 ├── lib/
 │   ├── api-keys.ts       # API key utilities
 │   ├── auth.ts           # Auth utilities
+│   ├── auth-session.ts   # WorkOS session management
 │   ├── db.ts             # Turso client
 │   ├── pocketbase.ts     # Instance orchestration
-│   └── r2.ts             # R2 storage client
+│   ├── r2.ts             # R2 storage client
+│   └── workos.ts         # WorkOS client config
 ├── scripts/
 │   └── migrate.js        # Database migration
-├── auth.ts               # NextAuth config
 ├── middleware.ts         # Route protection
 ├── .env.example
 ├── package.json
@@ -270,11 +278,12 @@ picobase/
 ## 🔒 Security Considerations
 
 - API keys are hashed with bcrypt before storage
-- User passwords are hashed with bcrypt (10 rounds)
-- NextAuth handles session management with JWT
+- User authentication handled by WorkOS AuthKit (industry-standard security)
+- Session cookies are HTTP-only and secure in production
 - Middleware protects dashboard routes
 - Instance ownership is verified on all operations
 - Environment variables for sensitive credentials
+- WorkOS manages password security, MFA, and email verification
 
 ## 🛠️ Development
 
@@ -324,7 +333,7 @@ MIT License - feel free to use this project for personal or commercial purposes.
 - [Turso](https://turso.tech/) - Distributed SQLite
 - [Cloudflare R2](https://www.cloudflare.com/products/r2/) - S3-compatible storage
 - [Next.js](https://nextjs.org/) - React framework
-- [NextAuth.js](https://next-auth.js.org/) - Authentication
+- [WorkOS](https://workos.com/) - Enterprise-ready authentication
 
 ---
 
