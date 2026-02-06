@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getInstanceBySubdomain } from '@/lib/db'
 import { startRailwayInstance } from '@/lib/railway-client'
+import { ensureInstancePort } from '@/lib/instance-management'
 
 const RAILWAY_API_URL = process.env.RAILWAY_API_URL
 const RAILWAY_API_KEY = process.env.RAILWAY_API_KEY
@@ -104,7 +105,9 @@ async function handleProxyRequest(request: NextRequest) {
 
                     // Trigger start (idempotent-ish in our new route, but explicit start helps)
                     try {
-                        await startRailwayInstance(instance.id, instance.port || 8090)
+                        // Ensure we have a valid port (avoid conflicts if old port is stuck)
+                        const freshPort = await ensureInstancePort(instance.id, instance.port || 8090)
+                        await startRailwayInstance(instance.id, freshPort)
                     } catch (e) {
                         console.warn('[Proxy] Failed to send start command, continuing anyway:', e)
                     }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthSession } from '@/lib/auth-provider'
 import { startRailwayInstance } from '@/lib/railway-client'
 import { db } from '@/lib/db'
+import { ensureInstancePort } from '@/lib/instance-management'
 
 export async function POST(
   request: NextRequest,

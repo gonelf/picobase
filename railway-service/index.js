@@ -146,9 +146,18 @@ app.all('/instances/:id/proxy/*', authenticateRequest, async (req, res) => {
         const body = await proxyReq.arrayBuffer();
 
         res.status(proxyReq.status);
+
+        // Forward headers, but filter out those that shouldn't be proxied
+        // specifically content-encoding, because fetch() already decompresses the body
+        // but if we forward content-encoding: gzip, the client will try to decompress it again
+        const ignoredHeaders = ['content-encoding', 'content-length', 'transfer-encoding'];
+
         proxyReq.headers.forEach((value, key) => {
-            res.setHeader(key, value);
+            if (!ignoredHeaders.includes(key.toLowerCase())) {
+                res.setHeader(key, value);
+            }
         });
+
         res.send(Buffer.from(body));
 
     } catch (error) {
