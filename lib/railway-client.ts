@@ -3,6 +3,14 @@
  * Communicates with the Railway service to manage PocketBase instances
  */
 
+// Normalize the Railway API URL to ensure it has a protocol
+function normalizeUrl(url: string): string {
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        return `https://${url}`;
+    }
+    return url;
+}
+
 const RAILWAY_API_URL = process.env.RAILWAY_API_URL;
 const RAILWAY_API_KEY = process.env.RAILWAY_API_KEY;
 
@@ -14,6 +22,9 @@ if (!RAILWAY_API_KEY) {
     throw new Error('RAILWAY_API_KEY environment variable is not set');
 }
 
+// Normalize the Railway API URL
+const NORMALIZED_RAILWAY_API_URL = normalizeUrl(RAILWAY_API_URL);
+
 interface RailwayResponse {
     success?: boolean;
     error?: string;
@@ -24,7 +35,7 @@ async function railwayRequest(
     endpoint: string,
     options: RequestInit = {}
 ): Promise<RailwayResponse> {
-    const url = `${RAILWAY_API_URL}${endpoint}`;
+    const url = `${NORMALIZED_RAILWAY_API_URL}${endpoint}`;
 
     const response = await fetch(url, {
         ...options,
