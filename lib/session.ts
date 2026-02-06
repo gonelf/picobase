@@ -16,7 +16,7 @@ export async function getSession() {
 }
 
 export async function getSupertokensSession() {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const allCookies = cookieStore.getAll();
 
     const { accessTokenPayload, hasToken } = await getSSRSession(allCookies);

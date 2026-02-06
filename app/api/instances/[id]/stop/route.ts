@@ -5,7 +5,7 @@ import { db } from '@/lib/db'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession()
@@ -14,16 +14,18 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
+
     const result = await db.execute({
       sql: 'SELECT user_id FROM instances WHERE id = ?',
-      args: [params.id],
+      args: [id],
     })
 
     if (result.rows.length === 0 || result.rows[0].user_id !== session.user.id) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    await stopInstance(params.id)
+    await stopInstance(id)
 
     return NextResponse.json({ success: true })
   } catch (error) {

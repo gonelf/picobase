@@ -5,7 +5,7 @@ import { db } from '@/lib/db'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession()
@@ -14,10 +14,12 @@ export async function POST(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
+
     // Verify instance ownership
     const result = await db.execute({
       sql: 'SELECT user_id, port FROM instances WHERE id = ?',
-      args: [params.id],
+      args: [id],
     })
 
     if (result.rows.length === 0 || result.rows[0].user_id !== session.user.id) {
@@ -27,12 +29,12 @@ export async function POST(
     const port = result.rows[0].port as number || 8090
 
     // Start instance on Railway
-    const railwayResponse = await startRailwayInstance(params.id, port)
+    const railwayResponse = await startRailwayInstance(id, port)
 
     // Update instance status in database
     await db.execute({
       sql: 'UPDATE instances SET status = ?, last_started_at = ? WHERE id = ?',
-      args: ['running', new Date().toISOString(), params.id],
+      args: ['running', new Date().toISOString(), id],
     })
 
     return NextResponse.json({

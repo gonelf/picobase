@@ -4,7 +4,7 @@ import { deleteInstance } from '@/lib/pocketbase'
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession()
@@ -13,7 +13,9 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    await deleteInstance(params.id, session.user.id)
+    const { id } = await params
+
+    await deleteInstance(id, session.user.id)
 
     return NextResponse.json({ success: true })
   } catch (error) {
