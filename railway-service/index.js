@@ -117,6 +117,47 @@ app.post('/instances/:id/start', authenticateRequest, async (req, res) => {
     }
 });
 
+// Proxy endpoint - forwards requests to PocketBase instance
+app.all('/instances/:id/proxy/*', authenticateRequest, async (req, res) => {
+    const { id } = req.params;
+    const pathToProxy = req.params[0] || '/';
+
+    const instance = runningInstances.get(id);
+
+    if (!instance) {
+        return res.status(404).json({ error: 'Instance not running' });
+    }
+
+    try {
+        // Forward request to PocketBase instance
+        const pbUrl = `http://127.0.0.1:${instance.port}/${pathToProxy}`;
+
+        // Create proxy request
+        const proxyReq = await fetch(pbUrl, {
+            method: req.method,
+            headers: {
+                ...req.headers,
+                host: `127.0.0.1:${instance.port}`,
+            },
+            body: req.method !== 'GET' && req.method !== 'HEAD' ? JSON.stringify(req.body) : undefined,
+        });
+
+        // Forward response
+        const body = await proxyReq.arrayBuffer();
+
+        res.status(proxyReq.status);
+        proxyReq.headers.forEach((value, key) => {
+            res.setHeader(key, value);
+        });
+        res.send(Buffer.from(body));
+
+    } catch (error) {
+        console.error(`Error proxying to instance ${id}:`, error);
+        res.status(500).json({ error: 'Proxy error' });
+    }
+});
+
+
 // Stop instance
 app.post('/instances/:id/stop', authenticateRequest, async (req, res) => {
     const { id } = req.params;

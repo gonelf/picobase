@@ -55,3 +55,17 @@ export interface UsageLog {
   metadata: string | null
   created_at: string
 }
+
+// Helper function to lookup instance by subdomain
+export async function getInstanceBySubdomain(subdomain: string) {
+  const result = await db.execute({
+    sql: 'SELECT id, user_id, name, subdomain, status, port FROM instances WHERE subdomain = ?',
+    args: [subdomain],
+  })
+
+  if (result.rows.length === 0) {
+    return null
+  }
+
+  return result.rows[0] as unknown as Pick<Instance, 'id' | 'user_id' | 'name' | 'subdomain' | 'status' | 'port'>
+}

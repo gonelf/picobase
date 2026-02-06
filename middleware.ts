@@ -1,6 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+const INSTANCES_DOMAIN = process.env.INSTANCES_DOMAIN || 'localhost:3001'
+
 export async function middleware(request: NextRequest) {
+  const hostname = request.headers.get('host') || ''
+
+  // Check if this is a subdomain request for an instance
+  // Extract subdomain: {subdomain}.picobase.com -> subdomain
+  const subdomain = hostname.replace(`.${INSTANCES_DOMAIN}`, '')
+
+  // If this is a subdomain request (not the main domain)
+  if (subdomain && subdomain !== INSTANCES_DOMAIN && subdomain !== hostname && !hostname.startsWith('www.')) {
+    // Rewrite to proxy route with subdomain in header
+    const url = request.nextUrl.clone()
+    url.pathname = `/api/proxy${url.pathname}`
+
+    const response = NextResponse.rewrite(url)
+    response.headers.set('x-instance-subdomain', subdomain)
+
+    return response
+  }
+
+  // Continue with existing authentication middleware for platform routes
   const provider = process.env.AUTH_PROVIDER || 'supertokens'
 
   // Check session based on provider

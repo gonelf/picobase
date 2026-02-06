@@ -7,20 +7,29 @@ import InstanceActions from '@/components/InstanceActions'
 import ApiKeysList from '@/components/ApiKeysList'
 import { getAuthUrl } from '@/lib/auth-utils'
 
-export default async function InstanceDetail({ params }: { params: { id: string } }) {
+export default async function InstanceDetail({ params }: { params: Promise<{ id: string }> }) {
   const session = await getSession()
 
   if (!session?.user?.id) {
     redirect(getAuthUrl('signin'))
   }
 
-  const instance = await getInstanceStatus(params.id)
+  // Await params in Next.js 15+
+  const { id } = await params
+
+  const instance = await getInstanceStatus(id)
 
   if (!instance) {
     redirect('/dashboard')
   }
 
-  const apiKeys = await listApiKeys(params.id)
+  const apiKeys = await listApiKeys(id)
+
+  // Get public URL for the instance
+  const instancesDomain = process.env.INSTANCES_DOMAIN || 'localhost:3001'
+  const protocol = instancesDomain.includes('localhost') ? 'http' : 'https'
+  const publicUrl = `${protocol}://${instance.subdomain}.${instancesDomain}`
+  const adminUrl = `${publicUrl}/_/`
 
   return (
     <div className="max-w-4xl">
@@ -65,13 +74,25 @@ export default async function InstanceDetail({ params }: { params: { id: string 
                 {instance.id as string}
               </dd>
             </div>
-            {instance.status === 'running' && instance.port && (
-              <div className="flex justify-between">
-                <dt className="text-sm text-gray-600 dark:text-gray-400">API Endpoint:</dt>
-                <dd className="text-sm font-mono text-gray-900 dark:text-white">
-                  http://localhost:{instance.port as number}
-                </dd>
-              </div>
+            {instance.status === 'running' && (
+              <>
+                <div className="flex justify-between">
+                  <dt className="text-sm text-gray-600 dark:text-gray-400">Public URL:</dt>
+                  <dd className="text-sm font-mono text-gray-900 dark:text-white">
+                    <a href={publicUrl} target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:text-primary-700">
+                      {publicUrl}
+                    </a>
+                  </dd>
+                </div>
+                <div className="flex justify-between">
+                  <dt className="text-sm text-gray-600 dark:text-gray-400">Admin UI:</dt>
+                  <dd className="text-sm font-mono text-gray-900 dark:text-white">
+                    <a href={adminUrl} target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:text-primary-700">
+                      {adminUrl}
+                    </a>
+                  </dd>
+                </div>
+              </>
             )}
             <div className="flex justify-between">
               <dt className="text-sm text-gray-600 dark:text-gray-400">Created:</dt>
@@ -90,13 +111,13 @@ export default async function InstanceDetail({ params }: { params: { id: string 
           </dl>
         </div>
 
-        <InstanceActions instanceId={params.id} status={instance.status as string} />
+        <InstanceActions instanceId={id} status={instance.status as string} />
 
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">API Keys</h2>
           </div>
-          <ApiKeysList instanceId={params.id} initialKeys={apiKeys} />
+          <ApiKeysList instanceId={id} initialKeys={apiKeys} />
         </div>
       </div>
     </div>
