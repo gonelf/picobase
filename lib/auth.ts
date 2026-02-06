@@ -46,16 +46,36 @@ export async function createUser(email: string, password: string, name?: string)
 }
 
 export async function syncUser(id: string, email: string, name?: string) {
-  const existingUser = await getUserById(id)
-  if (existingUser) {
-    return existingUser
+  // First check if user exists by ID
+  const existingUserById = await getUserById(id)
+  if (existingUserById) {
+    return existingUserById
   }
 
+  // Check if user exists by email (could be from different auth provider)
+  const existingUserByEmail = await getUserByEmail(email)
+  if (existingUserByEmail) {
+    // Update the existing user with the new auth provider ID
+    const now = new Date().toISOString()
+    await db.execute({
+      sql: 'UPDATE users SET id = ?, name = ?, updated_at = ? WHERE email = ?',
+      args: [id, name || existingUserByEmail.name, now, email],
+    })
+    return {
+      id,
+      email,
+      name: name || existingUserByEmail.name || null,
+      created_at: existingUserByEmail.created_at,
+      updated_at: now,
+    }
+  }
+
+  // No existing user, create new one
   const now = new Date().toISOString()
 
-  // We use a placeholder hash because auth is handled by SuperTokens
+  // We use a placeholder hash because auth is handled by auth providers
   // but we need to satisfy the NOT NULL constraint
-  const passwordHash = 'managed_by_supertokens'
+  const passwordHash = 'managed_by_auth_provider'
 
   await db.execute({
     sql: 'INSERT INTO users (id, email, password_hash, name, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)',

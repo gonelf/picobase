@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSession } from '@/lib/session'
-import { startInstance, getInstanceStatus } from '@/lib/pocketbase'
+import { getAuthSession } from '@/lib/auth-provider'
+import { startRailwayInstance } from '@/lib/railway-client'
 import { db } from '@/lib/db'
 
 export async function POST(
@@ -8,20 +8,15 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getSession()
+    const session = await getAuthSession()
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const instance = await getInstanceStatus(params.id)
-
-    if (!instance) {
-      return NextResponse.json({ error: 'Instance not found' }, { status: 404 })
-    }
-
+    // Verify instance ownership
     const result = await db.execute({
-      sql: 'SELECT user_id FROM instances WHERE id = ?',
+      sql: 'SELECT user_id, port FROM instances WHERE id = ?',
       args: [params.id],
     })
 
@@ -29,9 +24,22 @@ export async function POST(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    const { port, url } = await startInstance(params.id)
+    const port = result.rows[0].port as number || 8090
 
-    return NextResponse.json({ port, url })
+    // Start instance on Railway
+    const railwayResponse = await startRailwayInstance(params.id, port)
+
+    // Update instance status in database
+    await db.execute({
+      sql: 'UPDATE instances SET status = ?, last_started_at = ? WHERE id = ?',
+      args: ['running', new Date().toISOString(), params.id],
+    })
+
+    return NextResponse.json({
+      port,
+      url: `http://localhost:${port}`,
+      ...railwayResponse
+    })
   } catch (error) {
     console.error('Start instance error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
