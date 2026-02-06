@@ -5,12 +5,13 @@ import { listApiKeys } from '@/lib/api-keys'
 import Link from 'next/link'
 import InstanceActions from '@/components/InstanceActions'
 import ApiKeysList from '@/components/ApiKeysList'
+import { getAuthUrl } from '@/lib/auth-utils'
 
 export default async function InstanceDetail({ params }: { params: { id: string } }) {
   const session = await getSession()
 
   if (!session?.user?.id) {
-    redirect('/auth')
+    redirect(getAuthUrl('signin'))
   }
 
   const instance = await getInstanceStatus(params.id)
@@ -41,10 +42,10 @@ export default async function InstanceDetail({ params }: { params: { id: string 
           </div>
           <span
             className={`px-3 py-1 text-sm font-medium rounded-full ${instance.status === 'running'
-                ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
-                : instance.status === 'stopped'
-                  ? 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400'
-                  : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
+              ? 'bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400'
+              : instance.status === 'stopped'
+                ? 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-400'
+                : 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
               }`}
           >
             {instance.status as string}

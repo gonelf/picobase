@@ -12,6 +12,10 @@ try {
 }
 
 export async function getSession() {
+    return getSupertokensSession();
+}
+
+export async function getSupertokensSession() {
     const cookieStore = cookies();
     const allCookies = cookieStore.getAll();
 

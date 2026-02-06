@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getSession } from '@/lib/session'
+import { getAuthSession } from '@/lib/auth-provider'
 import { createInstance } from '@/lib/pocketbase'
 import { z } from 'zod'
 
@@ -10,7 +10,7 @@ const createInstanceSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getSession()
+    const session = await getAuthSession()
 
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

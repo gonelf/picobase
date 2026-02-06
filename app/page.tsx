@@ -1,6 +1,10 @@
 import Link from 'next/link'
+import { getAuthUrl } from '@/lib/auth-utils'
 
 export default function Home() {
+  const signInUrl = getAuthUrl('signin')
+  const signUpUrl = getAuthUrl('signup')
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm">
@@ -17,13 +21,13 @@ export default function Home() {
 
           <div className="flex gap-4 justify-center">
             <Link
-              href="/auth/signin"
+              href={signInUrl}
               className="rounded-lg bg-primary-600 px-6 py-3 text-white font-semibold hover:bg-primary-700 transition-colors"
             >
               Sign In
             </Link>
             <Link
-              href="/auth/signup"
+              href={signUpUrl}
               className="rounded-lg border border-primary-600 px-6 py-3 text-primary-600 font-semibold hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
             >
               Sign Up

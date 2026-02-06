@@ -12,6 +12,17 @@ export default async function Dashboard() {
 
   const instances = await listUserInstances(session.user.id)
 
+  // Serialize instances to plain objects to avoid Next.js warning
+  const serializedInstances = instances.map((instance: any) => ({
+    id: instance.id,
+    name: instance.name,
+    subdomain: instance.subdomain,
+    status: instance.status,
+    port: instance.port,
+    created_at: instance.created_at,
+    last_started_at: instance.last_started_at,
+  }))
+
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
@@ -31,7 +42,7 @@ export default async function Dashboard() {
         </Link>
       </div>
 
-      {instances.length === 0 ? (
+      {serializedInstances.length === 0 ? (
         <div className="text-center py-12 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
             No instances yet
@@ -48,7 +59,7 @@ export default async function Dashboard() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {instances.map((instance: any) => (
+          {serializedInstances.map((instance) => (
             <InstanceCard key={instance.id} instance={instance} />
           ))}
         </div>
