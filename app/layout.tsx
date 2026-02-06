@@ -6,8 +6,8 @@ import { AuthProvider } from './components/auth-provider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'PicoBase - Multi-tenant BaaS Platform',
-  description: 'Your own Supabase alternative with PocketBase instances',
+  title: 'PicoBase - Instant Backend Infrastructure',
+  description: 'Multi-tenant backend platform with real-time database, authentication, file storage, and instant APIs. Build faster with ready-to-use backend services.',
 }
 
 export default function RootLayout({

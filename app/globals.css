@@ -30,4 +30,16 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+  
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-2xl hover:scale-105 hover:-translate-y-1;
+  }
+  
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r;
+  }
+  
+  .glass-effect {
+    @apply backdrop-blur-sm bg-opacity-80 border border-white/20;
+  }
 }
