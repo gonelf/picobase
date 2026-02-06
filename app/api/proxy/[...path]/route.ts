@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getInstanceBySubdomain } from '@/lib/db'
+import { startRailwayInstance } from '@/lib/railway-client'
 
 const RAILWAY_API_URL = process.env.RAILWAY_API_URL
 const RAILWAY_API_KEY = process.env.RAILWAY_API_KEY
@@ -89,7 +90,7 @@ async function handleProxyRequest(request: NextRequest) {
         }
 
         // Forward the request to Railway
-        const proxyResponse = await fetch(railwayProxyUrl, {
+        let proxyResponse = await fetch(railwayProxyUrl, {
             method: request.method,
             headers: {
                 'X-API-Key': RAILWAY_API_KEY!,
@@ -101,6 +102,41 @@ async function handleProxyRequest(request: NextRequest) {
             },
             body,
         })
+
+        // Lazy Recovery: Check if the instance is actually not running on Railway
+        // This happens if Railway service restarted but DB still says "running"
+        if (proxyResponse.status === 404) {
+            // Clone response to read body without consuming the original stream if it's not the error we expect
+            const clone = proxyResponse.clone()
+            try {
+                const errorBody = await clone.json()
+                if (errorBody.error === 'Instance not running') {
+                    console.log(`[Proxy] Instance ${instance.id} not running on Railway (but DB says running). Auto-recovering...`)
+
+                    // Start the instance
+                    await startRailwayInstance(instance.id, instance.port || 8090)
+
+                    // Wait for it to start (3s)
+                    await new Promise(resolve => setTimeout(resolve, 3000))
+
+                    // Retry the request
+                    proxyResponse = await fetch(railwayProxyUrl, {
+                        method: request.method,
+                        headers: {
+                            'X-API-Key': RAILWAY_API_KEY!,
+                            'Content-Type': request.headers.get('content-type') || 'application/json',
+                            // Forward other relevant headers
+                            ...(request.headers.get('authorization') && {
+                                'authorization': request.headers.get('authorization')!,
+                            }),
+                        },
+                        body,
+                    })
+                }
+            } catch (e) {
+                // Ignore JSON parse errors, just return original response
+            }
+        }
 
         // Get response body
         const responseBody = await proxyResponse.arrayBuffer()

@@ -79,7 +79,7 @@ export default function InstanceCard({ instance }: { instance: Instance }) {
       <div className="flex justify-between items-start mb-4">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white font-bold text-lg">
+            <div className="w-10 h-10 rounded-lg bg-primary-600 flex items-center justify-center text-white font-bold text-lg">
               {instance.name.charAt(0).toUpperCase()}
             </div>
             <div>
@@ -101,7 +101,7 @@ export default function InstanceCard({ instance }: { instance: Instance }) {
       </div>
 
       {status === 'running' && instance.port && (
-        <div className="mb-4 p-3 bg-gradient-to-r from-primary-50 to-accent-50 dark:from-primary-900/10 dark:to-accent-900/10 rounded-lg border border-primary-200 dark:border-primary-800">
+        <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-primary-200 dark:border-primary-800">
           <p className="text-xs font-semibold text-primary-700 dark:text-primary-400 mb-1">API Endpoint:</p>
           <p className="text-sm font-mono text-gray-900 dark:text-white break-all">
             http://localhost:{instance.port}
@@ -114,7 +114,7 @@ export default function InstanceCard({ instance }: { instance: Instance }) {
           <button
             onClick={handleStart}
             disabled={loading}
-            className="flex-1 px-4 py-2.5 bg-gradient-to-r from-primary-600 to-accent-600 text-white rounded-lg font-semibold hover:shadow-lg disabled:opacity-50 transition-all duration-300 hover:scale-105"
+            className="flex-1 px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-semibold hover:shadow-lg disabled:opacity-50 transition-all duration-300 hover:scale-105"
           >
             {loading ? 'Starting...' : '▶ Start'}
           </button>
