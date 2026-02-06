@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthSession } from '@/lib/auth-provider'
-import { stopInstance, getInstanceStatus } from '@/lib/pocketbase'
+import { stopRailwayInstance } from '@/lib/railway-client'
 import { db } from '@/lib/db'
 
 export async function POST(
@@ -25,7 +25,14 @@ export async function POST(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
-    await stopInstance(id)
+    // Stop instance on Railway
+    await stopRailwayInstance(id)
+
+    // Update instance status in database
+    await db.execute({
+      sql: 'UPDATE instances SET status = ?, last_stopped_at = ? WHERE id = ?',
+      args: ['stopped', new Date().toISOString(), id],
+    })
 
     return NextResponse.json({ success: true })
   } catch (error) {

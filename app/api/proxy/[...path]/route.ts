@@ -89,53 +89,69 @@ async function handleProxyRequest(request: NextRequest) {
             body = await request.text()
         }
 
-        // Forward the request to Railway
-        let proxyResponse = await fetch(railwayProxyUrl, {
-            method: request.method,
-            headers: {
-                'X-API-Key': RAILWAY_API_KEY!,
-                'Content-Type': request.headers.get('content-type') || 'application/json',
-                // Forward other relevant headers
-                ...(request.headers.get('authorization') && {
-                    'authorization': request.headers.get('authorization')!,
-                }),
-            },
-            body,
-        })
+        // Forward the request to Railway with robust retry and recovery
+        let proxyResponse: Response | null = null;
+        let lastError: any = null;
 
-        // Lazy Recovery: Check if the instance is actually not running on Railway
-        // This happens if Railway service restarted but DB still says "running"
-        if (proxyResponse.status === 404) {
-            // Clone response to read body without consuming the original stream if it's not the error we expect
-            const clone = proxyResponse.clone()
+        // Try up to 5 times
+        for (let attempt = 0; attempt < 5; attempt++) {
             try {
-                const errorBody = await clone.json()
-                if (errorBody.error === 'Instance not running') {
-                    console.log(`[Proxy] Instance ${instance.id} not running on Railway (but DB says running). Auto-recovering...`)
+                // If it's a retry, verify/start instance first
+                if (attempt > 0) {
+                    // Check if we need to start it (only if we suspect it's down)
+                    // But simpler strategy: just ensure it's started if we are failing
+                    console.log(`[Proxy] Retry attempt ${attempt + 1} for ${instance.id}...`)
 
-                    // Start the instance
-                    await startRailwayInstance(instance.id, instance.port || 8090)
+                    // Trigger start (idempotent-ish in our new route, but explicit start helps)
+                    try {
+                        await startRailwayInstance(instance.id, instance.port || 8090)
+                    } catch (e) {
+                        console.warn('[Proxy] Failed to send start command, continuing anyway:', e)
+                    }
 
-                    // Wait for it to start (3s)
-                    await new Promise(resolve => setTimeout(resolve, 3000))
-
-                    // Retry the request
-                    proxyResponse = await fetch(railwayProxyUrl, {
-                        method: request.method,
-                        headers: {
-                            'X-API-Key': RAILWAY_API_KEY!,
-                            'Content-Type': request.headers.get('content-type') || 'application/json',
-                            // Forward other relevant headers
-                            ...(request.headers.get('authorization') && {
-                                'authorization': request.headers.get('authorization')!,
-                            }),
-                        },
-                        body,
-                    })
+                    // Wait a bit increasing with attempts: 1s, 2s, 3s, 4s
+                    await new Promise(resolve => setTimeout(resolve, attempt * 1000))
                 }
-            } catch (e) {
-                // Ignore JSON parse errors, just return original response
+
+                proxyResponse = await fetch(railwayProxyUrl, {
+                    method: request.method,
+                    headers: {
+                        'X-API-Key': RAILWAY_API_KEY!,
+                        'Content-Type': request.headers.get('content-type') || 'application/json',
+                        ...(request.headers.get('authorization') && {
+                            'authorization': request.headers.get('authorization')!,
+                        }),
+                    },
+                    body,
+                })
+
+                // Check for "Instance not running" 404 from Railway Service
+                if (proxyResponse.status === 404) {
+                    const clone = proxyResponse.clone()
+                    try {
+                        const errorBody = await clone.json()
+                        if (errorBody.error === 'Instance not running') {
+                            console.log(`[Proxy] Instance ${instance.id} reported not running. Retrying...`)
+                            lastError = new Error('Instance not running')
+                            continue // Retry loop will trigger start
+                        }
+                    } catch (e) {
+                        // Not JSON, probably real 404
+                    }
+                }
+
+                // If we get here, we have a valid response (success or application error like 404 from PB itself)
+                break
+
+            } catch (error) {
+                console.warn(`[Proxy] Fetch error on attempt ${attempt + 1}:`, error)
+                lastError = error
+                // Continue to next attempt which will try to recover
             }
+        }
+
+        if (!proxyResponse) {
+            throw lastError || new Error('Failed to connect to instance after retries')
         }
 
         // Get response body

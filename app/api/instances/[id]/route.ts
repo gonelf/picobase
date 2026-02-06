@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthSession } from '@/lib/auth-provider'
-import { deleteInstance } from '@/lib/pocketbase'
+import { deleteRailwayInstance } from '@/lib/railway-client'
+import { db } from '@/lib/db'
 
 export async function DELETE(
   request: NextRequest,
@@ -15,7 +16,19 @@ export async function DELETE(
 
     const { id } = await params
 
-    await deleteInstance(id, session.user.id)
+    // Delete instance from Railway
+    await deleteRailwayInstance(id)
+
+    // Cleanup database
+    await db.execute({
+      sql: 'DELETE FROM api_keys WHERE instance_id = ?',
+      args: [id],
+    })
+
+    await db.execute({
+      sql: 'DELETE FROM instances WHERE id = ? AND user_id = ?',
+      args: [id, session.user.id],
+    })
 
     return NextResponse.json({ success: true })
   } catch (error) {
