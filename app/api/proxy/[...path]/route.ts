@@ -120,7 +120,10 @@ async function handleProxyRequest(request: NextRequest) {
     } catch (error) {
         console.error('Proxy error:', error)
         return NextResponse.json(
-            { error: 'Proxy request failed' },
+            {
+                error: 'Proxy request failed',
+                details: error instanceof Error ? error.message : String(error)
+            },
             { status: 500 }
         )
     }
