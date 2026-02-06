@@ -15,9 +15,10 @@ export default async function DashboardLayout({
     redirect(getAuthUrl('signin'))
   }
 
-  const displayName = session.user.firstName && session.user.lastName
-    ? `${session.user.firstName} ${session.user.lastName}`
-    : session.user.email
+  const user = session.user as any
+  const displayName = user.name || (user.firstName && user.lastName
+    ? `${user.firstName} ${user.lastName}`
+    : user.email)
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">

@@ -4,6 +4,9 @@ import SuperTokens, { getUser } from "supertokens-node";
 import { backendConfig } from "@/config/backend";
 import { syncUser } from "./auth";
 
+import { getServerSession } from "next-auth";
+import { authOptions } from "./nextauth";
+
 // Ensure init
 try {
     SuperTokens.init(backendConfig());
@@ -12,6 +15,12 @@ try {
 }
 
 export async function getSession() {
+    const provider = process.env.AUTH_PROVIDER || 'supertokens';
+
+    if (provider === 'nextauth') {
+        return getServerSession(authOptions);
+    }
+
     return getSupertokensSession();
 }
 
