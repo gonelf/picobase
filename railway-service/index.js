@@ -131,6 +131,7 @@ app.all('/instances/:id/proxy/*', authenticateRequest, async (req, res) => {
     try {
         // Forward request to PocketBase instance
         const pbUrl = `http://127.0.0.1:${instance.port}/${pathToProxy}`;
+        console.log(`[Proxy] Proxying ${req.method} ${req.url} -> ${pbUrl}`);
 
         // Create proxy request
         const proxyReq = await fetch(pbUrl, {

@@ -56,5 +56,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
+  // Match everything except static files and images
+  // We need to match /api and /favicon.ico to proxy them for subdomains
+  matcher: ['/((?!_next/static|_next/image).*)'],
 }
