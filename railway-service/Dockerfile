@@ -1,15 +1,16 @@
 FROM node:18-alpine
 
-# Install wget and unzip for PocketBase download
-RUN apk add --no-cache wget unzip
+# Install curl, unzip, and ca-certificates for secure downloads
+# libc6-compat is needed for PocketBase (Go binary) on Alpine
+RUN apk add --no-cache curl unzip ca-certificates libc6-compat
 
 # Download and install PocketBase
 WORKDIR /tmp
-RUN wget https://github.com/pocketbase/pocketbase/releases/download/v0.22.0/pocketbase_0.22.0_linux_amd64.zip \
-    && unzip pocketbase_0.22.0_linux_amd64.zip \
+RUN curl -L -o pocketbase.zip https://github.com/pocketbase/pocketbase/releases/download/v0.22.0/pocketbase_0.22.0_linux_amd64.zip \
+    && unzip pocketbase.zip \
     && chmod +x pocketbase \
     && mv pocketbase /usr/local/bin/ \
-    && rm pocketbase_0.22.0_linux_amd64.zip
+    && rm pocketbase.zip
 
 # Setup application
 WORKDIR /app
