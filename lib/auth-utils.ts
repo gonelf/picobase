@@ -6,7 +6,7 @@ export function getAuthUrl(path: 'signin' | 'signup' | 'signout' = 'signin'): st
 
     if (provider === 'nextauth') {
         // NextAuth only has signin page, signup would need to be created separately
-        return '/auth-nextauth/signin'
+        return '/login'
     }
 
     // SuperTokens paths

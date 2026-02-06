@@ -28,22 +28,22 @@ export async function middleware(request: NextRequest) {
   let hasSession = false
 
   if (provider === 'nextauth') {
-    // NextAuth uses 'next-auth.session-token' cookie (or '__Secure-next-auth.session-token' in production)
-    hasSession = request.cookies.has('next-auth.session-token') ||
-      request.cookies.has('__Secure-next-auth.session-token')
+    // NextAuth uses 'app-session-token' cookie
+    hasSession = request.cookies.has('app-session-token') ||
+      request.cookies.has('__Secure-app-session-token')
   } else {
     // SuperTokens uses 'sAccessToken' cookie
     hasSession = request.cookies.has('sAccessToken')
   }
 
   // Check if user is on an auth page (different paths for different providers)
-  const isAuthPage = request.nextUrl.pathname.startsWith('/auth-nextauth') ||
+  const isAuthPage = request.nextUrl.pathname.startsWith('/login') ||
     request.nextUrl.pathname.startsWith('/auth')
   const isDashboard = request.nextUrl.pathname.startsWith('/dashboard')
 
   // Redirect to auth if trying to access dashboard without session
   if (isDashboard && !hasSession) {
-    const redirectUrl = provider === 'nextauth' ? '/auth-nextauth/signin' : '/auth'
+    const redirectUrl = provider === 'nextauth' ? '/login' : '/auth'
     return NextResponse.redirect(new URL(redirectUrl, request.url))
   }
 

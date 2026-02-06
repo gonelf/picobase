@@ -36,8 +36,8 @@ export const authOptions: NextAuthOptions = {
         })
     ],
     pages: {
-        signIn: '/auth-nextauth/signin',
-        error: '/auth-nextauth/signin',
+        signIn: '/login',
+        error: '/login',
     },
     callbacks: {
         async jwt({ token, user }) {
@@ -67,8 +67,8 @@ export const authOptions: NextAuthOptions = {
     cookies: {
         sessionToken: {
             name: process.env.NODE_ENV === 'production'
-                ? '__Secure-next-auth.session-token'
-                : 'next-auth.session-token',
+                ? '__Secure-app-session-token'
+                : 'app-session-token',
             options: {
                 httpOnly: true,
                 sameSite: 'lax',
@@ -81,8 +81,8 @@ export const authOptions: NextAuthOptions = {
         },
         callbackUrl: {
             name: process.env.NODE_ENV === 'production'
-                ? '__Secure-next-auth.callback-url'
-                : 'next-auth.callback-url',
+                ? '__Secure-app-callback-url'
+                : 'app-callback-url',
             options: {
                 sameSite: 'lax',
                 path: '/',
@@ -91,8 +91,8 @@ export const authOptions: NextAuthOptions = {
         },
         csrfToken: {
             name: process.env.NODE_ENV === 'production'
-                ? '__Host-next-auth.csrf-token'
-                : 'next-auth.csrf-token',
+                ? '__Host-app-csrf-token'
+                : 'app-csrf-token',
             options: {
                 httpOnly: true,
                 sameSite: 'lax',
