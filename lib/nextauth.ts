@@ -11,26 +11,31 @@ export const authOptions: NextAuthOptions = {
                 password: { label: 'Password', type: 'password' }
             },
             async authorize(credentials) {
-                if (!credentials?.email || !credentials?.password) {
-                    throw new Error('Please enter your email and password')
-                }
+                try {
+                    if (!credentials?.email || !credentials?.password) {
+                        throw new Error('Please enter your email and password')
+                    }
 
-                const user = await getUserByEmail(credentials.email)
+                    const user = await getUserByEmail(credentials.email)
 
-                if (!user) {
-                    throw new Error('No user found with this email')
-                }
+                    if (!user) {
+                        throw new Error('No user found with this email')
+                    }
 
-                const isValid = await verifyPassword(credentials.password, user.password_hash as string)
+                    const isValid = await verifyPassword(credentials.password, user.password_hash as string)
 
-                if (!isValid) {
-                    throw new Error('Invalid password')
-                }
+                    if (!isValid) {
+                        throw new Error('Invalid password')
+                    }
 
-                return {
-                    id: user.id as string,
-                    email: user.email as string,
-                    name: user.name as string || null,
+                    return {
+                        id: user.id as string,
+                        email: user.email as string,
+                        name: user.name as string || null,
+                    }
+                } catch (error) {
+                    console.error('Error in NextAuth authorize callback:', error)
+                    return null
                 }
             }
         })
