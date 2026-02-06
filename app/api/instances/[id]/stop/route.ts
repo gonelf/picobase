@@ -26,7 +26,13 @@ export async function POST(
     }
 
     // Stop instance on Railway
-    await stopRailwayInstance(id)
+    try {
+      await stopRailwayInstance(id)
+    } catch (error: any) {
+      // If Railway service fails (not running, connection error, etc.), 
+      // we assume the instance is effectively unreachable/stopped and update DB to reflect reality.
+      console.warn(`[Stop] Failed to stop on Railway (proceeding to DB update): ${error.message}`)
+    }
 
     // Update instance status in database
     await db.execute({
