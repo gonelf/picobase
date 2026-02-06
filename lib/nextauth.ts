@@ -80,7 +80,7 @@ export const authOptions: NextAuthOptions = {
                 path: '/',
                 secure: process.env.NODE_ENV === 'production',
                 domain: process.env.NODE_ENV === 'production'
-                    ? `.${process.env.PLATFORM_DOMAIN}`
+                    ? `.${process.env.PLATFORM_DOMAIN?.split(':')[0]}`
                     : undefined,
             },
         },
