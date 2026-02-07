@@ -6,7 +6,7 @@ import { nanoid } from 'nanoid'
 
 const createInstanceSchema = z.object({
   name: z.string().min(1).max(100),
-  subdomain: z.string().min(1).max(63).regex(/^[a-z0-9-]+$/),
+  subdomain: z.string().min(1).max(63).regex(/^[a-z0-9\-]+$/),
   adminEmail: z.string().email().optional(),
   adminPassword: z.string().min(8).optional(),
 })
