@@ -27,8 +27,21 @@ export default function QuickStats({ instanceId }: { instanceId: string }) {
       const response = await fetch(`/api/instances/${instanceId}/stats`)
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to fetch stats')
+        let errorMessage = 'Failed to fetch stats'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorData.details || errorMessage
+        } catch (e) {
+          // If JSON parsing fails, try to get text
+          try {
+            const errorText = await response.text()
+            if (errorText) errorMessage = errorText
+          } catch {
+            // If all else fails, use status text
+            errorMessage = `${errorMessage} (${response.status} ${response.statusText})`
+          }
+        }
+        throw new Error(errorMessage)
       }
 
       const data = await response.json()
