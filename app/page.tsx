@@ -1,10 +1,6 @@
-import Link from 'next/link'
-import { getAuthUrl } from '@/lib/auth-utils'
+import WaitlistForm from '@/components/WaitlistForm'
 
 export default function Home() {
-  const signInUrl = getAuthUrl('signin')
-  const signUpUrl = getAuthUrl('signup')
-
   return (
     <main className="min-h-screen">
       {/* Hero Section */}
@@ -25,22 +21,14 @@ export default function Home() {
               Launch production-ready backends in seconds. Database, authentication, file storage, and APIs — all configured and ready to use.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-              <Link
-                href={signUpUrl}
-                className="group relative px-8 py-4 bg-white text-primary-700 font-bold text-lg rounded-lg shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"
-              >
-                <span className="relative z-10">Get Started Free</span>
-              </Link>
-              <Link
-                href={signInUrl}
-                className="px-8 py-4 bg-white/10 backdrop-blur-sm text-white font-semibold text-lg rounded-lg border-2 border-white/30 hover:bg-white/20 transition-all duration-300"
-              >
-                Sign In
-              </Link>
+            <div className="mb-8">
+              <p className="text-white/80 text-sm mb-4 font-medium uppercase tracking-wider">
+                Join the waitlist for early access
+              </p>
+              <WaitlistForm />
             </div>
 
-            <div className="flex flex-wrap gap-6 justify-center text-white/80 text-sm">
+            <div className="flex flex-wrap gap-6 justify-center text-white/80 text-sm mt-8">
               <div className="flex items-center gap-2">
                 <svg className="w-5 h-5 text-green-300" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
@@ -233,16 +221,11 @@ export default function Home() {
             Ready to Build Something Amazing?
           </h2>
           <p className="text-xl text-white/90 mb-10">
-            Join thousands of developers who've shipped faster with instant backend infrastructure
+            Join the waitlist to get early access when we launch. Share your link to move up the list!
           </p>
-          <Link
-            href={signUpUrl}
-            className="inline-block px-10 py-5 bg-white text-primary-700 font-bold text-lg rounded-lg shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-105"
-          >
-            Start Building Now — It's Free
-          </Link>
+          <WaitlistForm />
           <p className="mt-6 text-white/70 text-sm">
-            No credit card required • Deploy in 60 seconds • Cancel anytime
+            No credit card required — Get notified when it's your turn
           </p>
         </div>
       </section>
