@@ -57,8 +57,21 @@ export default function RecordModal({
       })
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || `Failed to ${isEdit ? 'update' : 'create'} record`)
+        let errorMessage = `Failed to ${isEdit ? 'update' : 'create'} record`
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorData.details || errorMessage
+        } catch (e) {
+          // If JSON parsing fails, try to get text
+          try {
+            const errorText = await response.text()
+            if (errorText) errorMessage = errorText
+          } catch {
+            // If all else fails, use status text
+            errorMessage = `${errorMessage} (${response.status} ${response.statusText})`
+          }
+        }
+        throw new Error(errorMessage)
       }
 
       onSuccess()
