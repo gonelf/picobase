@@ -1,4 +1,5 @@
 import SignOutButton from '../components/SignOutButton'
+import { Logo } from '@/components/Logo'
 import Link from 'next/link'
 import { getSession } from '@/lib/session'
 import { redirect } from 'next/navigation'
@@ -26,9 +27,7 @@ export default async function DashboardLayout({
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 justify-between items-center">
             <div className="flex items-center">
-              <Link href="/dashboard" className="text-xl font-bold gradient-text from-primary-600 to-accent-600">
-                PicoBase
-              </Link>
+              <Logo />
             </div>
             <div className="flex items-center gap-6">
               <Link
@@ -51,8 +50,8 @@ export default async function DashboardLayout({
             </div>
           </div>
         </div>
-      </nav>
+      </nav >
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">{children}</main>
-    </div>
+    </div >
   )
 }
