@@ -5,6 +5,9 @@ import { listApiKeys } from '@/lib/api-keys'
 import Link from 'next/link'
 import InstanceActions from '@/components/InstanceActions'
 import ApiKeysList from '@/components/ApiKeysList'
+import QuickStats from '@/components/QuickStats'
+import DataBrowserSection from '@/components/DataBrowserSection'
+import AuthUsersPanel from '@/components/AuthUsersPanel'
 import { getAuthUrl } from '@/lib/auth-utils'
 
 export default async function InstanceDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -84,20 +87,19 @@ export default async function InstanceDetail({ params }: { params: Promise<{ id:
                     </a>
                   </dd>
                 </div>
-                <div className="flex justify-between">
-                  <dt className="text-sm text-gray-600 dark:text-gray-400">Admin UI:</dt>
-                  <dd className="text-sm font-mono text-gray-900 dark:text-white">
-                    <a href={adminUrl} target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:text-primary-700">
-                      {adminUrl}
-                    </a>
-                  </dd>
-                </div>
-                {/* Debugging: Internal Proxy URL */}
-                <div className="flex justify-between">
-                  <dt className="text-sm text-gray-600 dark:text-gray-400">Internal Proxy:</dt>
-                  <dd className="text-sm font-mono text-gray-900 dark:text-white truncate max-w-[300px]" title={`${process.env.RAILWAY_API_URL}/instances/${id}/proxy/_/`}>
-                    <a href={`${process.env.RAILWAY_API_URL}/instances/${id}/proxy/_/?key=${process.env.RAILWAY_API_KEY}`} target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:text-primary-700">
-                      {`${process.env.RAILWAY_API_URL}/instances/${id}/proxy/_/`}
+                <div className="flex justify-between items-center">
+                  <dt className="text-sm text-gray-600 dark:text-gray-400">Advanced Settings:</dt>
+                  <dd>
+                    <a
+                      href={adminUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 border border-primary-300 dark:border-primary-600 rounded-lg hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
+                    >
+                      Open PocketBase Admin
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                      </svg>
                     </a>
                   </dd>
                 </div>
@@ -121,6 +123,31 @@ export default async function InstanceDetail({ params }: { params: Promise<{ id:
         </div>
 
         <InstanceActions instanceId={id} status={instance.status as string} />
+
+        {instance.status === 'running' && (
+          <>
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Overview
+              </h2>
+              <QuickStats instanceId={id} />
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Data Browser
+              </h2>
+              <DataBrowserSection instanceId={id} />
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                Auth Users
+              </h2>
+              <AuthUsersPanel instanceId={id} />
+            </div>
+          </>
+        )}
 
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
           <div className="flex justify-between items-center mb-4">
