@@ -24,14 +24,16 @@ export async function getInstanceCredentials(
     return null
   }
 
-  const instance = result.rows[0] as { admin_email: string | null; admin_password: string | null }
+  const row = result.rows[0]
+  const admin_email = row.admin_email as string | null
+  const admin_password = row.admin_password as string | null
 
-  if (!instance.admin_email || !instance.admin_password) {
+  if (!admin_email || !admin_password) {
     throw new Error('Instance admin credentials not configured')
   }
 
   return {
-    admin_email: instance.admin_email,
-    admin_password: instance.admin_password,
+    admin_email,
+    admin_password,
   }
 }
