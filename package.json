@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "db:migrate": "node scripts/migrate.js"
+    "db:migrate": "node scripts/migrate.js",
+    "db:migrate:admin": "node scripts/add-admin-credentials.js"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.490.0",

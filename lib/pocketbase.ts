@@ -32,7 +32,13 @@ function getAvailablePort(): number {
   throw new Error('No available ports')
 }
 
-export async function createInstance(userId: string, name: string, subdomain: string) {
+export async function createInstance(
+  userId: string,
+  name: string,
+  subdomain: string,
+  adminEmail: string,
+  adminPassword: string
+) {
   const id = nanoid()
   const now = new Date().toISOString()
   const r2Key = `instances/${id}/pb_data.db`
@@ -47,8 +53,8 @@ export async function createInstance(userId: string, name: string, subdomain: st
   }
 
   await db.execute({
-    sql: 'INSERT INTO instances (id, user_id, name, subdomain, status, r2_key, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-    args: [id, userId, name, subdomain, 'stopped', r2Key, now, now],
+    sql: 'INSERT INTO instances (id, user_id, name, subdomain, status, r2_key, admin_email, admin_password, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    args: [id, userId, name, subdomain, 'stopped', r2Key, adminEmail, adminPassword, now, now],
   })
 
   const instanceDir = path.join(INSTANCES_DIR, id)
