@@ -26,7 +26,8 @@ export default function NewInstance() {
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data.error || 'An error occurred')
+        const errorMessage = data.details ? `${data.error}: ${data.details}` : (data.error || 'An error occurred')
+        setError(errorMessage)
         return
       }
 
@@ -97,7 +98,7 @@ export default function NewInstance() {
                 }
                 className="flex-1 rounded-l-lg border border-r-0 border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-900 focus:border-primary-500 focus:outline-none focus:ring-primary-500"
                 placeholder="my-project"
-                pattern="[a-z0-9-]+"
+                pattern="[a-z0-9\-]+"
               />
               <span className="rounded-r-lg border border-l-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-3 py-2 text-sm text-gray-600 dark:text-gray-400">
                 .picobase.io

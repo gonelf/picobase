@@ -70,8 +70,21 @@ export default function DataBrowser({
       )
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to fetch records')
+        let errorMessage = 'Failed to fetch records'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorData.details || errorMessage
+        } catch (e) {
+          // If JSON parsing fails, try to get text
+          try {
+            const errorText = await response.text()
+            if (errorText) errorMessage = errorText
+          } catch {
+            // If all else fails, use status text
+            errorMessage = `${errorMessage} (${response.status} ${response.statusText})`
+          }
+        }
+        throw new Error(errorMessage)
       }
 
       const data = await response.json()
@@ -99,8 +112,21 @@ export default function DataBrowser({
       )
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to delete record')
+        let errorMessage = 'Failed to delete record'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorData.details || errorMessage
+        } catch (e) {
+          // If JSON parsing fails, try to get text
+          try {
+            const errorText = await response.text()
+            if (errorText) errorMessage = errorText
+          } catch {
+            // If all else fails, use status text
+            errorMessage = `${errorMessage} (${response.status} ${response.statusText})`
+          }
+        }
+        throw new Error(errorMessage)
       }
 
       // Refresh records after delete

@@ -32,7 +32,13 @@ function getAvailablePort(): number {
   throw new Error('No available ports')
 }
 
-export async function createInstance(userId: string, name: string, subdomain: string) {
+export async function createInstance(
+  userId: string,
+  name: string,
+  subdomain: string,
+  adminEmail: string,
+  adminPassword: string
+) {
   const id = nanoid()
   const now = new Date().toISOString()
   const r2Key = `instances/${id}/pb_data.db`
@@ -47,15 +53,27 @@ export async function createInstance(userId: string, name: string, subdomain: st
   }
 
   await db.execute({
-    sql: 'INSERT INTO instances (id, user_id, name, subdomain, status, r2_key, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-    args: [id, userId, name, subdomain, 'stopped', r2Key, now, now],
+    sql: 'INSERT INTO instances (id, user_id, name, subdomain, status, r2_key, admin_email, admin_password, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    args: [id, userId, name, subdomain, 'stopped', r2Key, adminEmail, adminPassword, now, now],
   })
 
-  const instanceDir = path.join(INSTANCES_DIR, id)
-  await fs.mkdir(instanceDir, { recursive: true })
+  // Only create filesystem directories in local development
+  // On serverless (Vercel), instances run on Railway, not locally
+  // Check if we're in a serverless environment by looking for VERCEL or LAMBDA env vars
+  const isServerless = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME
 
-  const pbDataDir = path.join(instanceDir, 'pb_data')
-  await fs.mkdir(pbDataDir, { recursive: true })
+  if (!isServerless) {
+    try {
+      const instanceDir = path.join(INSTANCES_DIR, id)
+      await fs.mkdir(instanceDir, { recursive: true })
+
+      const pbDataDir = path.join(instanceDir, 'pb_data')
+      await fs.mkdir(pbDataDir, { recursive: true })
+    } catch (error) {
+      // Ignore filesystem errors in serverless environments
+      console.log('Skipping local directory creation (serverless environment or read-only filesystem)')
+    }
+  }
 
   return {
     id,
@@ -63,6 +81,36 @@ export async function createInstance(userId: string, name: string, subdomain: st
     subdomain,
     status: 'stopped',
     created_at: now,
+  }
+}
+
+async function createPocketBaseAdmin(port: number, email: string, password: string): Promise<void> {
+  try {
+    // Create initial admin user via PocketBase API
+    const response = await fetch(`http://127.0.0.1:${port}/api/admins`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        passwordConfirm: password,
+      }),
+    })
+
+    if (response.ok) {
+      console.log(`Successfully created admin user: ${email}`)
+    } else if (response.status === 400) {
+      // Admin already exists, which is fine
+      console.log(`Admin user already exists for port ${port}`)
+    } else {
+      const errorText = await response.text()
+      console.error(`Failed to create admin user: ${response.status} ${errorText}`)
+    }
+  } catch (error) {
+    console.error('Error creating PocketBase admin:', error)
+    // Don't throw - this is not critical, admin can be created manually if needed
   }
 }
 
@@ -86,6 +134,8 @@ export async function startInstance(instanceId: string): Promise<{ port: number;
     throw new Error('Instance not found')
   }
 
+  const instance = result.rows[0] as any
+
   await db.execute({
     sql: 'UPDATE instances SET status = ? WHERE id = ?',
     args: ['starting', instanceId],
@@ -93,6 +143,7 @@ export async function startInstance(instanceId: string): Promise<{ port: number;
 
   const instanceDir = path.join(INSTANCES_DIR, instanceId)
   const dbPath = path.join(instanceDir, 'pb_data', 'data.db')
+  const isFirstRun = !existsSync(dbPath)
 
   await fs.mkdir(path.join(instanceDir, 'pb_data'), { recursive: true })
 
@@ -134,7 +185,14 @@ export async function startInstance(instanceId: string): Promise<{ port: number;
     })
   })
 
+  // Wait for PocketBase to start
   await new Promise((resolve) => setTimeout(resolve, 2000))
+
+  // Automatically create admin account if this is first run and credentials are available
+  if ((isFirstRun || !dbExistsInR2) && instance.admin_email && instance.admin_password) {
+    console.log(`Creating admin account for instance ${instanceId}...`)
+    await createPocketBaseAdmin(port, instance.admin_email, instance.admin_password)
+  }
 
   await db.execute({
     sql: 'UPDATE instances SET status = ?, port = ?, last_started_at = ? WHERE id = ?',

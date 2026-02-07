@@ -1,17 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
-
-const RAILWAY_API_URL = process.env.RAILWAY_API_URL
-const RAILWAY_API_KEY = process.env.RAILWAY_API_KEY
-
-function normalizeUrl(url: string): string {
-  if (!url.startsWith('http://') && !url.startsWith('https://')) {
-    return `https://${url}`
-  }
-  return url
-}
-
-const NORMALIZED_RAILWAY_API_URL = RAILWAY_API_URL ? normalizeUrl(RAILWAY_API_URL) : ''
+import { getInstanceCredentials } from '@/lib/get-instance-credentials'
+import { authenticatedPocketBaseRequest } from '@/lib/pocketbase-auth'
+import { db } from '@/lib/db'
 
 export async function GET(
   request: NextRequest,
@@ -29,10 +20,35 @@ export async function GET(
 
     const { id: instanceId } = await params
 
-    if (!NORMALIZED_RAILWAY_API_URL || !RAILWAY_API_KEY) {
+    // Check instance status first
+    const instanceResult = await db.execute({
+      sql: 'SELECT status FROM instances WHERE id = ? AND user_id = ?',
+      args: [instanceId, session.user.id],
+    })
+
+    if (instanceResult.rows.length === 0) {
       return NextResponse.json(
-        { error: 'Railway API not configured' },
-        { status: 500 }
+        { error: 'Instance not found' },
+        { status: 404 }
+      )
+    }
+
+    const status = instanceResult.rows[0].status as string
+
+    if (status !== 'running') {
+      return NextResponse.json(
+        { error: 'Instance not running', details: `Instance is ${status}. Start the instance to view users.` },
+        { status: 503 }
+      )
+    }
+
+    // Get instance credentials
+    const credentials = await getInstanceCredentials(instanceId, session.user.id)
+
+    if (!credentials) {
+      return NextResponse.json(
+        { error: 'Instance credentials not found' },
+        { status: 404 }
       )
     }
 
@@ -40,17 +56,13 @@ export async function GET(
     const url = new URL(request.url)
     const searchParams = url.searchParams.toString()
 
-    // Call Railway service to proxy to PocketBase users collection
-    // PocketBase stores auth users in the 'users' collection
-    const railwayUrl = `${NORMALIZED_RAILWAY_API_URL}/instances/${instanceId}/proxy/api/collections/users/records${searchParams ? `?${searchParams}` : ''}`
-
-    const response = await fetch(railwayUrl, {
-      method: 'GET',
-      headers: {
-        'X-API-Key': RAILWAY_API_KEY,
-        'Content-Type': 'application/json',
-      },
-    })
+    // Make authenticated request to PocketBase users collection
+    const response = await authenticatedPocketBaseRequest(
+      instanceId,
+      credentials.admin_email,
+      credentials.admin_password,
+      `api/collections/users/records${searchParams ? `?${searchParams}` : ''}`
+    )
 
     if (!response.ok) {
       const errorText = await response.text()

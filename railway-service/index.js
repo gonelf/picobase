@@ -73,10 +73,42 @@ app.get('/instances/:id/status', authenticateRequest, async (req, res) => {
     });
 });
 
+// Helper function to create PocketBase admin
+async function createPocketBaseAdmin(port, email, password) {
+    try {
+        const response = await fetch(`http://127.0.0.1:${port}/api/admins`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                email,
+                password,
+                passwordConfirm: password,
+            }),
+        });
+
+        if (response.ok) {
+            console.log(`Successfully created admin user: ${email}`);
+            return true;
+        } else if (response.status === 400) {
+            console.log(`Admin user already exists for port ${port}`);
+            return true;
+        } else {
+            const errorText = await response.text();
+            console.error(`Failed to create admin user: ${response.status} ${errorText}`);
+            return false;
+        }
+    } catch (error) {
+        console.error('Error creating PocketBase admin:', error);
+        return false;
+    }
+}
+
 // Start instance
 app.post('/instances/:id/start', authenticateRequest, async (req, res) => {
     const { id } = req.params;
-    const { port = 8090 } = req.body;
+    const { port = 8090, adminEmail, adminPassword } = req.body;
 
     try {
         // Check if already running
@@ -87,6 +119,10 @@ app.post('/instances/:id/start', authenticateRequest, async (req, res) => {
         // Create instance directory
         const instanceDir = path.join(INSTANCES_DIR, id);
         await fs.mkdir(instanceDir, { recursive: true });
+
+        // Check if this is first run
+        const dbPath = path.join(instanceDir, 'pb_data', 'data.db');
+        const isFirstRun = !await fs.access(dbPath).then(() => true).catch(() => false);
 
         // Start PocketBase process
         const pbProcess = spawn('/usr/local/bin/pocketbase', [
@@ -116,6 +152,21 @@ app.post('/instances/:id/start', authenticateRequest, async (req, res) => {
             console.log(`[${id}] Process exited with code ${code}`);
             runningInstances.delete(id);
         });
+
+        // Wait for PocketBase to start, then create admin if credentials provided
+        // Always try to create admin when credentials are available, not just on first run
+        // PocketBase will return 400 if admin already exists, which we handle gracefully
+        if (adminEmail && adminPassword) {
+            setTimeout(async () => {
+                console.log(`Creating admin account for instance ${id}...`);
+                const created = await createPocketBaseAdmin(port, adminEmail, adminPassword);
+                if (created) {
+                    console.log(`Admin account ready for instance ${id}`);
+                } else {
+                    console.error(`Failed to ensure admin account for instance ${id}`);
+                }
+            }, 3000); // Increased to 3 seconds for better reliability
+        }
 
         res.json({
             success: true,
