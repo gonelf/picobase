@@ -3,6 +3,7 @@ import { getSession } from '@/lib/session'
 import { getInstanceCredentials } from '@/lib/get-instance-credentials'
 import { authenticatedPocketBaseRequest } from '@/lib/pocketbase-auth'
 import { db } from '@/lib/db'
+import { touchInstanceActivity } from '@/lib/activity'
 
 async function getVerifiedRunningInstance(instanceId: string, userId: string) {
   const instanceResult = await db.execute({
@@ -66,6 +67,7 @@ export async function GET(
     }
 
     const data = await response.json()
+    touchInstanceActivity(instanceId).catch(() => {})
     return NextResponse.json(data)
 
   } catch (error) {

@@ -40,10 +40,19 @@ async function migrate() {
         updated_at TEXT NOT NULL,
         last_started_at TEXT,
         last_stopped_at TEXT,
+        last_activity_at TEXT,
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
       )
     `)
     console.log('✓ Created instances table')
+
+    // Add last_activity_at column if missing (for existing databases)
+    try {
+      await db.execute('ALTER TABLE instances ADD COLUMN last_activity_at TEXT')
+      console.log('✓ Added last_activity_at column to instances')
+    } catch (e) {
+      // Column already exists
+    }
 
     await db.execute(`
       CREATE INDEX IF NOT EXISTS idx_instances_user_id ON instances(user_id)

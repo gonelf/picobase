@@ -3,6 +3,7 @@ import { getSession } from '@/lib/session'
 import { getInstanceCredentials } from '@/lib/get-instance-credentials'
 import { authenticatedPocketBaseRequest } from '@/lib/pocketbase-auth'
 import { db } from '@/lib/db'
+import { touchInstanceActivity } from '@/lib/activity'
 
 async function getVerifiedInstance(instanceId: string, userId: string) {
   const instanceResult = await db.execute({
@@ -72,6 +73,7 @@ export async function PATCH(
     }
 
     const data = await response.json()
+    touchInstanceActivity(instanceId).catch(() => {})
     return NextResponse.json(data)
 
   } catch (error) {
@@ -126,6 +128,7 @@ export async function DELETE(
       )
     }
 
+    touchInstanceActivity(instanceId).catch(() => {})
     if (response.status === 204) {
       return new NextResponse(null, { status: 204 })
     }

@@ -3,6 +3,7 @@ import { getSession } from '@/lib/session'
 import { getInstanceCredentials } from '@/lib/get-instance-credentials'
 import { authenticatedPocketBaseRequest } from '@/lib/pocketbase-auth'
 import { db } from '@/lib/db'
+import { touchInstanceActivity } from '@/lib/activity'
 
 export async function GET(
   request: NextRequest,
@@ -71,6 +72,7 @@ export async function GET(
 
     const data = await response.json()
     const collections = Array.isArray(data) ? data : (data.items || [])
+    touchInstanceActivity(instanceId).catch(() => {})
     return NextResponse.json(collections)
 
   } catch (error) {
@@ -151,6 +153,7 @@ export async function POST(
     }
 
     const data = await response.json()
+    touchInstanceActivity(instanceId).catch(() => {})
     return NextResponse.json(data)
 
   } catch (error) {

@@ -12,5 +12,11 @@
       "AUTH_PROVIDER": "nextauth",
       "NEXT_PUBLIC_AUTH_PROVIDER": "nextauth"
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/pause-idle",
+      "schedule": "0 * * * *"
+    }
+  ]
 }

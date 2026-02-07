@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
+import { touchInstanceActivity } from '@/lib/activity'
 
 const RAILWAY_API_URL = process.env.RAILWAY_API_URL
 const RAILWAY_API_KEY = process.env.RAILWAY_API_KEY
@@ -61,6 +62,7 @@ export async function GET(
     }
 
     const data = await response.json()
+    touchInstanceActivity(instanceId).catch(() => {})
     return NextResponse.json(data)
 
   } catch (error) {
@@ -120,6 +122,7 @@ export async function POST(
     }
 
     const data = await response.json()
+    touchInstanceActivity(instanceId).catch(() => {})
     return NextResponse.json(data)
 
   } catch (error) {
