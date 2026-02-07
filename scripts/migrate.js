@@ -92,6 +92,29 @@ async function migrate() {
     `)
     console.log('✓ Created index on usage_logs.instance_id')
 
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS waitlist_entries (
+        id TEXT PRIMARY KEY,
+        email TEXT UNIQUE NOT NULL,
+        referral_code TEXT UNIQUE NOT NULL,
+        referred_by TEXT,
+        position INTEGER NOT NULL,
+        referral_count INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL
+      )
+    `)
+    console.log('✓ Created waitlist_entries table')
+
+    await db.execute(`
+      CREATE INDEX IF NOT EXISTS idx_waitlist_referral_code ON waitlist_entries(referral_code)
+    `)
+    console.log('✓ Created index on waitlist_entries.referral_code')
+
+    await db.execute(`
+      CREATE INDEX IF NOT EXISTS idx_waitlist_position ON waitlist_entries(position)
+    `)
+    console.log('✓ Created index on waitlist_entries.position')
+
     console.log('\n✅ Migration completed successfully!')
   } catch (error) {
     console.error('❌ Migration failed:', error)

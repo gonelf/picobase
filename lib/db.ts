@@ -56,6 +56,16 @@ export interface UsageLog {
   created_at: string
 }
 
+export interface WaitlistEntry {
+  id: string
+  email: string
+  referral_code: string
+  referred_by: string | null
+  position: number
+  referral_count: number
+  created_at: string
+}
+
 // Helper function to lookup instance by subdomain
 export async function getInstanceBySubdomain(subdomain: string) {
   const result = await db.execute({

@@ -54,15 +54,9 @@ export async function middleware(request: NextRequest) {
   const isDashboard = request.nextUrl.pathname.startsWith('/dashboard')
   const isHomePage = request.nextUrl.pathname === '/'
 
-  // Redirect home to login if no session
-  if (isHomePage && !hasSession) {
-    const redirectUrl = provider === 'nextauth' ? '/login' : '/auth'
-    return NextResponse.redirect(new URL(redirectUrl, request.url))
-  }
-
-  // Redirect home to dashboard if has session
-  if (isHomePage && hasSession) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+  // Homepage is public (waitlist page) — no redirects
+  if (isHomePage) {
+    return NextResponse.next()
   }
 
   // Redirect to auth if trying to access dashboard without session
