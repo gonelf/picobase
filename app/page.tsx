@@ -11,8 +11,15 @@ export default function Home() {
       <section className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-accent-600 to-primary-700 animate-gradient">
         <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE2djhoLTh2LThoOHptLTE2IDB2OGgtOHYtOGg0em0zMiAwdjhoLTh2LThoOHptLTE2IDE2djhoLTh2LThoOHptLTE2IDB2OGgtOHYtOGg0em0zMiAwdjhoLTh2LThoOHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30"></div>
 
-        {/* Sign In link */}
-        <div className="relative max-w-7xl mx-auto px-6 pt-6 flex justify-end">
+        {/* Nav bar */}
+        <div className="relative max-w-7xl mx-auto px-6 pt-6 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" fill="currentColor" fillOpacity="0.2" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+              <path d="M3 7l9 5m0 0l9-5m-9 5v10" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
+            </svg>
+            <span className="text-white font-bold text-xl">PicoBase</span>
+          </Link>
           <Link
             href={signInUrl}
             className="px-6 py-2 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-lg border border-white/30 hover:bg-white/20 transition-all duration-300"
