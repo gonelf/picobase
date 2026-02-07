@@ -42,7 +42,11 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Invalid input' }, { status: 400 })
+      console.error('Validation error:', error.errors)
+      return NextResponse.json({
+        error: 'Invalid input',
+        details: error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+      }, { status: 400 })
     }
 
     if (error.message === 'Subdomain already taken') {
