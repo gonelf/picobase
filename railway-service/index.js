@@ -153,12 +153,19 @@ app.post('/instances/:id/start', authenticateRequest, async (req, res) => {
             runningInstances.delete(id);
         });
 
-        // Wait for PocketBase to start, then create admin if needed
-        if (isFirstRun && adminEmail && adminPassword) {
+        // Wait for PocketBase to start, then create admin if credentials provided
+        // Always try to create admin when credentials are available, not just on first run
+        // PocketBase will return 400 if admin already exists, which we handle gracefully
+        if (adminEmail && adminPassword) {
             setTimeout(async () => {
                 console.log(`Creating admin account for instance ${id}...`);
-                await createPocketBaseAdmin(port, adminEmail, adminPassword);
-            }, 2000);
+                const created = await createPocketBaseAdmin(port, adminEmail, adminPassword);
+                if (created) {
+                    console.log(`Admin account ready for instance ${id}`);
+                } else {
+                    console.error(`Failed to ensure admin account for instance ${id}`);
+                }
+            }, 3000); // Increased to 3 seconds for better reliability
         }
 
         res.json({
