@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState } from 'react'
 
 interface ProjectSidebarProps {
   projectId: string
@@ -52,27 +53,49 @@ const navItems = [
 export default function ProjectSidebar({ projectId, projectName, projectStatus }: ProjectSidebarProps) {
   const pathname = usePathname()
   const basePath = `/dashboard/projects/${projectId}`
+  const [collapsed, setCollapsed] = useState(false)
 
   const isRunning = projectStatus === 'running'
 
   return (
-    <div className="w-56 border-r border-gray-800 bg-gray-900 flex flex-col shrink-0">
-      <div className="px-4 py-4 border-b border-gray-800">
-        <div className="flex items-center gap-2.5">
-          <div className="w-6 h-6 rounded bg-primary-600/20 flex items-center justify-center text-primary-400 font-semibold text-xs">
+    <div className={`${collapsed ? 'w-12' : 'w-56'} border-r border-gray-800 bg-gray-900 flex flex-col shrink-0 transition-all duration-200`}>
+      {/* Header */}
+      <div className={`border-b border-gray-800 ${collapsed ? 'px-2 py-3' : 'px-4 py-4'}`}>
+        {collapsed ? (
+          <button
+            onClick={() => setCollapsed(false)}
+            className="w-8 h-8 rounded bg-primary-600/20 flex items-center justify-center text-primary-400 font-semibold text-xs hover:bg-primary-600/30 transition-colors"
+            title={projectName}
+          >
             {projectName.charAt(0).toUpperCase()}
-          </div>
-          <div className="min-w-0 flex-1">
-            <h2 className="text-sm font-medium text-white truncate">{projectName}</h2>
-            <div className="flex items-center gap-1.5 mt-0.5">
-              <div className={`w-1.5 h-1.5 rounded-full ${isRunning ? 'bg-green-500' : 'bg-gray-600'}`} />
-              <span className="text-xs text-gray-500 capitalize">{projectStatus}</span>
+          </button>
+        ) : (
+          <div className="flex items-center gap-2.5">
+            <div className="w-6 h-6 rounded bg-primary-600/20 flex items-center justify-center text-primary-400 font-semibold text-xs">
+              {projectName.charAt(0).toUpperCase()}
             </div>
+            <div className="min-w-0 flex-1">
+              <h2 className="text-sm font-medium text-white truncate">{projectName}</h2>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <div className={`w-1.5 h-1.5 rounded-full ${isRunning ? 'bg-green-500' : 'bg-gray-600'}`} />
+                <span className="text-xs text-gray-500 capitalize">{projectStatus}</span>
+              </div>
+            </div>
+            <button
+              onClick={() => setCollapsed(true)}
+              className="text-gray-600 hover:text-gray-400 transition-colors"
+              title="Collapse sidebar"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 19l-7-7 7-7m8 14l-7-7 7-7" />
+              </svg>
+            </button>
           </div>
-        </div>
+        )}
       </div>
 
-      <nav className="flex-1 px-2 py-3 space-y-0.5">
+      {/* Navigation */}
+      <nav className={`flex-1 py-3 space-y-0.5 ${collapsed ? 'px-1.5' : 'px-2'}`}>
         {navItems.map((item) => {
           const fullHref = `${basePath}${item.href}`
           const isActive = pathname === fullHref || (item.href === '/editor' && pathname === basePath)
@@ -81,14 +104,15 @@ export default function ProjectSidebar({ projectId, projectName, projectStatus }
             <Link
               key={item.href}
               href={fullHref}
-              className={`flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-colors ${
+              title={collapsed ? item.label : undefined}
+              className={`flex items-center ${collapsed ? 'justify-center px-0 py-2' : 'gap-2.5 px-3 py-2'} rounded-md text-sm transition-colors ${
                 isActive
                   ? 'bg-gray-800 text-white'
                   : 'text-gray-400 hover:text-white hover:bg-gray-800/50'
               }`}
             >
-              <span className={isActive ? 'text-primary-400' : ''}>{item.icon}</span>
-              {item.label}
+              <span className={`shrink-0 ${isActive ? 'text-primary-400' : ''}`}>{item.icon}</span>
+              {!collapsed && item.label}
             </Link>
           )
         })}
