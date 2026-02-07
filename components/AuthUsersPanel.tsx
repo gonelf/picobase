@@ -34,7 +34,12 @@ export default function AuthUsersPanel({ instanceId }: { instanceId: string }) {
         let errorMessage = 'Failed to fetch users'
         try {
           const errorData = await response.json()
-          errorMessage = errorData.error || errorData.details || errorMessage
+          // Combine error and details for better context
+          if (errorData.details) {
+            errorMessage = errorData.details
+          } else {
+            errorMessage = errorData.error || errorMessage
+          }
         } catch (e) {
           // If JSON parsing fails, try to get text
           try {

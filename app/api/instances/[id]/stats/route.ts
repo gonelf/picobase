@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
 import { getInstanceCredentials } from '@/lib/get-instance-credentials'
 import { authenticatedPocketBaseRequest } from '@/lib/pocketbase-auth'
+import { db } from '@/lib/db'
 
 export async function GET(
   request: NextRequest,
@@ -19,12 +20,34 @@ export async function GET(
 
     const { id: instanceId } = await params
 
+    // Check instance status first
+    const instanceResult = await db.execute({
+      sql: 'SELECT status FROM instances WHERE id = ? AND user_id = ?',
+      args: [instanceId, session.user.id],
+    })
+
+    if (instanceResult.rows.length === 0) {
+      return NextResponse.json(
+        { error: 'Instance not found' },
+        { status: 404 }
+      )
+    }
+
+    const status = instanceResult.rows[0].status as string
+
+    if (status !== 'running') {
+      return NextResponse.json(
+        { error: 'Instance not running', details: `Instance is ${status}. Start the instance to view stats.` },
+        { status: 503 }
+      )
+    }
+
     // Get instance credentials
     const credentials = await getInstanceCredentials(instanceId, session.user.id)
 
     if (!credentials) {
       return NextResponse.json(
-        { error: 'Instance not found' },
+        { error: 'Instance credentials not found' },
         { status: 404 }
       )
     }
