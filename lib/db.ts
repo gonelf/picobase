@@ -31,6 +31,8 @@ export interface Instance {
   status: 'stopped' | 'starting' | 'running' | 'stopping' | 'error'
   port: number | null
   r2_key: string
+  admin_email: string | null
+  admin_password: string | null
   created_at: string
   updated_at: string
   last_started_at: string | null

@@ -26,7 +26,8 @@ export default function NewInstance() {
       const data = await response.json()
 
       if (!response.ok) {
-        setError(data.error || 'An error occurred')
+        const errorMessage = data.details ? `${data.error}: ${data.details}` : (data.error || 'An error occurred')
+        setError(errorMessage)
         return
       }
 
