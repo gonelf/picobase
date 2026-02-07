@@ -1,4 +1,5 @@
 const express = require('express');
+const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const { spawn } = require('child_process');
 const fs = require('fs').promises;
@@ -17,23 +18,26 @@ const runningInstances = new Map();
 // Middleware
 app.use(cors());
 app.use(express.json());
+app.use(cookieParser());
 
 // Authentication middleware
 function authenticateRequest(req, res, next) {
-    const apiKey = req.headers['x-api-key'] || req.query.key;
+    // Check for API key in headers, query, or cookies
+    const apiKey = req.headers['x-api-key'] || req.query.key || req.cookies['railway-api-key'];
 
     if (!apiKey || apiKey !== API_SECRET) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    // Remove key from query to avoid passing it downstream if possible (optional, but good practice)
-    // However, for proxying we might just leave it or sanitize it. 
-    // Express query is separate from url string so it won't affect req.url unless we rebuild it.
-    // But we are proxying... wait.
-
-    // In the proxy handler, we construct the pbUrl using req.params and existing structure
-    // so the query param 'key' might get passed to PocketBase if we aren't careful?
-    // PocketBase won't care about an extra 'key' param usually.
+    // If key came from query, set a cookie for future requests (like assets)
+    if (req.query.key === API_SECRET) {
+        // Set cookie valid for session or short duration
+        res.cookie('railway-api-key', API_SECRET, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax'
+        });
+    }
 
     next();
 }
