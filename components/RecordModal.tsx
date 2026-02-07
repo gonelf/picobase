@@ -62,12 +62,10 @@ export default function RecordModal({
           const errorData = await response.json()
           errorMessage = errorData.error || errorData.details || errorMessage
         } catch (e) {
-          // If JSON parsing fails, try to get text
           try {
             const errorText = await response.text()
             if (errorText) errorMessage = errorText
           } catch {
-            // If all else fails, use status text
             errorMessage = `${errorMessage} (${response.status} ${response.statusText})`
           }
         }
@@ -92,37 +90,39 @@ export default function RecordModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6">
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-900 border border-gray-800 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="sticky top-0 bg-gray-900 border-b border-gray-800 p-5">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-              {isEdit ? 'Edit Record' : 'Create Record'}
-            </h2>
+            <div>
+              <h2 className="text-sm font-medium text-white">
+                {isEdit ? 'Edit Record' : 'Create Record'}
+              </h2>
+              <p className="text-xs text-gray-500 mt-0.5">
+                {collection.name}
+              </p>
+            </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              className="text-gray-500 hover:text-white transition-colors"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            {collection.name}
-          </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-5 space-y-4">
           {error && (
-            <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-              <p className="text-sm text-red-800 dark:text-red-300">{error}</p>
+            <div className="p-3 bg-red-900/20 border border-red-800 rounded-lg">
+              <p className="text-sm text-red-400">{error}</p>
             </div>
           )}
 
           {collection.schema?.map((field) => (
             <div key={field.name}>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-xs font-medium text-gray-400 mb-1.5">
                 {field.name}
                 {field.required && <span className="text-red-500 ml-1">*</span>}
               </label>
@@ -131,24 +131,21 @@ export default function RecordModal({
                 value={formData[field.name]}
                 onChange={(value) => handleChange(field.name, value)}
               />
-              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                {field.type}
-              </p>
             </div>
           ))}
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-3 pt-3">
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 font-medium"
+              className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-500 disabled:opacity-50 text-sm font-medium transition-colors"
             >
               {loading ? 'Saving...' : isEdit ? 'Update' : 'Create'}
             </button>
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700"
+              className="flex-1 px-4 py-2 border border-gray-700 text-gray-300 rounded-md hover:bg-gray-800 text-sm transition-colors"
             >
               Cancel
             </button>
@@ -168,7 +165,7 @@ function FieldInput({
   value: any
   onChange: (value: any) => void
 }) {
-  const commonClasses = "w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-900 dark:text-white"
+  const commonClasses = "w-full px-3 py-2 text-sm border border-gray-700 rounded-md bg-gray-800 text-white placeholder-gray-500 focus:border-primary-500 focus:outline-none"
 
   switch (field.type) {
     case 'bool':
@@ -177,7 +174,7 @@ function FieldInput({
           type="checkbox"
           checked={value || false}
           onChange={(e) => onChange(e.target.checked)}
-          className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500"
+          className="w-4 h-4 text-primary-600 rounded focus:ring-primary-500 bg-gray-800 border-gray-700"
         />
       )
 

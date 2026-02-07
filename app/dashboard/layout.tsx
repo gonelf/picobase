@@ -22,36 +22,35 @@ export default async function DashboardLayout({
     : user.email)
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950">
-      <nav className="border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm sticky top-0 z-50 shadow-sm">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 justify-between items-center">
-            <div className="flex items-center">
+    <div className="min-h-screen bg-gray-950 text-gray-100">
+      <nav className="border-b border-gray-800 bg-gray-950/95 backdrop-blur-sm sticky top-0 z-50">
+        <div className="px-4 sm:px-6">
+          <div className="flex h-12 justify-between items-center">
+            <div className="flex items-center gap-5">
               <Logo />
-            </div>
-            <div className="flex items-center gap-6">
+              <div className="h-5 w-px bg-gray-700" />
               <Link
                 href="/dashboard"
-                className="text-sm font-medium text-gray-700 hover:text-primary-600 dark:text-gray-300 dark:hover:text-primary-400 transition-colors"
+                className="text-sm text-gray-400 hover:text-white transition-colors"
               >
-                Instances
+                All Projects
               </Link>
-              <div className="flex items-center gap-4 border-l border-gray-200 dark:border-gray-700 pl-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 flex items-center justify-center text-white font-semibold text-sm">
-                    {displayName.charAt(0).toUpperCase()}
-                  </div>
-                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {displayName}
-                  </span>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-7 h-7 rounded-full bg-primary-600 flex items-center justify-center text-white font-medium text-xs">
+                  {displayName.charAt(0).toUpperCase()}
                 </div>
-                <SignOutButton />
+                <span className="text-sm text-gray-300 hidden sm:inline">
+                  {displayName}
+                </span>
               </div>
+              <SignOutButton />
             </div>
           </div>
         </div>
-      </nav >
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">{children}</main>
-    </div >
+      </nav>
+      <main>{children}</main>
+    </div>
   )
 }
