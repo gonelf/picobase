@@ -79,8 +79,10 @@ export const authOptions: NextAuthOptions = {
                 sameSite: 'lax',
                 path: '/',
                 secure: process.env.NODE_ENV === 'production',
-                domain: process.env.NODE_ENV === 'production'
-                    ? `.${process.env.PLATFORM_DOMAIN?.split(':')[0]}`
+                // Only set domain for production with PLATFORM_DOMAIN configured
+                // Vercel previews and local dev should not set domain (defaults to current host)
+                domain: process.env.PLATFORM_DOMAIN && !process.env.VERCEL_URL
+                    ? `.${process.env.PLATFORM_DOMAIN.split(':')[0]}`
                     : undefined,
             },
         },
