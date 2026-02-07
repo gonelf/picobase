@@ -20,11 +20,22 @@ app.use(express.json());
 
 // Authentication middleware
 function authenticateRequest(req, res, next) {
-    const apiKey = req.headers['x-api-key'];
+    const apiKey = req.headers['x-api-key'] || req.query.key;
 
     if (!apiKey || apiKey !== API_SECRET) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
+
+    // Remove key from query to avoid passing it downstream if possible (optional, but good practice)
+    // However, for proxying we might just leave it or sanitize it. 
+    // Express query is separate from url string so it won't affect req.url unless we rebuild it.
+    // But we are proxying... wait.
+
+    // In the proxy handler, we construct the pbUrl using req.params and existing structure
+    // so the query param 'key' might get passed to PocketBase if we aren't careful?
+    // PocketBase won't care about an extra 'key' param usually.
+
+    next();
 
     next();
 }

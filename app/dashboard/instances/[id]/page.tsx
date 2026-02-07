@@ -92,6 +92,15 @@ export default async function InstanceDetail({ params }: { params: Promise<{ id:
                     </a>
                   </dd>
                 </div>
+                {/* Debugging: Internal Proxy URL */}
+                <div className="flex justify-between">
+                  <dt className="text-sm text-gray-600 dark:text-gray-400">Internal Proxy:</dt>
+                  <dd className="text-sm font-mono text-gray-900 dark:text-white truncate max-w-[300px]" title={`${process.env.RAILWAY_API_URL}/instances/${id}/proxy/_/`}>
+                    <a href={`${process.env.RAILWAY_API_URL}/instances/${id}/proxy/_/?key=${process.env.RAILWAY_API_KEY}`} target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:text-primary-700">
+                      {`${process.env.RAILWAY_API_URL}/instances/${id}/proxy/_/`}
+                    </a>
+                  </dd>
+                </div>
               </>
             )}
             <div className="flex justify-between">
@@ -120,6 +129,6 @@ export default async function InstanceDetail({ params }: { params: Promise<{ id:
           <ApiKeysList instanceId={id} initialKeys={apiKeys} />
         </div>
       </div>
-    </div>
+    </div >
   )
 }
