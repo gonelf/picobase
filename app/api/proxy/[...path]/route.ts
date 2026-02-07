@@ -4,6 +4,8 @@ import { startRailwayInstance } from '@/lib/railway-client'
 import { ensureInstancePort } from '@/lib/instance-management'
 import { touchInstanceActivity } from '@/lib/activity'
 import { validateApiKey } from '@/lib/api-keys'
+import { checkRateLimit } from '@/lib/rate-limit'
+import { logApiRequest } from '@/lib/usage-log'
 
 const RAILWAY_API_URL = process.env.RAILWAY_API_URL
 const RAILWAY_API_KEY = process.env.RAILWAY_API_KEY
@@ -38,6 +40,20 @@ function corsHeaders(request: NextRequest): Record<string, string> {
     }
 }
 
+// Standardized error response format for SDK consumers
+function errorResponse(
+    request: NextRequest,
+    code: string,
+    message: string,
+    status: number,
+    extraHeaders?: Record<string, string>,
+) {
+    return NextResponse.json(
+        { error: { code, message } },
+        { status, headers: { ...corsHeaders(request), ...extraHeaders } },
+    )
+}
+
 export async function OPTIONS(request: NextRequest) {
     return new NextResponse(null, { status: 204, headers: corsHeaders(request) })
 }
@@ -63,25 +79,22 @@ export async function PATCH(request: NextRequest) {
 }
 
 async function handleProxyRequest(request: NextRequest) {
+    const startTime = Date.now()
+    let apiKeyId: string | undefined
+
     try {
         // Get subdomain from middleware header
         const subdomain = request.headers.get('x-instance-subdomain')
 
         if (!subdomain) {
-            return NextResponse.json(
-                { error: 'Invalid instance subdomain' },
-                { status: 400 }
-            )
+            return errorResponse(request, 'BAD_REQUEST', 'Invalid instance subdomain', 400)
         }
 
         // Lookup instance by subdomain
         const instance = await getInstanceBySubdomain(subdomain)
 
         if (!instance) {
-            return NextResponse.json(
-                { error: 'Instance not found' },
-                { status: 404, headers: corsHeaders(request) }
-            )
+            return errorResponse(request, 'NOT_FOUND', 'Instance not found', 404)
         }
 
         // Validate API key if provided (SDK clients send X-PicoBase-Key)
@@ -89,25 +102,39 @@ async function handleProxyRequest(request: NextRequest) {
         if (picobaseKey) {
             const keyResult = await validateApiKey(picobaseKey)
             if (!keyResult) {
-                return NextResponse.json(
-                    { error: 'Invalid API key', code: 'INVALID_API_KEY' },
-                    { status: 401, headers: corsHeaders(request) }
-                )
+                return errorResponse(request, 'INVALID_API_KEY', 'Invalid or expired API key', 401)
             }
             // Ensure the API key belongs to this instance
             if (keyResult.instanceId !== instance.id) {
-                return NextResponse.json(
-                    { error: 'API key does not match instance', code: 'INVALID_API_KEY' },
-                    { status: 401, headers: corsHeaders(request) }
+                return errorResponse(request, 'INVALID_API_KEY', 'API key does not match instance', 401)
+            }
+            apiKeyId = keyResult.apiKeyId
+
+            // Rate limit per API key (100 requests/minute)
+            const rateResult = checkRateLimit(`key:${apiKeyId}`, 100, 60_000)
+            if (!rateResult.allowed) {
+                return errorResponse(
+                    request,
+                    'RATE_LIMITED',
+                    'Too many requests. Please slow down.',
+                    429,
+                    {
+                        'Retry-After': String(Math.ceil(rateResult.resetMs / 1000)),
+                        'X-RateLimit-Limit': String(rateResult.limit),
+                        'X-RateLimit-Remaining': '0',
+                        'X-RateLimit-Reset': String(Math.ceil(rateResult.resetMs / 1000)),
+                    },
                 )
             }
         }
 
         // Check if instance is running
         if (instance.status !== 'running') {
-            return NextResponse.json(
-                { error: 'Instance is not running', status: instance.status },
-                { status: 503, headers: corsHeaders(request) },
+            return errorResponse(
+                request,
+                'INSTANCE_UNAVAILABLE',
+                `Instance is not running (status: ${instance.status})`,
+                503,
             )
         }
 
@@ -117,6 +144,22 @@ async function handleProxyRequest(request: NextRequest) {
         const url = new URL(request.url)
         const pathToProxy = url.pathname.replace('/api/proxy', '') || '/'
         const search = url.search
+
+        // Health check endpoint — responds without hitting the PocketBase instance
+        if (pathToProxy === '/api/picobase/health') {
+            return NextResponse.json(
+                {
+                    status: 'ok',
+                    instance: {
+                        id: instance.id,
+                        name: instance.name,
+                        subdomain: instance.subdomain,
+                        status: instance.status,
+                    },
+                },
+                { headers: corsHeaders(request) },
+            )
+        }
 
         // Forward request to Railway service, which will proxy to the PocketBase instance
         const railwayProxyUrl = `${NORMALIZED_RAILWAY_API_URL}/instances/${instance.id}/proxy${pathToProxy}${search}`
@@ -254,6 +297,16 @@ async function handleProxyRequest(request: NextRequest) {
         // Record activity (non-blocking, debounced)
         touchInstanceActivity(instance.id).catch(() => {})
 
+        // Log usage (non-blocking)
+        logApiRequest({
+            instanceId: instance.id,
+            apiKeyId,
+            method: request.method,
+            path: pathToProxy,
+            status: proxyResponse.status,
+            durationMs: Date.now() - startTime,
+        })
+
         // Return the proxied response
         return new NextResponse(responseBody, {
             status: proxyResponse.status,
@@ -262,12 +315,11 @@ async function handleProxyRequest(request: NextRequest) {
         })
     } catch (error) {
         console.error('Proxy error:', error)
-        return NextResponse.json(
-            {
-                error: 'Proxy request failed',
-                details: error instanceof Error ? error.message : String(error)
-            },
-            { status: 500, headers: corsHeaders(request) }
+        return errorResponse(
+            request,
+            'PROXY_ERROR',
+            error instanceof Error ? error.message : 'Proxy request failed',
+            500,
         )
     }
 }
