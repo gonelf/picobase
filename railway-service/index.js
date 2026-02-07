@@ -36,8 +36,6 @@ function authenticateRequest(req, res, next) {
     // PocketBase won't care about an extra 'key' param usually.
 
     next();
-
-    next();
 }
 
 // Health check
