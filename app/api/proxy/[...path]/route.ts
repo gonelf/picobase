@@ -3,6 +3,7 @@ import { getInstanceBySubdomain } from '@/lib/db'
 import { startRailwayInstance } from '@/lib/railway-client'
 import { ensureInstancePort } from '@/lib/instance-management'
 import { touchInstanceActivity } from '@/lib/activity'
+import { validateApiKey } from '@/lib/api-keys'
 
 const RAILWAY_API_URL = process.env.RAILWAY_API_URL
 const RAILWAY_API_KEY = process.env.RAILWAY_API_KEY
@@ -24,6 +25,22 @@ function normalizeUrl(url: string): string {
 }
 
 const NORMALIZED_RAILWAY_API_URL = normalizeUrl(RAILWAY_API_URL)
+
+// CORS headers for SDK clients
+function corsHeaders(request: NextRequest): Record<string, string> {
+    const origin = request.headers.get('origin') || '*'
+    return {
+        'Access-Control-Allow-Origin': origin,
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-PicoBase-Key',
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Max-Age': '86400',
+    }
+}
+
+export async function OPTIONS(request: NextRequest) {
+    return new NextResponse(null, { status: 204, headers: corsHeaders(request) })
+}
 
 export async function GET(request: NextRequest) {
     return handleProxyRequest(request)
@@ -63,15 +80,34 @@ async function handleProxyRequest(request: NextRequest) {
         if (!instance) {
             return NextResponse.json(
                 { error: 'Instance not found' },
-                { status: 404 }
+                { status: 404, headers: corsHeaders(request) }
             )
+        }
+
+        // Validate API key if provided (SDK clients send X-PicoBase-Key)
+        const picobaseKey = request.headers.get('x-picobase-key')
+        if (picobaseKey) {
+            const keyResult = await validateApiKey(picobaseKey)
+            if (!keyResult) {
+                return NextResponse.json(
+                    { error: 'Invalid API key', code: 'INVALID_API_KEY' },
+                    { status: 401, headers: corsHeaders(request) }
+                )
+            }
+            // Ensure the API key belongs to this instance
+            if (keyResult.instanceId !== instance.id) {
+                return NextResponse.json(
+                    { error: 'API key does not match instance', code: 'INVALID_API_KEY' },
+                    { status: 401, headers: corsHeaders(request) }
+                )
+            }
         }
 
         // Check if instance is running
         if (instance.status !== 'running') {
             return NextResponse.json(
                 { error: 'Instance is not running', status: instance.status },
-                { status: 503 }
+                { status: 503, headers: corsHeaders(request) },
             )
         }
 
@@ -209,6 +245,12 @@ async function handleProxyRequest(request: NextRequest) {
             responseHeaders.set('set-cookie', setCookieHeader)
         }
 
+        // Add CORS headers for SDK clients
+        const cors = corsHeaders(request)
+        for (const [key, value] of Object.entries(cors)) {
+            responseHeaders.set(key, value)
+        }
+
         // Record activity (non-blocking, debounced)
         touchInstanceActivity(instance.id).catch(() => {})
 
@@ -225,7 +267,7 @@ async function handleProxyRequest(request: NextRequest) {
                 error: 'Proxy request failed',
                 details: error instanceof Error ? error.message : String(error)
             },
-            { status: 500 }
+            { status: 500, headers: corsHeaders(request) }
         )
     }
 }
