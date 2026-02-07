@@ -116,15 +116,34 @@ async function handleProxyRequest(request: NextRequest) {
                     await new Promise(resolve => setTimeout(resolve, attempt * 1000))
                 }
 
+                // Forward important request headers
+                const headersToForward: Record<string, string> = {
+                    'X-API-Key': RAILWAY_API_KEY!,
+                }
+
+                // Forward these headers if they exist
+                const headerNames = [
+                    'content-type',
+                    'authorization',
+                    'cookie',
+                    'accept',
+                    'accept-encoding',
+                    'accept-language',
+                    'user-agent',
+                    'referer',
+                    'origin',
+                ]
+
+                for (const headerName of headerNames) {
+                    const value = request.headers.get(headerName)
+                    if (value) {
+                        headersToForward[headerName] = value
+                    }
+                }
+
                 proxyResponse = await fetch(railwayProxyUrl, {
                     method: request.method,
-                    headers: {
-                        'X-API-Key': RAILWAY_API_KEY!,
-                        'Content-Type': request.headers.get('content-type') || 'application/json',
-                        ...(request.headers.get('authorization') && {
-                            'authorization': request.headers.get('authorization')!,
-                        }),
-                    },
+                    headers: headersToForward,
                     body,
                 })
 
@@ -160,17 +179,40 @@ async function handleProxyRequest(request: NextRequest) {
         // Get response body
         const responseBody = await proxyResponse.arrayBuffer()
 
+        // Forward important response headers from PocketBase
+        const responseHeaders = new Headers()
+
+        const responseHeaderNames = [
+            'content-type',
+            'cache-control',
+            'content-encoding',
+            'content-security-policy',
+            'x-content-type-options',
+            'x-frame-options',
+            'etag',
+            'last-modified',
+            'expires',
+            'vary',
+        ]
+
+        for (const headerName of responseHeaderNames) {
+            const value = proxyResponse.headers.get(headerName)
+            if (value) {
+                responseHeaders.set(headerName, value)
+            }
+        }
+
+        // Handle set-cookie separately as it can have multiple values
+        const setCookieHeader = proxyResponse.headers.get('set-cookie')
+        if (setCookieHeader) {
+            responseHeaders.set('set-cookie', setCookieHeader)
+        }
+
         // Return the proxied response
         return new NextResponse(responseBody, {
             status: proxyResponse.status,
             statusText: proxyResponse.statusText,
-            headers: {
-                'Content-Type': proxyResponse.headers.get('content-type') || 'application/json',
-                // Forward other relevant headers from PocketBase
-                ...(proxyResponse.headers.get('cache-control') && {
-                    'cache-control': proxyResponse.headers.get('cache-control')!,
-                }),
-            },
+            headers: responseHeaders,
         })
     } catch (error) {
         console.error('Proxy error:', error)
