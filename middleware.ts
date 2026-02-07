@@ -21,25 +21,49 @@ export async function middleware(request: NextRequest) {
     return response
   }
 
+  // Skip auth checks for API routes (they handle their own auth)
+  if (request.nextUrl.pathname.startsWith('/api')) {
+    return NextResponse.next()
+  }
+
   // Continue with existing authentication middleware for platform routes
-  const provider = process.env.AUTH_PROVIDER || 'supertokens'
+  const provider = process.env.AUTH_PROVIDER || 'nextauth'
 
   // Check session based on provider
   let hasSession = false
 
-  if (provider === 'nextauth') {
-    // NextAuth uses 'app-session-token' cookie
-    hasSession = request.cookies.has('app-session-token') ||
-      request.cookies.has('__Secure-app-session-token')
-  } else {
-    // SuperTokens uses 'sAccessToken' cookie
-    hasSession = request.cookies.has('sAccessToken')
+  try {
+    if (provider === 'nextauth') {
+      // NextAuth uses multiple possible cookie names depending on environment
+      hasSession = request.cookies.has('app-session-token') ||
+        request.cookies.has('__Secure-app-session-token') ||
+        request.cookies.has('next-auth.session-token') ||
+        request.cookies.has('__Secure-next-auth.session-token')
+    } else {
+      // SuperTokens uses 'sAccessToken' cookie
+      hasSession = request.cookies.has('sAccessToken')
+    }
+  } catch (error) {
+    console.error('Session check error:', error)
+    hasSession = false
   }
 
   // Check if user is on an auth page (different paths for different providers)
   const isAuthPage = request.nextUrl.pathname.startsWith('/login') ||
     request.nextUrl.pathname.startsWith('/auth')
   const isDashboard = request.nextUrl.pathname.startsWith('/dashboard')
+  const isHomePage = request.nextUrl.pathname === '/'
+
+  // Redirect home to login if no session
+  if (isHomePage && !hasSession) {
+    const redirectUrl = provider === 'nextauth' ? '/login' : '/auth'
+    return NextResponse.redirect(new URL(redirectUrl, request.url))
+  }
+
+  // Redirect home to dashboard if has session
+  if (isHomePage && hasSession) {
+    return NextResponse.redirect(new URL('/dashboard', request.url))
+  }
 
   // Redirect to auth if trying to access dashboard without session
   if (isDashboard && !hasSession) {

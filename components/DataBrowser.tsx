@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import RecordModal from './RecordModal'
 
 interface Record {
   id: string
@@ -34,19 +35,38 @@ export default function DataBrowser({
   const [error, setError] = useState<string | null>(null)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showModal, setShowModal] = useState(false)
+  const [editingRecord, setEditingRecord] = useState<Record | undefined>()
+  const [deletingId, setDeletingId] = useState<string | null>(null)
   const perPage = 20
 
   useEffect(() => {
     fetchRecords()
-  }, [collection.id, page])
+  }, [collection.id, page, searchQuery])
 
   async function fetchRecords() {
     setLoading(true)
     setError(null)
 
     try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        perPage: perPage.toString(),
+      })
+
+      // Add search filter if query exists
+      if (searchQuery) {
+        // PocketBase filter syntax for searching across all fields
+        const searchFields = collection.schema?.map(f => f.name) || []
+        const filterParts = searchFields.map(field => `${field} ~ "${searchQuery}"`).join(' || ')
+        if (filterParts) {
+          params.append('filter', filterParts)
+        }
+      }
+
       const response = await fetch(
-        `/api/instances/${instanceId}/collections/${collection.id}/records?page=${page}&perPage=${perPage}`
+        `/api/instances/${instanceId}/collections/${collection.id}/records?${params.toString()}`
       )
 
       if (!response.ok) {
@@ -63,6 +83,53 @@ export default function DataBrowser({
     } finally {
       setLoading(false)
     }
+  }
+
+  async function handleDelete(recordId: string) {
+    if (!confirm('Are you sure you want to delete this record?')) {
+      return
+    }
+
+    setDeletingId(recordId)
+
+    try {
+      const response = await fetch(
+        `/api/instances/${instanceId}/collections/${collection.id}/records/${recordId}`,
+        { method: 'DELETE' }
+      )
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to delete record')
+      }
+
+      // Refresh records after delete
+      fetchRecords()
+    } catch (err) {
+      console.error('Error deleting record:', err)
+      alert(err instanceof Error ? err.message : 'Failed to delete record')
+    } finally {
+      setDeletingId(null)
+    }
+  }
+
+  function handleEdit(record: Record) {
+    setEditingRecord(record)
+    setShowModal(true)
+  }
+
+  function handleCreate() {
+    setEditingRecord(undefined)
+    setShowModal(true)
+  }
+
+  function handleModalClose() {
+    setShowModal(false)
+    setEditingRecord(undefined)
+  }
+
+  function handleModalSuccess() {
+    fetchRecords()
   }
 
   // Get visible fields (exclude system fields except id)
@@ -101,6 +168,16 @@ export default function DataBrowser({
 
   return (
     <div className="space-y-4">
+      {showModal && (
+        <RecordModal
+          instanceId={instanceId}
+          collection={collection}
+          record={editingRecord}
+          onClose={handleModalClose}
+          onSuccess={handleModalSuccess}
+        />
+      )}
+
       <div className="flex items-center justify-between">
         <button
           onClick={onBack}
@@ -108,6 +185,27 @@ export default function DataBrowser({
         >
           ← Back to collections
         </button>
+        <button
+          onClick={handleCreate}
+          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm font-medium"
+        >
+          + Create Record
+        </button>
+      </div>
+
+      <div className="flex items-center gap-4">
+        <div className="flex-1">
+          <input
+            type="text"
+            placeholder="Search records..."
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value)
+              setPage(1) // Reset to first page on search
+            }}
+            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-900 dark:text-white"
+          />
+        </div>
         <div className="text-sm text-gray-600 dark:text-gray-400">
           {records.length} record{records.length !== 1 ? 's' : ''}
         </div>
@@ -126,13 +224,16 @@ export default function DataBrowser({
                     {field}
                   </th>
                 ))}
+                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
               {records.length === 0 ? (
                 <tr>
                   <td
-                    colSpan={displayFields.length}
+                    colSpan={displayFields.length + 1}
                     className="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
                   >
                     No records found
@@ -154,6 +255,23 @@ export default function DataBrowser({
                         </div>
                       </td>
                     ))}
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => handleEdit(record)}
+                          className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 text-xs font-medium"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(record.id)}
+                          disabled={deletingId === record.id}
+                          className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-xs font-medium disabled:opacity-50"
+                        >
+                          {deletingId === record.id ? 'Deleting...' : 'Delete'}
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))
               )}
