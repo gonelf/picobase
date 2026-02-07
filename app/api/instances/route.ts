@@ -54,6 +54,18 @@ export async function POST(request: NextRequest) {
     }
 
     console.error('Create instance error:', error)
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
+
+    // Check if it's a database error
+    if (error.message?.includes('no such column')) {
+      return NextResponse.json({
+        error: 'Database schema error',
+        details: 'Missing required columns. Please run the database migration: npm run db:migrate:admin'
+      }, { status: 500 })
+    }
+
+    return NextResponse.json({
+      error: 'Internal server error',
+      details: error.message || 'An unexpected error occurred'
+    }, { status: 500 })
   }
 }
