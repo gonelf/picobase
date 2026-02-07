@@ -294,6 +294,45 @@ picobase/
 3. **UI components**: Create in `components/`
 4. **Pages**: Add to `app/dashboard/`
 
+### PocketBase Proxy API Pattern
+
+API routes under `app/api/instances/[id]/` proxy requests to PocketBase instances via `authenticatedPocketBaseRequest()` from `lib/pocketbase-auth.ts`. When adding new proxy endpoints, be aware of PocketBase's response format.
+
+**PocketBase list endpoints return paginated objects, not arrays:**
+
+```json
+{
+  "page": 1,
+  "perPage": 30,
+  "totalItems": 5,
+  "totalPages": 1,
+  "items": [{ "id": "...", "name": "...", ... }]
+}
+```
+
+You must extract the `items` array before using array methods (`.filter()`, `.map()`, `.length`):
+
+```typescript
+// Server-side: extracting items from PocketBase response
+const data = await response.json()
+const items = Array.isArray(data) ? data : (data.items || [])
+```
+
+**Choose your return contract based on client needs:**
+
+| Client needs | Server returns | Client handles |
+|---|---|---|
+| Just the list | Plain array (extract `.items` server-side) | `setItems(data)` |
+| List + pagination | Full paginated object (pass through) | `setItems(data.items \|\| [])` and `setTotal(data.totalItems \|\| 0)` |
+
+**Existing endpoints for reference:**
+
+| Endpoint | Returns | Example |
+|---|---|---|
+| `GET /api/instances/[id]/collections` | Plain array | `collections/route.ts` |
+| `GET /api/instances/[id]/stats` | Computed stats object (extracts `.items` internally) | `stats/route.ts` |
+| `GET /api/instances/[id]/users` | Full paginated object (client needs `totalItems`) | `users/route.ts` + `AuthUsersPanel.tsx` |
+
 ### Testing Locally
 
 ```bash

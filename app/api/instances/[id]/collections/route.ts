@@ -70,7 +70,8 @@ export async function GET(
     }
 
     const data = await response.json()
-    return NextResponse.json(data)
+    const collections = Array.isArray(data) ? data : (data.items || [])
+    return NextResponse.json(collections)
 
   } catch (error) {
     console.error('Error fetching collections:', error)

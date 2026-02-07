@@ -64,7 +64,8 @@ export async function GET(
       throw new Error('Failed to fetch collections')
     }
 
-    const collections = await collectionsResponse.json()
+    const collectionsData = await collectionsResponse.json()
+    const collections = Array.isArray(collectionsData) ? collectionsData : (collectionsData.items || [])
 
     // Count records in each collection
     const stats = {
