@@ -8,8 +8,7 @@ export default function Home() {
   return (
     <main className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-accent-600 to-primary-700 animate-gradient">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDE2djhoLTh2LThoOHptLTE2IDB2OGgtOHYtOGg0em0zMiAwdjhoLTh2LThoOHptLTE2IDE2djhoLTh2LThoOHptLTE2IDB2OGgtOHYtOGg0em0zMiAwdjhoLTh2LThoOHoiLz48L2c+PC9nPjwvc3ZnPg==')] opacity-30"></div>
+      <section className="relative overflow-hidden bg-gray-950">
 
         {/* Nav bar */}
         <div className="relative max-w-7xl mx-auto px-6 pt-6 flex items-center justify-between">
@@ -33,7 +32,7 @@ export default function Home() {
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight">
               Instant Backend
               <br />
-              <span className="gradient-text from-green-200 to-blue-200">
+              <span className="text-primary-400">
                 Infrastructure
               </span>
             </h1>
@@ -51,19 +50,19 @@ export default function Home() {
 
             <div className="flex flex-wrap gap-6 justify-center text-white/80 text-sm mt-8">
               <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-green-300" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5 text-primary-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <span>No credit card required</span>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-green-300" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5 text-primary-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <span>Deploy in 60 seconds</span>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-green-300" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5 text-primary-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <span>Full API access</span>
@@ -236,7 +235,7 @@ export default function Home() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 md:py-28 px-6 bg-gradient-to-br from-primary-600 via-accent-600 to-primary-700">
+      <section className="py-20 md:py-28 px-6 bg-gray-950">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
             Ready to Build Something Amazing?
