@@ -57,11 +57,23 @@ export async function createInstance(
     args: [id, userId, name, subdomain, 'stopped', r2Key, adminEmail, adminPassword, now, now],
   })
 
-  const instanceDir = path.join(INSTANCES_DIR, id)
-  await fs.mkdir(instanceDir, { recursive: true })
+  // Only create filesystem directories in local development
+  // On serverless (Vercel), instances run on Railway, not locally
+  // Check if we're in a serverless environment by looking for VERCEL or LAMBDA env vars
+  const isServerless = process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME
 
-  const pbDataDir = path.join(instanceDir, 'pb_data')
-  await fs.mkdir(pbDataDir, { recursive: true })
+  if (!isServerless) {
+    try {
+      const instanceDir = path.join(INSTANCES_DIR, id)
+      await fs.mkdir(instanceDir, { recursive: true })
+
+      const pbDataDir = path.join(instanceDir, 'pb_data')
+      await fs.mkdir(pbDataDir, { recursive: true })
+    } catch (error) {
+      // Ignore filesystem errors in serverless environments
+      console.log('Skipping local directory creation (serverless environment or read-only filesystem)')
+    }
+  }
 
   return {
     id,
