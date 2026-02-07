@@ -54,10 +54,15 @@ async function railwayRequest(
     return response.json();
 }
 
-export async function startRailwayInstance(instanceId: string, port: number = 8090) {
+export async function startRailwayInstance(
+    instanceId: string,
+    port: number = 8090,
+    adminEmail?: string,
+    adminPassword?: string
+) {
     return railwayRequest(`/instances/${instanceId}/start`, {
         method: 'POST',
-        body: JSON.stringify({ port }),
+        body: JSON.stringify({ port, adminEmail, adminPassword }),
     });
 }
 

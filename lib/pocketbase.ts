@@ -72,6 +72,36 @@ export async function createInstance(
   }
 }
 
+async function createPocketBaseAdmin(port: number, email: string, password: string): Promise<void> {
+  try {
+    // Create initial admin user via PocketBase API
+    const response = await fetch(`http://127.0.0.1:${port}/api/admins`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        password,
+        passwordConfirm: password,
+      }),
+    })
+
+    if (response.ok) {
+      console.log(`Successfully created admin user: ${email}`)
+    } else if (response.status === 400) {
+      // Admin already exists, which is fine
+      console.log(`Admin user already exists for port ${port}`)
+    } else {
+      const errorText = await response.text()
+      console.error(`Failed to create admin user: ${response.status} ${errorText}`)
+    }
+  } catch (error) {
+    console.error('Error creating PocketBase admin:', error)
+    // Don't throw - this is not critical, admin can be created manually if needed
+  }
+}
+
 export async function startInstance(instanceId: string): Promise<{ port: number; url: string }> {
   await ensureInstancesDir()
 
@@ -92,6 +122,8 @@ export async function startInstance(instanceId: string): Promise<{ port: number;
     throw new Error('Instance not found')
   }
 
+  const instance = result.rows[0] as any
+
   await db.execute({
     sql: 'UPDATE instances SET status = ? WHERE id = ?',
     args: ['starting', instanceId],
@@ -99,6 +131,7 @@ export async function startInstance(instanceId: string): Promise<{ port: number;
 
   const instanceDir = path.join(INSTANCES_DIR, instanceId)
   const dbPath = path.join(instanceDir, 'pb_data', 'data.db')
+  const isFirstRun = !existsSync(dbPath)
 
   await fs.mkdir(path.join(instanceDir, 'pb_data'), { recursive: true })
 
@@ -140,7 +173,14 @@ export async function startInstance(instanceId: string): Promise<{ port: number;
     })
   })
 
+  // Wait for PocketBase to start
   await new Promise((resolve) => setTimeout(resolve, 2000))
+
+  // Automatically create admin account if this is first run and credentials are available
+  if ((isFirstRun || !dbExistsInR2) && instance.admin_email && instance.admin_password) {
+    console.log(`Creating admin account for instance ${instanceId}...`)
+    await createPocketBaseAdmin(port, instance.admin_email, instance.admin_password)
+  }
 
   await db.execute({
     sql: 'UPDATE instances SET status = ?, port = ?, last_started_at = ? WHERE id = ?',

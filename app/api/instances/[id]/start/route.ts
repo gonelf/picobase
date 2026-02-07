@@ -17,9 +17,9 @@ export async function POST(
 
     const { id } = await params
 
-    // Verify instance ownership
+    // Verify instance ownership and get admin credentials
     const result = await db.execute({
-      sql: 'SELECT user_id, port FROM instances WHERE id = ?',
+      sql: 'SELECT user_id, port, admin_email, admin_password FROM instances WHERE id = ?',
       args: [id],
     })
 
@@ -27,13 +27,15 @@ export async function POST(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
+    const instance = result.rows[0] as any
+
     // Dynamic Port Allocation
     // 1. Get all ports currently used by running instances
     const usedPortsResult = await db.execute('SELECT port FROM instances WHERE status = "running" AND port IS NOT NULL')
     const usedPorts = new Set(usedPortsResult.rows.map(row => row.port as number))
 
     // 2. Determine port for this instance
-    let port = result.rows[0].port as number
+    let port = instance.port as number
 
     // If port is undefined, null, or already in use by another running instance, assign a new one
     if (!port || usedPorts.has(port)) {
@@ -45,8 +47,13 @@ export async function POST(
       port = candidate
     }
 
-    // Start instance on Railway
-    const railwayResponse = await startRailwayInstance(id, port)
+    // Start instance on Railway with admin credentials
+    const railwayResponse = await startRailwayInstance(
+      id,
+      port,
+      instance.admin_email,
+      instance.admin_password
+    )
 
     // Update instance status in database with the assigned port
     await db.execute({
