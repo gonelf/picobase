@@ -1,7 +1,7 @@
 import { getSession } from '@/lib/session'
 import { listUserInstances } from '@/lib/pocketbase'
 import Link from 'next/link'
-import InstanceCard from '@/components/InstanceCard'
+import ProjectCard from '@/components/ProjectCard'
 
 export default async function Dashboard() {
   const session = await getSession()
@@ -12,8 +12,7 @@ export default async function Dashboard() {
 
   const instances = await listUserInstances(session.user.id)
 
-  // Serialize instances to plain objects to avoid Next.js warning
-  const serializedInstances = instances.map((instance: any) => ({
+  const serializedProjects = instances.map((instance: any) => ({
     id: instance.id,
     name: instance.name,
     subdomain: instance.subdomain,
@@ -24,56 +23,45 @@ export default async function Dashboard() {
   }))
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-12">
-        <div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-3">
-            <span className="text-primary-600 dark:text-primary-400">
-              Your Instances
-            </span>
-          </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-300">
-            Manage your backend instances and deployments
-          </p>
-        </div>
+    <div className="px-8 py-8 max-w-7xl mx-auto">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-semibold text-white">
+          Your Projects
+        </h1>
         <Link
           href="/dashboard/new"
-          className="group relative px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+          className="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium rounded-md transition-colors"
         >
-          <span className="relative z-10">+ Create Instance</span>
+          New Project
         </Link>
       </div>
 
-      {serializedInstances.length === 0 ? (
-        <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-lg">
-          <div className="max-w-md mx-auto">
-            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center">
-              <svg className="w-10 h-10 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" />
+      {serializedProjects.length === 0 ? (
+        <div className="text-center py-24 border border-gray-800 rounded-lg bg-gray-900/50">
+          <div className="max-w-sm mx-auto">
+            <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-gray-800 flex items-center justify-center">
+              <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4v16m8-8H4" />
               </svg>
             </div>
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
-              No instances yet
+            <h3 className="text-lg font-medium text-white mb-2">
+              No projects yet
             </h3>
-            <p className="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-              Get started by creating your first backend instance.
-              It takes less than 60 seconds to deploy.
+            <p className="text-sm text-gray-400 mb-6">
+              Get started by creating your first project. It takes less than 60 seconds to deploy.
             </p>
             <Link
               href="/dashboard/new"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium rounded-md transition-colors"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-              Create Your First Instance
+              New Project
             </Link>
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {serializedInstances.map((instance) => (
-            <InstanceCard key={instance.id} instance={instance} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {serializedProjects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
           ))}
         </div>
       )}

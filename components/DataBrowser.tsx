@@ -55,9 +55,7 @@ export default function DataBrowser({
         perPage: perPage.toString(),
       })
 
-      // Add search filter if query exists
       if (searchQuery) {
-        // PocketBase filter syntax for searching across all fields
         const searchFields = collection.schema?.map(f => f.name) || []
         const filterParts = searchFields.map(field => `${field} ~ "${searchQuery}"`).join(' || ')
         if (filterParts) {
@@ -75,12 +73,10 @@ export default function DataBrowser({
           const errorData = await response.json()
           errorMessage = errorData.error || errorData.details || errorMessage
         } catch (e) {
-          // If JSON parsing fails, try to get text
           try {
             const errorText = await response.text()
             if (errorText) errorMessage = errorText
           } catch {
-            // If all else fails, use status text
             errorMessage = `${errorMessage} (${response.status} ${response.statusText})`
           }
         }
@@ -117,19 +113,16 @@ export default function DataBrowser({
           const errorData = await response.json()
           errorMessage = errorData.error || errorData.details || errorMessage
         } catch (e) {
-          // If JSON parsing fails, try to get text
           try {
             const errorText = await response.text()
             if (errorText) errorMessage = errorText
           } catch {
-            // If all else fails, use status text
             errorMessage = `${errorMessage} (${response.status} ${response.statusText})`
           }
         }
         throw new Error(errorMessage)
       }
 
-      // Refresh records after delete
       fetchRecords()
     } catch (err) {
       console.error('Error deleting record:', err)
@@ -158,14 +151,13 @@ export default function DataBrowser({
     fetchRecords()
   }
 
-  // Get visible fields (exclude system fields except id)
   const visibleFields = ['id', ...(collection.schema?.map(f => f.name) || [])]
-  const displayFields = visibleFields.slice(0, 6) // Limit to 6 columns for better display
+  const displayFields = visibleFields.slice(0, 8)
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-gray-500 dark:text-gray-400">Loading records...</div>
+      <div className="flex items-center justify-center p-12">
+        <div className="text-sm text-gray-500">Loading records...</div>
       </div>
     )
   }
@@ -175,15 +167,15 @@ export default function DataBrowser({
       <div className="space-y-4">
         <button
           onClick={onBack}
-          className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+          className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
         >
-          ← Back to collections
+          &larr; Back to collections
         </button>
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <p className="text-sm text-red-800 dark:text-red-300">{error}</p>
+        <div className="p-4 bg-red-900/20 border border-red-800 rounded-lg">
+          <p className="text-sm text-red-400">{error}</p>
           <button
             onClick={fetchRecords}
-            className="mt-2 text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 underline"
+            className="mt-2 text-sm text-red-400 hover:text-red-300 underline"
           >
             Retry
           </button>
@@ -205,62 +197,63 @@ export default function DataBrowser({
       )}
 
       <div className="flex items-center justify-between">
-        <button
-          onClick={onBack}
-          className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
-        >
-          ← Back to collections
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onBack}
+            className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
+          >
+            &larr;
+          </button>
+          <h2 className="text-sm font-medium text-white">{collection.name}</h2>
+          <span className="text-xs text-gray-600">
+            {records.length} record{records.length !== 1 ? 's' : ''}
+          </span>
+        </div>
         <button
           onClick={handleCreate}
-          className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm font-medium"
+          className="px-3 py-1.5 bg-primary-600 text-white rounded-md hover:bg-primary-500 text-xs font-medium transition-colors"
         >
-          + Create Record
+          + New Record
         </button>
       </div>
 
-      <div className="flex items-center gap-4">
-        <div className="flex-1">
-          <input
-            type="text"
-            placeholder="Search records..."
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value)
-              setPage(1) // Reset to first page on search
-            }}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-900 dark:text-white"
-          />
-        </div>
-        <div className="text-sm text-gray-600 dark:text-gray-400">
-          {records.length} record{records.length !== 1 ? 's' : ''}
-        </div>
+      <div>
+        <input
+          type="text"
+          placeholder="Search records..."
+          value={searchQuery}
+          onChange={(e) => {
+            setSearchQuery(e.target.value)
+            setPage(1)
+          }}
+          className="w-full px-3 py-2 text-sm border border-gray-800 rounded-md bg-gray-900 text-white placeholder-gray-600 focus:border-gray-700 focus:outline-none"
+        />
       </div>
 
-      <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
+      <div className="border border-gray-800 rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+            <thead className="bg-gray-900 border-b border-gray-800">
               <tr>
                 {displayFields.map((field) => (
                   <th
                     key={field}
-                    className="px-4 py-3 text-left text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider"
+                    className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
                     {field}
                   </th>
                 ))}
-                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                <th className="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="divide-y divide-gray-800">
               {records.length === 0 ? (
                 <tr>
                   <td
                     colSpan={displayFields.length + 1}
-                    className="px-4 py-8 text-center text-gray-500 dark:text-gray-400"
+                    className="px-4 py-8 text-center text-sm text-gray-500"
                   >
                     No records found
                   </td>
@@ -269,32 +262,32 @@ export default function DataBrowser({
                 records.map((record) => (
                   <tr
                     key={record.id}
-                    className="hover:bg-gray-50 dark:hover:bg-gray-900/50 transition-colors"
+                    className="hover:bg-gray-900/50 transition-colors"
                   >
                     {displayFields.map((field) => (
                       <td
                         key={field}
-                        className="px-4 py-3 text-gray-900 dark:text-gray-100"
+                        className="px-4 py-2.5 text-gray-300"
                       >
-                        <div className="max-w-xs truncate">
+                        <div className="max-w-xs truncate text-xs font-mono">
                           {formatValue(record[field])}
                         </div>
                       </td>
                     ))}
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                    <td className="px-4 py-2.5 text-right">
+                      <div className="flex items-center justify-end gap-3">
                         <button
                           onClick={() => handleEdit(record)}
-                          className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 text-xs font-medium"
+                          className="text-gray-500 hover:text-white text-xs transition-colors"
                         >
                           Edit
                         </button>
                         <button
                           onClick={() => handleDelete(record.id)}
                           disabled={deletingId === record.id}
-                          className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-xs font-medium disabled:opacity-50"
+                          className="text-gray-500 hover:text-red-400 text-xs transition-colors disabled:opacity-50"
                         >
-                          {deletingId === record.id ? 'Deleting...' : 'Delete'}
+                          {deletingId === record.id ? '...' : 'Delete'}
                         </button>
                       </div>
                     </td>
@@ -311,17 +304,17 @@ export default function DataBrowser({
           <button
             onClick={() => setPage(p => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1.5 text-xs border border-gray-800 rounded-md hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed text-gray-400 transition-colors"
           >
             Previous
           </button>
-          <span className="text-sm text-gray-600 dark:text-gray-400">
+          <span className="text-xs text-gray-500">
             Page {page} of {totalPages}
           </span>
           <button
             onClick={() => setPage(p => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-3 py-1.5 text-xs border border-gray-800 rounded-md hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed text-gray-400 transition-colors"
           >
             Next
           </button>

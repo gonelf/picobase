@@ -60,19 +60,19 @@ export default function ApiKeysList({
   return (
     <div>
       {newKey && (
-        <div className="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-          <p className="text-sm font-medium text-green-900 dark:text-green-300 mb-2">
-            API Key Created! Copy it now, you won't see it again.
+        <div className="mb-4 p-4 bg-green-900/20 border border-green-800 rounded-lg">
+          <p className="text-sm font-medium text-green-400 mb-2">
+            API Key Created! Copy it now, you won&apos;t see it again.
           </p>
           <div className="flex items-center gap-2">
-            <code className="flex-1 px-3 py-2 bg-white dark:bg-gray-900 rounded border border-green-200 dark:border-green-800 text-sm font-mono">
+            <code className="flex-1 px-3 py-2 bg-gray-900 rounded border border-green-800 text-sm font-mono text-white">
               {newKey}
             </code>
             <button
               onClick={() => {
                 navigator.clipboard.writeText(newKey)
               }}
-              className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm font-medium"
+              className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-500 text-xs font-medium transition-colors"
             >
               Copy
             </button>
@@ -83,12 +83,12 @@ export default function ApiKeysList({
       {!showCreateForm ? (
         <button
           onClick={() => setShowCreateForm(true)}
-          className="mb-4 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 text-sm font-medium"
+          className="mb-4 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-500 text-sm font-medium transition-colors"
         >
           Create API Key
         </button>
       ) : (
-        <form onSubmit={handleCreateKey} className="mb-4 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+        <form onSubmit={handleCreateKey} className="mb-4 p-4 bg-gray-900 border border-gray-800 rounded-lg">
           <div className="flex gap-2">
             <input
               type="text"
@@ -96,19 +96,19 @@ export default function ApiKeysList({
               onChange={(e) => setKeyName(e.target.value)}
               placeholder="Key name (e.g., Production)"
               required
-              className="flex-1 rounded border border-gray-300 dark:border-gray-600 px-3 py-2 text-sm dark:bg-gray-800"
+              className="flex-1 rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-primary-500 focus:outline-none"
             />
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700 disabled:opacity-50 text-sm font-medium"
+              className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-500 disabled:opacity-50 text-sm font-medium transition-colors"
             >
               {loading ? 'Creating...' : 'Create'}
             </button>
             <button
               type="button"
               onClick={() => setShowCreateForm(false)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-700 text-sm"
+              className="px-4 py-2 border border-gray-700 text-gray-300 rounded-md hover:bg-gray-800 text-sm transition-colors"
             >
               Cancel
             </button>
@@ -117,35 +117,38 @@ export default function ApiKeysList({
       )}
 
       {initialKeys.length === 0 ? (
-        <p className="text-sm text-gray-500 dark:text-gray-400">No API keys yet</p>
+        <p className="text-sm text-gray-500">No API keys yet</p>
       ) : (
-        <div className="space-y-3">
-          {initialKeys.map((key: any) => (
-            <div
-              key={key.id}
-              className="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-900 rounded border border-gray-200 dark:border-gray-700"
-            >
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {key.name}
-                </p>
-                <p className="text-xs font-mono text-gray-600 dark:text-gray-400 mt-1">
-                  {key.key_prefix}...
-                </p>
-                {key.last_used_at && (
-                  <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
-                    Last used: {new Date(key.last_used_at).toLocaleString()}
-                  </p>
-                )}
-              </div>
-              <button
-                onClick={() => handleDeleteKey(key.id)}
-                className="text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
-              >
-                Delete
-              </button>
-            </div>
-          ))}
+        <div className="border border-gray-800 rounded-lg overflow-hidden">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-900 border-b border-gray-800">
+              <tr>
+                <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Key</th>
+                <th className="px-4 py-2.5 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Used</th>
+                <th className="px-4 py-2.5 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-800">
+              {initialKeys.map((key: any) => (
+                <tr key={key.id} className="hover:bg-gray-900/50 transition-colors">
+                  <td className="px-4 py-2.5 text-sm text-white">{key.name}</td>
+                  <td className="px-4 py-2.5 text-xs font-mono text-gray-400">{key.key_prefix}...</td>
+                  <td className="px-4 py-2.5 text-xs text-gray-500">
+                    {key.last_used_at ? new Date(key.last_used_at).toLocaleString() : 'Never'}
+                  </td>
+                  <td className="px-4 py-2.5 text-right">
+                    <button
+                      onClick={() => handleDeleteKey(key.id)}
+                      className="text-xs text-gray-500 hover:text-red-400 transition-colors"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

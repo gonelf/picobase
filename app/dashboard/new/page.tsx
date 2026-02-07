@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
-export default function NewInstance() {
+export default function NewProject() {
   const router = useRouter()
   const [name, setName] = useState('')
   const [subdomain, setSubdomain] = useState('')
@@ -41,30 +41,30 @@ export default function NewInstance() {
   }
 
   return (
-    <div className="max-w-2xl">
-      <div className="mb-8">
+    <div className="px-8 py-8 max-w-xl mx-auto">
+      <div className="mb-6">
         <Link
           href="/dashboard"
-          className="text-sm text-primary-600 hover:text-primary-700 mb-4 inline-block"
+          className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
         >
-          ← Back to instances
+          &larr; Back to projects
         </Link>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-          Create New Instance
+        <h1 className="text-xl font-semibold text-white mt-4">
+          Create a new project
         </h1>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
-          Set up a new PocketBase instance
+        <p className="mt-1 text-sm text-gray-400">
+          Your project will have its own dedicated PocketBase instance.
         </p>
       </div>
 
-      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="border border-gray-800 rounded-lg bg-gray-900 p-6">
+        <form onSubmit={handleSubmit} className="space-y-5">
           <div>
             <label
               htmlFor="name"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              className="block text-sm font-medium text-gray-300 mb-1.5"
             >
-              Instance Name
+              Project Name
             </label>
             <input
               type="text"
@@ -72,18 +72,15 @@ export default function NewInstance() {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded-lg border border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-900 focus:border-primary-500 focus:outline-none focus:ring-primary-500"
+              className="w-full rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
               placeholder="My Project"
             />
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-              A friendly name for your instance
-            </p>
           </div>
 
           <div>
             <label
               htmlFor="subdomain"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              className="block text-sm font-medium text-gray-300 mb-1.5"
             >
               Subdomain
             </label>
@@ -96,53 +93,41 @@ export default function NewInstance() {
                 onChange={(e) =>
                   setSubdomain(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))
                 }
-                className="flex-1 rounded-l-lg border border-r-0 border-gray-300 dark:border-gray-600 px-3 py-2 text-gray-900 dark:text-white dark:bg-gray-900 focus:border-primary-500 focus:outline-none focus:ring-primary-500"
+                className="flex-1 rounded-l-md border border-r-0 border-gray-700 bg-gray-800 px-3 py-2 text-sm text-white placeholder-gray-500 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                 placeholder="my-project"
                 pattern="[a-z0-9\-]+"
               />
-              <span className="rounded-r-lg border border-l-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 px-3 py-2 text-sm text-gray-600 dark:text-gray-400">
+              <span className="rounded-r-md border border-l-0 border-gray-700 bg-gray-800/50 px-3 py-2 text-sm text-gray-500">
                 .picobase.io
               </span>
             </div>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-xs text-gray-500">
               Lowercase letters, numbers, and hyphens only
             </p>
           </div>
 
           {error && (
-            <div className="rounded-md bg-red-50 dark:bg-red-900/20 p-4">
-              <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+            <div className="rounded-md bg-red-900/30 border border-red-800 p-3">
+              <p className="text-sm text-red-400">{error}</p>
             </div>
           )}
 
-          <div className="flex gap-4">
+          <div className="flex gap-3 pt-2">
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 rounded-lg bg-primary-600 px-4 py-2 text-white font-semibold hover:bg-primary-700 disabled:opacity-50"
+              className="flex-1 rounded-md bg-primary-600 px-4 py-2 text-sm text-white font-medium hover:bg-primary-500 disabled:opacity-50 transition-colors"
             >
-              {loading ? 'Creating...' : 'Create Instance'}
+              {loading ? 'Creating...' : 'Create Project'}
             </button>
             <Link
               href="/dashboard"
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 font-semibold"
+              className="px-4 py-2 border border-gray-700 text-gray-300 rounded-md hover:bg-gray-800 text-sm font-medium transition-colors"
             >
               Cancel
             </Link>
           </div>
         </form>
-      </div>
-
-      <div className="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
-        <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-2">
-          What happens next?
-        </h3>
-        <ul className="text-sm text-blue-800 dark:text-blue-400 space-y-1">
-          <li>• Your PocketBase instance will be created</li>
-          <li>• You'll get API keys to access your instance</li>
-          <li>• Start/stop your instance on-demand</li>
-          <li>• Your data is automatically backed up to R2</li>
-        </ul>
       </div>
     </div>
   )
