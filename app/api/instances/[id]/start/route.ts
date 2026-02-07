@@ -55,10 +55,11 @@ export async function POST(
       instance.admin_password
     )
 
-    // Update instance status in database with the assigned port
+    // Update instance status in database with the assigned port and reset activity timer
+    const now = new Date().toISOString()
     await db.execute({
-      sql: 'UPDATE instances SET status = ?, port = ?, last_started_at = ? WHERE id = ?',
-      args: ['running', port, new Date().toISOString(), id],
+      sql: 'UPDATE instances SET status = ?, port = ?, last_started_at = ?, last_activity_at = ? WHERE id = ?',
+      args: ['running', port, now, now, id],
     })
 
     return NextResponse.json({

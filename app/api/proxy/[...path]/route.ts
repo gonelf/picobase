@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getInstanceBySubdomain } from '@/lib/db'
 import { startRailwayInstance } from '@/lib/railway-client'
 import { ensureInstancePort } from '@/lib/instance-management'
+import { touchInstanceActivity } from '@/lib/activity'
 
 const RAILWAY_API_URL = process.env.RAILWAY_API_URL
 const RAILWAY_API_KEY = process.env.RAILWAY_API_KEY
@@ -207,6 +208,9 @@ async function handleProxyRequest(request: NextRequest) {
         if (setCookieHeader) {
             responseHeaders.set('set-cookie', setCookieHeader)
         }
+
+        // Record activity (non-blocking, debounced)
+        touchInstanceActivity(instance.id).catch(() => {})
 
         // Return the proxied response
         return new NextResponse(responseBody, {

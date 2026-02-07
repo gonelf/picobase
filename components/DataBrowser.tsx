@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import RecordModal from './RecordModal'
+import CollectionModal from './CollectionModal'
 
 interface Record {
   id: string
@@ -14,6 +15,7 @@ interface Collection {
   id: string
   name: string
   type: string
+  system?: boolean
   schema?: Array<{
     name: string
     type: string
@@ -25,10 +27,14 @@ export default function DataBrowser({
   instanceId,
   collection,
   onBack,
+  onCollectionUpdated,
+  onCollectionDeleted,
 }: {
   instanceId: string
   collection: Collection
   onBack: () => void
+  onCollectionUpdated?: () => void
+  onCollectionDeleted?: () => void
 }) {
   const [records, setRecords] = useState<Record[]>([])
   const [loading, setLoading] = useState(true)
@@ -39,6 +45,9 @@ export default function DataBrowser({
   const [showModal, setShowModal] = useState(false)
   const [editingRecord, setEditingRecord] = useState<Record | undefined>()
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [showEditCollection, setShowEditCollection] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deletingCollection, setDeletingCollection] = useState(false)
   const perPage = 20
 
   useEffect(() => {
@@ -132,6 +141,37 @@ export default function DataBrowser({
     }
   }
 
+  async function handleDeleteCollection() {
+    setDeletingCollection(true)
+
+    try {
+      const response = await fetch(
+        `/api/instances/${instanceId}/collections/${collection.id}`,
+        { method: 'DELETE' }
+      )
+
+      if (!response.ok && response.status !== 204) {
+        let errorMessage = 'Failed to delete collection'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorData.details || errorMessage
+        } catch {
+          const errorText = await response.text()
+          if (errorText) errorMessage = errorText
+        }
+        throw new Error(errorMessage)
+      }
+
+      onCollectionDeleted?.()
+    } catch (err) {
+      console.error('Error deleting collection:', err)
+      alert(err instanceof Error ? err.message : 'Failed to delete collection')
+    } finally {
+      setDeletingCollection(false)
+      setShowDeleteConfirm(false)
+    }
+  }
+
   function handleEdit(record: Record) {
     setEditingRecord(record)
     setShowModal(true)
@@ -196,6 +236,27 @@ export default function DataBrowser({
         />
       )}
 
+      {showEditCollection && (
+        <CollectionModal
+          instanceId={instanceId}
+          collection={{
+            id: collection.id,
+            name: collection.name,
+            type: collection.type,
+            schema: collection.schema?.map(f => ({
+              name: f.name,
+              type: f.type,
+              required: f.required,
+            })) || [],
+          }}
+          onClose={() => setShowEditCollection(false)}
+          onSuccess={() => {
+            setShowEditCollection(false)
+            onCollectionUpdated?.()
+          }}
+        />
+      )}
+
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <button
@@ -209,12 +270,48 @@ export default function DataBrowser({
             {records.length} record{records.length !== 1 ? 's' : ''}
           </span>
         </div>
-        <button
-          onClick={handleCreate}
-          className="px-3 py-1.5 bg-primary-600 text-white rounded-md hover:bg-primary-500 text-xs font-medium transition-colors"
-        >
-          + New Record
-        </button>
+        <div className="flex items-center gap-2">
+          {!collection.system && (
+            <>
+              <button
+                onClick={() => setShowEditCollection(true)}
+                className="px-3 py-1.5 border border-gray-700 text-gray-400 rounded-md hover:bg-gray-800 hover:text-white text-xs transition-colors"
+              >
+                Edit Schema
+              </button>
+              {!showDeleteConfirm ? (
+                <button
+                  onClick={() => setShowDeleteConfirm(true)}
+                  className="px-3 py-1.5 border border-gray-700 text-gray-400 rounded-md hover:border-red-800 hover:text-red-400 text-xs transition-colors"
+                >
+                  Delete
+                </button>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleDeleteCollection}
+                    disabled={deletingCollection}
+                    className="px-3 py-1.5 bg-red-600 text-white rounded-md hover:bg-red-500 disabled:opacity-50 text-xs font-medium transition-colors"
+                  >
+                    {deletingCollection ? 'Deleting...' : 'Confirm'}
+                  </button>
+                  <button
+                    onClick={() => setShowDeleteConfirm(false)}
+                    className="px-3 py-1.5 border border-gray-700 text-gray-400 rounded-md hover:bg-gray-800 text-xs transition-colors"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              )}
+            </>
+          )}
+          <button
+            onClick={handleCreate}
+            className="px-3 py-1.5 bg-primary-600 text-white rounded-md hover:bg-primary-500 text-xs font-medium transition-colors"
+          >
+            + New Record
+          </button>
+        </div>
       </div>
 
       <div>

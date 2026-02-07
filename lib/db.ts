@@ -37,6 +37,7 @@ export interface Instance {
   updated_at: string
   last_started_at: string | null
   last_stopped_at: string | null
+  last_activity_at: string | null
 }
 
 export interface ApiKey {
