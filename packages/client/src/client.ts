@@ -142,14 +142,18 @@ export class PicoBaseClient {
 /**
  * Create a new PicoBase client.
  *
- * @param url - Your PicoBase instance URL (e.g. `https://myapp.picobase.com`)
- * @param apiKey - Your API key (starts with `pbk_`)
- * @param options - Optional configuration
+ * Can be called with explicit URL and API key, or with zero arguments to
+ * auto-detect from environment variables (`PICOBASE_URL` / `NEXT_PUBLIC_PICOBASE_URL`
+ * and `PICOBASE_API_KEY` / `NEXT_PUBLIC_PICOBASE_API_KEY`).
  *
  * @example
  * ```ts
  * import { createClient } from '@picobase/client'
  *
+ * // Zero-config — reads from env vars
+ * const pb = createClient()
+ *
+ * // Or explicit
  * const pb = createClient('https://myapp.picobase.com', 'pbk_abc123_secret')
  *
  * // Sign up a user
@@ -165,10 +169,28 @@ export class PicoBaseClient {
  * })
  * ```
  */
+export function createClient(options?: PicoBaseClientOptions): PicoBaseClient
+export function createClient(url: string, apiKey: string, options?: PicoBaseClientOptions): PicoBaseClient
 export function createClient(
-  url: string,
-  apiKey: string,
+  urlOrOptions?: string | PicoBaseClientOptions,
+  apiKeyOrUndefined?: string,
   options?: PicoBaseClientOptions,
 ): PicoBaseClient {
-  return new PicoBaseClient(url, apiKey, options)
+  // Zero-arg / options-only: read from env
+  if (typeof urlOrOptions !== 'string') {
+    const env = typeof process !== 'undefined' ? process.env : {} as Record<string, string | undefined>
+    const url = env.PICOBASE_URL || env.NEXT_PUBLIC_PICOBASE_URL
+    const apiKey = env.PICOBASE_API_KEY || env.NEXT_PUBLIC_PICOBASE_API_KEY
+
+    if (!url || !apiKey) {
+      throw new Error(
+        'createClient() called without arguments, but PICOBASE_URL and PICOBASE_API_KEY ' +
+        'environment variables are not set. Either pass them explicitly or add them to your .env file.'
+      )
+    }
+
+    return new PicoBaseClient(url, apiKey, urlOrOptions)
+  }
+
+  return new PicoBaseClient(urlOrOptions, apiKeyOrUndefined!, options)
 }
