@@ -58,12 +58,12 @@ Features:
 
 ---
 
-### 5. Pre-built Auth UI Components (`@picobase/react`) — DONE
+### 5. Pre-built Auth UI Components (`@picobase_app/react`) — DONE
 
 New package at `packages/react/`. Provides:
 
 **Provider:**
-- `PicoBaseProvider` — React context provider wrapping `@picobase/client`
+- `PicoBaseProvider` — React context provider wrapping `@picobase_app/client`
   - Auto-refreshes auth token on mount
   - Syncs auth state changes to all consumers
 
@@ -84,7 +84,7 @@ New package at `packages/react/`. Provides:
 
 **Usage:**
 ```tsx
-import { PicoBaseProvider, AuthForm, useAuth } from '@picobase/react'
+import { PicoBaseProvider, AuthForm, useAuth } from '@picobase_app/react'
 
 function App() {
   return (
@@ -116,4 +116,4 @@ function ProtectedPage() {
 | OAuth provider setup flow | Done |
 | Email template editor | Done |
 | Webhook configuration for auth events | Done |
-| `@picobase/react` package | Done |
+| `@picobase_app/react` package | Done |

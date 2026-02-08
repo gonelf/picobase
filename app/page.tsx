@@ -107,7 +107,7 @@ export default function Home() {
               <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Install</h3>
               <div className="bg-gray-900 dark:bg-gray-800 rounded-lg p-4 font-mono text-sm text-left">
                 <span className="text-gray-500">$</span>
-                <span className="text-green-400"> npm install @picobase/client</span>
+                <span className="text-green-400"> npm install @picobase_app/client</span>
               </div>
             </div>
 
@@ -328,7 +328,7 @@ export default function Home() {
               </div>
               <div className="bg-white dark:bg-gray-900 p-5 font-mono text-sm leading-relaxed">
                 <div className="text-gray-500">// React: Drop-in auth UI</div>
-                <div className="text-gray-900 dark:text-gray-200">{'import { '}<span className="text-blue-600 dark:text-blue-400">AuthForm</span>{' } from '}<span className="text-green-600 dark:text-green-400">&apos;@picobase/react&apos;</span></div>
+                <div className="text-gray-900 dark:text-gray-200">{'import { '}<span className="text-blue-600 dark:text-blue-400">AuthForm</span>{' } from '}<span className="text-green-600 dark:text-green-400">&apos;@picobase_app/react&apos;</span></div>
                 <div className="text-gray-900 dark:text-gray-200 mt-2">{'<'}<span className="text-blue-600 dark:text-blue-400">AuthForm</span></div>
                 <div className="text-gray-900 dark:text-gray-200">&nbsp;&nbsp;providers={'{['}
                   <span className="text-green-600 dark:text-green-400">&apos;google&apos;</span>, <span className="text-green-600 dark:text-green-400">&apos;github&apos;</span>

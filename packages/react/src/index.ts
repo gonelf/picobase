@@ -10,5 +10,5 @@ export type { UseAuthReturn, UseCollectionReturn, UseRealtimeReturn } from './ho
 export { AuthForm } from './AuthForm'
 export type { AuthFormProps } from './AuthForm'
 
-// Re-export commonly needed types from @picobase/client
-export type { RecordModel, AuthResponse, PicoBaseClient } from '@picobase/client'
+// Re-export commonly needed types from @picobase_app/client
+export type { RecordModel, AuthResponse, PicoBaseClient } from '@picobase_app/client'

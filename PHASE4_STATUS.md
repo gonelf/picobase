@@ -55,7 +55,7 @@ Framework templates to accelerate project setup.
 #### Next.js Template — DONE
 - Full Next.js 14 app structure
 - App Router with TypeScript
-- Pre-configured `@picobase/client` and `@picobase/react`
+- Pre-configured `@picobase_app/client` and `@picobase_app/react`
 - Example authentication flow
 - Environment variables setup (`.env.local`)
 - `package.json` with all dependencies

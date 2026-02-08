@@ -1,5 +1,5 @@
 {
-  "name": "@picobase/react",
+  "name": "@picobase_app/react",
   "version": "0.1.0",
   "description": "PicoBase React components — drop-in auth UI and hooks",
   "main": "dist/index.js",
@@ -16,13 +16,13 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts --clean --external react --external react-dom --external @picobase/client",
-    "dev": "tsup src/index.ts --format cjs,esm --dts --watch --external react --external react-dom --external @picobase/client",
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean --external react --external react-dom --external @picobase_app/client",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch --external react --external react-dom --external @picobase_app/client",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@picobase/client": "workspace:*"
+    "@picobase_app/client": "workspace:*"
   },
   "peerDependencies": {
     "react": ">=18.0.0",

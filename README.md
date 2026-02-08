@@ -3,11 +3,11 @@
 **The backend for flow state.** A Supabase alternative that gets out of your way so you can ship.
 
 ```bash
-npm install @picobase/client
+npm install @picobase_app/client
 ```
 
 ```ts
-import { createClient } from '@picobase/client'
+import { createClient } from '@picobase_app/client'
 
 const pb = createClient() // reads PICOBASE_URL and PICOBASE_API_KEY from .env
 
@@ -66,13 +66,13 @@ git push  # that's it
 ## React Integration
 
 ```bash
-npm install @picobase/react
+npm install @picobase_app/react
 ```
 
 ### Provider setup (one time)
 
 ```tsx
-import { PicoBaseProvider } from '@picobase/react'
+import { PicoBaseProvider } from '@picobase_app/react'
 
 function App() {
   return (
@@ -89,7 +89,7 @@ function App() {
 ### Drop-in auth
 
 ```tsx
-import { AuthForm } from '@picobase/react'
+import { AuthForm } from '@picobase_app/react'
 
 function LoginPage() {
   return <AuthForm providers={['google', 'github']} redirectTo="/dashboard" />
@@ -99,7 +99,7 @@ function LoginPage() {
 ### Query data with hooks
 
 ```tsx
-import { useCollection } from '@picobase/react'
+import { useCollection } from '@picobase_app/react'
 
 function PostsList() {
   const { items, loading } = useCollection('posts', { sort: '-created' })
@@ -113,7 +113,7 @@ function PostsList() {
 ### Realtime subscriptions
 
 ```tsx
-import { useRealtime } from '@picobase/react'
+import { useRealtime } from '@picobase_app/react'
 
 function Chat() {
   const { items: messages, loading } = useRealtime('messages', { sort: 'created' })
@@ -171,8 +171,8 @@ Your App  -->  PicoBase SDK  -->  PicoBase Cloud  -->  PocketBase Instance
 
 ### Tech Stack
 
-- **SDK**: `@picobase/client` (TypeScript, wraps PocketBase SDK)
-- **React**: `@picobase/react` (Provider, hooks, AuthForm)
+- **SDK**: `@picobase_app/client` (TypeScript, wraps PocketBase SDK)
+- **React**: `@picobase_app/react` (Provider, hooks, AuthForm)
 - **CLI**: `picobase` (init, deploy, typegen)
 - **Platform**: Next.js 14, Turso, Cloudflare R2
 - **BaaS Engine**: PocketBase (SQLite, auth, realtime, file storage)

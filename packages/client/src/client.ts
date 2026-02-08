@@ -148,7 +148,7 @@ export class PicoBaseClient {
  *
  * @example
  * ```ts
- * import { createClient } from '@picobase/client'
+ * import { createClient } from '@picobase_app/client'
  *
  * // Zero-config — reads from env vars
  * const pb = createClient()
