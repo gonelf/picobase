@@ -66,13 +66,13 @@ App, you already have it.
 Open your terminal, navigate to your project folder, and run:
 
 ```bash
-npm install @picobase/client
+npm install @picobase_app/client
 ```
 
 If you're using **React**, also install the React helpers:
 
 ```bash
-npm install @picobase/client @picobase/react
+npm install @picobase_app/client @picobase_app/react
 ```
 
 That's it. Two packages, one install command.
@@ -92,7 +92,7 @@ utility files:
 ```typescript
 // src/lib/picobase.ts
 
-import { createClient } from '@picobase/client'
+import { createClient } from '@picobase_app/client'
 
 const pb = createClient(
   'https://myapp.picobase.com',   // <-- replace with your URL
@@ -110,7 +110,7 @@ Instead of importing the client everywhere, wrap your app with the
 ```tsx
 // src/main.tsx  (or App.tsx, index.tsx — wherever your app starts)
 
-import { PicoBaseProvider } from '@picobase/react'
+import { PicoBaseProvider } from '@picobase_app/react'
 
 function App() {
   return (
@@ -166,7 +166,7 @@ If you just want a working login/signup form with no extra work, use the
 validation, error messages, and OAuth buttons.
 
 ```tsx
-import { AuthForm } from '@picobase/react'
+import { AuthForm } from '@picobase_app/react'
 
 function LoginPage() {
   return (
@@ -201,7 +201,7 @@ If you want full control over how the form looks, use the `useAuth` hook.
 
 ```tsx
 import { useState } from 'react'
-import { useAuth } from '@picobase/react'
+import { useAuth } from '@picobase_app/react'
 
 function SignUpForm() {
   const { signUp } = useAuth()
@@ -255,7 +255,7 @@ function SignUpForm() {
 
 ```tsx
 import { useState } from 'react'
-import { useAuth } from '@picobase/react'
+import { useAuth } from '@picobase_app/react'
 
 function SignInForm() {
   const { signIn } = useAuth()
@@ -305,7 +305,7 @@ function SignInForm() {
 #### Sign out
 
 ```tsx
-import { useAuth } from '@picobase/react'
+import { useAuth } from '@picobase_app/react'
 
 function SignOutButton() {
   const { signOut } = useAuth()
@@ -317,7 +317,7 @@ function SignOutButton() {
 #### Password reset
 
 ```tsx
-import { useAuth } from '@picobase/react'
+import { useAuth } from '@picobase_app/react'
 
 function ForgotPasswordForm() {
   const { requestPasswordReset } = useAuth()
@@ -347,7 +347,7 @@ First, enable the OAuth provider in your PicoBase dashboard under **Auth
 Settings**. Then add a button:
 
 ```tsx
-import { useAuth } from '@picobase/react'
+import { useAuth } from '@picobase_app/react'
 
 function OAuthButtons() {
   const { signInWithOAuth } = useAuth()
@@ -419,7 +419,7 @@ Show different content depending on whether the user is logged in.
 ### React
 
 ```tsx
-import { useAuth } from '@picobase/react'
+import { useAuth } from '@picobase_app/react'
 
 function App() {
   const { user, loading } = useAuth()
@@ -512,7 +512,7 @@ The `useCollection` hook fetches data and gives you loading/error states
 automatically:
 
 ```tsx
-import { useCollection } from '@picobase/react'
+import { useCollection } from '@picobase_app/react'
 
 function PostList() {
   const { items, loading, error } = useCollection('posts', {
@@ -571,7 +571,7 @@ const thumbUrl = pb.storage.getFileUrl(record, 'photo.jpg', {
 
 ```tsx
 import { useState } from 'react'
-import { useClient } from '@picobase/react'
+import { useClient } from '@picobase_app/react'
 
 function PhotoUpload() {
   const client = useClient()
@@ -626,7 +626,7 @@ await unsubscribe()
 
 ```tsx
 import { useEffect, useState } from 'react'
-import { useClient } from '@picobase/react'
+import { useClient } from '@picobase_app/react'
 
 function LiveChat() {
   const client = useClient()
@@ -668,7 +668,7 @@ project:
 ```tsx
 // src/App.tsx
 
-import { PicoBaseProvider, useAuth, useCollection, AuthForm } from '@picobase/react'
+import { PicoBaseProvider, useAuth, useCollection, AuthForm } from '@picobase_app/react'
 
 const URL = import.meta.env.VITE_PICOBASE_URL
 const KEY = import.meta.env.VITE_PICOBASE_API_KEY

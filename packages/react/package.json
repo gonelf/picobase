@@ -22,7 +22,7 @@
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@picobase_app/client": "workspace:*"
+    "@picobase_app/client": "^0.1.0"
   },
   "peerDependencies": {
     "react": ">=18.0.0",

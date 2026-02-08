@@ -37,7 +37,7 @@ export async function initCommand(projectName?: string, options?: InitOptions): 
     }
 
     // Generate subdomain from project name
-    const defaultSubdomain = generateSubdomain(projectName);
+    const defaultSubdomain = generateSubdomain(projectName!);
 
     const answers = await inquirer.prompt([
       {
@@ -58,7 +58,7 @@ export async function initCommand(projectName?: string, options?: InitOptions): 
 
     try {
       // Create instance
-      const instance = await api.createInstance(projectName, answers.subdomain);
+      const instance = await api.createInstance(projectName!, answers.subdomain);
 
       spin.text = 'Generating API key...';
 
@@ -88,7 +88,7 @@ export async function initCommand(projectName?: string, options?: InitOptions): 
 
       // Create .env file if template is specified
       if (options?.template) {
-        await createTemplate(projectName, instance.url, apiKey.key, options.template);
+        await createTemplate(projectName!, instance.url, apiKey.key, options.template);
       } else {
         info('Get started with:');
         console.log('');
