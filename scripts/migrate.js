@@ -124,6 +124,26 @@ async function migrate() {
     `)
     console.log('✓ Created index on waitlist_entries.position')
 
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS webhooks (
+        id TEXT PRIMARY KEY,
+        instance_id TEXT NOT NULL,
+        url TEXT NOT NULL,
+        events TEXT NOT NULL DEFAULT '[]',
+        enabled INTEGER NOT NULL DEFAULT 1,
+        secret TEXT NOT NULL,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (instance_id) REFERENCES instances(id) ON DELETE CASCADE
+      )
+    `)
+    console.log('✓ Created webhooks table')
+
+    await db.execute(`
+      CREATE INDEX IF NOT EXISTS idx_webhooks_instance_id ON webhooks(instance_id)
+    `)
+    console.log('✓ Created index on webhooks.instance_id')
+
     console.log('\n✅ Migration completed successfully!')
   } catch (error) {
     console.error('❌ Migration failed:', error)

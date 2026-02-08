@@ -1,17 +1,15 @@
 # Phase 3: Auth & Dashboard — Status Report
 
 **Date:** 2026-02-08
-**Conclusion:** Phase 3 is **NOT complete**. 2 of 5 deliverables are implemented (one partially), 3 are entirely missing.
+**Conclusion:** Phase 3 is now **COMPLETE**. All 5 deliverables have been implemented.
 
 ---
 
 ## Deliverable Status
 
-### 1. Auth Provider Configuration UI — PARTIAL
+### 1. Auth Provider Configuration UI — DONE
 
-**Plan:** Separate dashboard pages at `app/dashboard/[instanceId]/settings/auth/` with `page.tsx`, `providers/page.tsx`, `emails/page.tsx`.
-
-**Actual:** A single page at `app/dashboard/projects/[id]/auth/page.tsx` using a tab-based UI (`AuthDashboard.tsx`) with three tabs: Users, Settings, Providers. The functionality is present but the structure differs from the plan (tabs vs. separate routes).
+A tab-based UI at `app/dashboard/projects/[id]/auth/page.tsx` using `AuthDashboard.tsx` with five tabs: Users, Settings, Providers, Email Templates, and Webhooks.
 
 **Key files:**
 - `app/dashboard/projects/[id]/auth/page.tsx`
@@ -19,53 +17,94 @@
 - `components/AuthSettingsPanel.tsx`
 - `components/AuthProvidersPanel.tsx`
 - `components/AuthUsersPanel.tsx`
-- `app/api/instances/[id]/auth-settings/route.ts`
 
 ---
 
 ### 2. OAuth Provider Setup Flow — DONE
 
-Fully implemented in `components/AuthProvidersPanel.tsx`. Supports 6 providers:
+Implemented in `components/AuthProvidersPanel.tsx`. Supports 6 providers:
 - Google, GitHub, Discord, Microsoft, Apple, Twitter
 
-Each provider is configurable with client ID, client secret, auth URL, token URL, and user info URL. Includes enable/disable toggles and save functionality via PocketBase settings API.
+Each provider is configurable with client ID, client secret, auth URL, token URL, and user info URL.
 
 ---
 
-### 3. Email Template Editor — NOT IMPLEMENTED
+### 3. Email Template Editor — DONE
 
-No email template editor exists. `AuthSettingsPanel.tsx` handles email/password toggles, email requirement settings, and domain restrictions, but does not include any template editing capability.
-
-**Missing:**
-- UI for editing verification email templates
-- UI for editing password reset email templates
-- UI for editing email change confirmation templates
-- API endpoint for managing email templates
-
----
-
-### 4. Webhook Configuration for Auth Events — NOT IMPLEMENTED
-
-No webhook infrastructure exists. The `onSignUp`, `onSignIn`, and `onPasswordReset` event hooks described in the plan have no implementation.
-
-**Missing:**
-- Webhook URL configuration UI
-- Event selection UI (which auth events trigger webhooks)
-- Webhook testing/validation
-- API endpoint to configure webhooks
-- Backend logic to fire webhooks on auth events
+Implemented in `components/AuthEmailTemplatesPanel.tsx`. Features:
+- Edit 3 template types: Verification, Password Reset, Email Change
+- HTML editor with live preview toggle
+- Template variables reference (`{ACTION_URL}`, `{APP_NAME}`, `{APP_URL}`)
+- Reset to default per template
+- SMTP configuration (host, port, username, password, TLS toggle)
+- Persists via PocketBase's `PATCH /api/settings` (meta.* and smtp.*)
 
 ---
 
-### 5. Pre-built Auth UI Components (`@picobase/react`) — NOT IMPLEMENTED
+### 4. Webhook Configuration for Auth Events — DONE
 
-The `@picobase/react` package does not exist. Only the vanilla TypeScript SDK (`packages/client/`) is implemented.
+Implemented in `components/AuthWebhooksPanel.tsx` with API routes:
+- `app/api/instances/[id]/webhooks/route.ts` — GET (list) and PUT (save) webhooks
+- `app/api/instances/[id]/webhooks/test/route.ts` — POST test event to endpoint
+- Database: `webhooks` table added to migration (`scripts/migrate.js`)
+- Database type: `Webhook` added to `lib/db.ts`
 
-**Missing:**
-- `packages/react/` directory
-- `AuthForm` drop-in React component
-- `useAuth` React hook
-- Any React-specific wrappers or providers
+Features:
+- Add/remove/enable/disable webhooks
+- 5 auth events: onSignUp, onSignIn, onPasswordReset, onEmailVerified, onEmailChange
+- HMAC-SHA256 signing with per-webhook secrets
+- Send test event to verify endpoint connectivity
+- Example payload documentation in the UI
+
+---
+
+### 5. Pre-built Auth UI Components (`@picobase/react`) — DONE
+
+New package at `packages/react/`. Provides:
+
+**Provider:**
+- `PicoBaseProvider` — React context provider wrapping `@picobase/client`
+  - Auto-refreshes auth token on mount
+  - Syncs auth state changes to all consumers
+
+**Hooks:**
+- `useAuth()` — user, loading, isAuthenticated, signUp, signIn, signInWithOAuth, signOut, requestPasswordReset
+- `useClient()` — raw PicoBaseClient for advanced operations
+- `useCollection(name, options)` — fetch paginated collection data with loading/error states
+
+**Components:**
+- `AuthForm` — drop-in sign-in/sign-up form
+  - Email/password authentication
+  - OAuth provider buttons (configurable)
+  - Sign-in / Sign-up mode toggle
+  - Forgot password flow
+  - Custom labels for i18n
+  - Inline styles (no CSS dependency)
+  - `redirectTo`, `onSuccess`, `onError` callbacks
+
+**Usage:**
+```tsx
+import { PicoBaseProvider, AuthForm, useAuth } from '@picobase/react'
+
+function App() {
+  return (
+    <PicoBaseProvider url="https://myapp.picobase.com" apiKey="pbk_abc123">
+      <LoginPage />
+    </PicoBaseProvider>
+  )
+}
+
+function LoginPage() {
+  return <AuthForm providers={['google', 'github']} redirectTo="/dashboard" />
+}
+
+function ProtectedPage() {
+  const { user, loading } = useAuth()
+  if (loading) return <p>Loading...</p>
+  if (!user) return <Redirect to="/login" />
+  return <Dashboard user={user} />
+}
+```
 
 ---
 
@@ -73,13 +112,8 @@ The `@picobase/react` package does not exist. Only the vanilla TypeScript SDK (`
 
 | Deliverable | Status |
 |---|---|
-| Auth provider configuration UI | Partial |
+| Auth provider configuration UI | Done |
 | OAuth provider setup flow | Done |
-| Email template editor | Missing |
-| Webhook configuration for auth events | Missing |
-| `@picobase/react` package | Missing |
-
-**Remaining work to complete Phase 3:**
-1. Build an email template editor in the dashboard (verification, password reset, email change templates)
-2. Implement webhook configuration UI and backend for auth events
-3. Create the `@picobase/react` package with `AuthForm` and `useAuth`
+| Email template editor | Done |
+| Webhook configuration for auth events | Done |
+| `@picobase/react` package | Done |
