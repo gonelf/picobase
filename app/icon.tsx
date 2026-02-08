@@ -1,0 +1,52 @@
+import { ImageResponse } from 'next/og'
+
+// Route segment config
+export const runtime = 'edge'
+
+// Image metadata
+export const size = {
+    width: 32,
+    height: 32,
+}
+export const contentType = 'image/png'
+
+// Image generation
+export default function Icon() {
+    return new ImageResponse(
+        (
+            // ImageResponse JSX element
+            <div
+                style={{
+                    fontSize: 24,
+                    background: 'black',
+                    width: '100%',
+                    height: '100%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    borderRadius: 8,
+                }}
+            >
+                <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                >
+                    <path
+                        fillRule="evenodd"
+                        clipRule="evenodd"
+                        d="M12 2L2 7.7735V16.2265L12 22L22 16.2265V7.7735L12 2ZM8.5 7H14.5C16.8 7 18 8.5 18 10.5C18 12.5 16.8 14 14.5 14H11.5V17H8.5V7ZM11.5 9.5V11.5H14.5C15.2 11.5 15.5 11.2 15.5 10.5C15.5 9.8 15.2 9.5 14.5 9.5H11.5Z"
+                        fill="currentColor"
+                    />
+                </svg>
+            </div>
+        ),
+        // ImageResponse options
+        {
+            ...size,
+        }
+    )
+}

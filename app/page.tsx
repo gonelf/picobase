@@ -14,10 +14,19 @@ export default function Home() {
         {/* Nav bar */}
         <div className="relative max-w-7xl mx-auto px-6 pt-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <svg className="w-8 h-8 text-white" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" fill="currentColor" fillOpacity="0.2" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-              <path d="M3 7l9 5m0 0l9-5m-9 5v10" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-            </svg>
+            <div
+              className="w-8 h-8 bg-white"
+              style={{
+                maskImage: 'url(/logo.svg)',
+                maskSize: 'contain',
+                maskPosition: 'center',
+                maskRepeat: 'no-repeat',
+                WebkitMaskImage: 'url(/logo.svg)',
+                WebkitMaskSize: 'contain',
+                WebkitMaskPosition: 'center',
+                WebkitMaskRepeat: 'no-repeat',
+              }}
+            />
             <span className="text-white font-bold text-xl">PicoBase</span>
           </Link>
           <div className="flex items-center gap-6">

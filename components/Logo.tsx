@@ -7,20 +7,20 @@ interface LogoProps {
 
 export function Logo({ className = '', showName = true }: LogoProps) {
     return (
-        <Link href="/dashboard" className={`flex items-center gap-2 ${className}`}>
-            <svg
-                width="24"
-                height="24"
-                viewBox="0 0 32 32"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                className="text-primary-500"
-            >
-                <path
-                    d="M8 4H20C24.4183 4 28 7.58172 28 12C28 16.4183 24.4183 20 20 20H14V28H8V4Z"
-                    fill="currentColor"
-                />
-            </svg>
+        <Link href="/dashboard" className={`flex items-center gap-2 text-primary-500 ${className}`}>
+            <div
+                className="w-6 h-6 bg-current"
+                style={{
+                    maskImage: 'url(/logo.svg)',
+                    maskSize: 'contain',
+                    maskPosition: 'center',
+                    maskRepeat: 'no-repeat',
+                    WebkitMaskImage: 'url(/logo.svg)',
+                    WebkitMaskSize: 'contain',
+                    WebkitMaskPosition: 'center',
+                    WebkitMaskRepeat: 'no-repeat',
+                }}
+            />
 
             {showName && (
                 <span className="text-sm font-semibold text-white">

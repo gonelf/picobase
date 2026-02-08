@@ -27,7 +27,7 @@ export default async function DashboardLayout({
         <div className="px-4 sm:px-6">
           <div className="flex h-12 justify-between items-center">
             <div className="flex items-center gap-5">
-              <Logo />
+              <Logo className="text-white" />
               <div className="h-5 w-px bg-gray-700" />
               <Link
                 href="/dashboard"
