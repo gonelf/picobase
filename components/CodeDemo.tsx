@@ -65,7 +65,7 @@ export default function CodeDemo() {
               </div>
             )
           }
-          return <div key={i} className="text-gray-200">{line.text}</div>
+          return null
         })}
       </div>
     </div>
