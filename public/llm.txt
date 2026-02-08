@@ -10,7 +10,7 @@ PicoBase is an instant backend infrastructure platform. It provides a multi-tena
 - **TypeScript-First**: Full autocomplete and type generation.
 
 ## Documentation
-Full documentation is available at: https://picobase.xyz/docs
+Full documentation is available at: https://picobase.app/docs
 
 ## Quickstart
 1. Install: `npm install @picobase_app/client`

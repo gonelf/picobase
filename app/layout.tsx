@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     siteName: 'PicoBase',
     images: [
       {
-        url: '/og-image.png',
+        url: '/preview.png',
         width: 1200,
         height: 630,
         alt: 'PicoBase Preview',
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'PicoBase - Instant Backend Infrastructure',
     description: 'Multi-tenant backend platform with real-time database, authentication, file storage, and instant APIs.',
-    images: ['/og-image.png'],
+    images: ['/preview.png'],
     creator: '@picobase',
   },
 }
