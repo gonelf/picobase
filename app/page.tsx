@@ -20,12 +20,20 @@ export default function Home() {
             </svg>
             <span className="text-white font-bold text-xl">PicoBase</span>
           </Link>
-          <Link
-            href={signInUrl}
-            className="px-6 py-2 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-lg border border-white/30 hover:bg-white/20 transition-all duration-300"
-          >
-            Sign In
-          </Link>
+          <div className="flex items-center gap-6">
+            <Link
+              href="/docs"
+              className="text-sm font-medium text-white/80 hover:text-white transition-colors"
+            >
+              Docs
+            </Link>
+            <Link
+              href={signInUrl}
+              className="px-6 py-2 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-lg border border-white/30 hover:bg-white/20 transition-all duration-300"
+            >
+              Sign In
+            </Link>
+          </div>
         </div>
 
         <div className="relative max-w-7xl mx-auto px-6 py-16 md:py-24 lg:py-32">
@@ -503,6 +511,19 @@ export default function Home() {
           </p>
         </div>
       </section>
-    </main>
+
+
+      {/* Footer */}
+      <footer className="bg-gray-950 border-t border-white/10 py-12 px-6">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-white/60">
+          <p>&copy; {new Date().getFullYear()} PicoBase. All rights reserved.</p>
+          <div className="flex gap-6">
+            <Link href="/docs" className="hover:text-white transition-colors">Documentation</Link>
+            <Link href="https://github.com/picobase/picobase" className="hover:text-white transition-colors">GitHub</Link>
+            <Link href="https://twitter.com/picobase" className="hover:text-white transition-colors">Twitter</Link>
+          </div>
+        </div>
+      </footer>
+    </main >
   )
 }

@@ -12,8 +12,92 @@ const PORT = process.env.PORT || 3000;
 const API_SECRET = process.env.API_SECRET_KEY;
 const INSTANCES_DIR = '/app/instances';
 
-// Store running instances
+// Store running instances in memory
 const runningInstances = new Map();
+
+// Save instance state to disk
+async function saveInstanceState(id, data) {
+    try {
+        const statePath = path.join(INSTANCES_DIR, id, 'state.json');
+        await fs.mkdir(path.dirname(statePath), { recursive: true });
+        await fs.writeFile(statePath, JSON.stringify(data, null, 2));
+    } catch (error) {
+        console.error(`Failed to save state for instance ${id}:`, error);
+    }
+}
+
+// Load instance state from disk
+async function loadInstanceState(id) {
+    try {
+        const statePath = path.join(INSTANCES_DIR, id, 'state.json');
+        const data = await fs.readFile(statePath, 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        return null; // No state file or error
+    }
+}
+
+// Ensure instance is running based on state
+async function ensureInstanceRunning(id, port) {
+    if (runningInstances.has(id)) return;
+
+    console.log(`Restoring instance ${id} on port ${port}...`);
+    const instanceDir = path.join(INSTANCES_DIR, id);
+
+    try {
+        // Check if directory exists
+        await fs.access(instanceDir);
+    } catch {
+        console.error(`Instance directory not found for ${id}, skipping restore.`);
+        return;
+    }
+
+    const pbProcess = spawn('/usr/local/bin/pocketbase', [
+        'serve',
+        '--http', `0.0.0.0:${port}`,
+        '--dir', instanceDir
+    ]);
+
+    runningInstances.set(id, {
+        process: pbProcess,
+        port,
+        startTime: Date.now(),
+        instanceDir
+    });
+
+    pbProcess.stdout.on('data', (data) => console.log(`[${id}] ${data}`));
+    pbProcess.stderr.on('data', (data) => console.error(`[${id}] ERROR: ${data}`));
+
+    pbProcess.on('exit', (code) => {
+        console.log(`[${id}] Process exited with code ${code}`);
+        runningInstances.delete(id);
+
+        // If exit was unexpected (non-zero code), try to restart?
+        // For now, let's rely on the service restart mechanic or manual intervention
+        // But we should update the state file if it was a clean exit that we intended?
+        // Actually no, let's keep the state as 'running' unless explicitly stopped via API
+    });
+}
+
+// Restore instances on startup
+async function restoreInstances() {
+    try {
+        const entries = await fs.readdir(INSTANCES_DIR, { withFileTypes: true });
+
+        for (const entry of entries) {
+            if (entry.isDirectory()) {
+                const id = entry.name;
+                const state = await loadInstanceState(id);
+
+                if (state && state.status === 'running' && state.port) {
+                    await ensureInstanceRunning(id, state.port);
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error restoring instances:', error);
+    }
+}
 
 // Middleware
 app.use(cors());
@@ -132,11 +216,19 @@ app.post('/instances/:id/start', authenticateRequest, async (req, res) => {
         ]);
 
         // Store instance info
-        runningInstances.set(id, {
+        const instanceInfo = {
             process: pbProcess,
             port,
             startTime: Date.now(),
             instanceDir
+        };
+        runningInstances.set(id, instanceInfo);
+
+        // Save state
+        await saveInstanceState(id, {
+            status: 'running',
+            port,
+            startTime: instanceInfo.startTime
         });
 
         // Handle process events
@@ -151,6 +243,9 @@ app.post('/instances/:id/start', authenticateRequest, async (req, res) => {
         pbProcess.on('exit', (code) => {
             console.log(`[${id}] Process exited with code ${code}`);
             runningInstances.delete(id);
+            // We don't automatically update state to 'stopped' here because
+            // if it crashes, we might want to restart it later (or on service restart).
+            // Only API stop calls should set status to 'stopped'.
         });
 
         // Wait for PocketBase to start, then create admin if credentials provided
@@ -256,6 +351,12 @@ app.post('/instances/:id/stop', authenticateRequest, async (req, res) => {
 
         runningInstances.delete(id);
 
+        // Update state
+        await saveInstanceState(id, {
+            status: 'stopped',
+            port: instance.port // Keep port for future restarts?
+        });
+
         res.json({
             success: true,
             instanceId: id
@@ -308,9 +409,13 @@ app.get('/instances', authenticateRequest, (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
     console.log(`🚀 PicoBase Railway Service running on port ${PORT}`);
     console.log(`📊 Health check: http://localhost:${PORT}/health`);
+
+    // Restore instances
+    console.log('🔄 Restoring running instances...');
+    await restoreInstances();
 });
 
 // Cleanup on exit
