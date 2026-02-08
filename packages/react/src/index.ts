@@ -3,8 +3,8 @@ export { PicoBaseProvider } from './PicoBaseProvider'
 export type { PicoBaseProviderProps } from './PicoBaseProvider'
 
 // Hooks
-export { useAuth, useClient, useCollection } from './hooks'
-export type { UseAuthReturn, UseCollectionReturn } from './hooks'
+export { useAuth, useClient, useCollection, useRealtime } from './hooks'
+export type { UseAuthReturn, UseCollectionReturn, UseRealtimeReturn } from './hooks'
 
 // Components
 export { AuthForm } from './AuthForm'

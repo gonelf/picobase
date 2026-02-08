@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { usePicoBaseContext } from './PicoBaseProvider'
 import type { PicoBaseClient, RecordModel, AuthResponse } from '@picobase/client'
 
@@ -186,4 +186,116 @@ export function useCollection<T = RecordModel>(
   const refresh = useCallback(() => setRefreshKey(k => k + 1), [])
 
   return { items, totalItems, loading, error, refresh }
+}
+
+// ── useRealtime ──────────────────────────────────────────────────────────────
+
+export interface UseRealtimeReturn<T> {
+  /** The latest records, updated in realtime. */
+  items: T[]
+  /** `true` while the initial fetch is in progress. */
+  loading: boolean
+  /** Error from the last fetch or subscription, if any. */
+  error: Error | null
+}
+
+/**
+ * Fetch a collection and automatically subscribe to realtime updates.
+ * Records stay in sync without manual polling or re-fetching.
+ *
+ * @example
+ * ```tsx
+ * function Chat() {
+ *   const { items: messages, loading } = useRealtime('messages', {
+ *     sort: 'created',
+ *   })
+ *
+ *   if (loading) return <p>Loading...</p>
+ *
+ *   return (
+ *     <ul>
+ *       {messages.map(m => <li key={m.id}>{m.text}</li>)}
+ *     </ul>
+ *   )
+ * }
+ * ```
+ */
+export function useRealtime<T extends RecordModel = RecordModel>(
+  collectionName: string,
+  options?: {
+    sort?: string
+    filter?: string
+    expand?: string
+  }
+): UseRealtimeReturn<T> {
+  const { client } = usePicoBaseContext()
+  const [items, setItems] = useState<T[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
+  const unsubRef = useRef<(() => Promise<void>) | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    // Initial fetch
+    client
+      .collection<T>(collectionName)
+      .getFullList({
+        sort: options?.sort,
+        filter: options?.filter,
+        expand: options?.expand,
+      })
+      .then(records => {
+        if (!cancelled) {
+          setItems(records)
+          setLoading(false)
+        }
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          setError(err instanceof Error ? err : new Error(String(err)))
+          setLoading(false)
+        }
+      })
+
+    // Subscribe to realtime
+    client
+      .collection<T>(collectionName)
+      .subscribe((event) => {
+        if (cancelled) return
+
+        if (event.action === 'create') {
+          setItems(prev => [...prev, event.record as T])
+        } else if (event.action === 'update') {
+          setItems(prev =>
+            prev.map(item =>
+              (item as RecordModel).id === (event.record as RecordModel).id
+                ? (event.record as T)
+                : item
+            )
+          )
+        } else if (event.action === 'delete') {
+          setItems(prev =>
+            prev.filter(item =>
+              (item as RecordModel).id !== (event.record as RecordModel).id
+            )
+          )
+        }
+      })
+      .then(unsub => {
+        unsubRef.current = unsub
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) {
+          setError(err instanceof Error ? err : new Error(String(err)))
+        }
+      })
+
+    return () => {
+      cancelled = true
+      unsubRef.current?.()
+    }
+  }, [client, collectionName, options?.sort, options?.filter, options?.expand])
+
+  return { items, loading, error }
 }

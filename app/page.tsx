@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getAuthUrl } from '@/lib/auth-utils'
 import WaitlistForm from '@/components/WaitlistForm'
+import CodeDemo from '@/components/CodeDemo'
 
 export default function Home() {
   const signInUrl = getAuthUrl('signin')
@@ -28,150 +29,223 @@ export default function Home() {
         </div>
 
         <div className="relative max-w-7xl mx-auto px-6 py-16 md:py-24 lg:py-32">
-          <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight">
-              Instant Backend
-              <br />
-              <span className="text-primary-400">
-                Infrastructure
-              </span>
-            </h1>
-
-            <p className="text-xl md:text-2xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed">
-              Launch production-ready backends in seconds. Database, authentication, file storage, and APIs — all configured and ready to use.
-            </p>
-
-            <div className="mb-8">
-              <p className="text-white/80 text-sm mb-4 font-medium uppercase tracking-wider">
-                Join the waitlist for early access
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Copy */}
+            <div>
+              <p className="text-primary-400 font-semibold text-sm uppercase tracking-wider mb-4">
+                The backend for flow state
               </p>
-              <WaitlistForm />
+              <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+                Backend at the
+                <br />
+                <span className="gradient-text from-primary-400 to-accent-400">
+                  Speed of Thought
+                </span>
+              </h1>
+
+              <p className="text-xl text-white/80 mb-8 leading-relaxed max-w-xl">
+                Stop managing migrations. Start vibing.
+                From <code className="text-primary-300 bg-white/10 px-2 py-0.5 rounded text-base">npm install</code> to
+                production data in 3 minutes. No Docker, no local env setup, no config fatigue.
+              </p>
+
+              <div className="mb-8">
+                <p className="text-white/60 text-sm mb-4 font-medium uppercase tracking-wider">
+                  Join the waitlist for early access
+                </p>
+                <WaitlistForm />
+              </div>
+
+              <div className="flex flex-wrap gap-6 text-white/70 text-sm">
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span>Zero config</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span>TypeScript-first</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span>Free tier</span>
+                </div>
+              </div>
             </div>
 
-            <div className="flex flex-wrap gap-6 justify-center text-white/80 text-sm mt-8">
-              <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-primary-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span>No credit card required</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-primary-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span>Deploy in 60 seconds</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-primary-400" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span>Full API access</span>
-              </div>
+            {/* Right: Code Demo */}
+            <div className="hidden lg:block">
+              <CodeDemo />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Grid */}
+      {/* How it Works — 3 Steps */}
       <section className="py-20 md:py-28 px-6 bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4 gradient-text from-primary-600 to-accent-600 dark:from-primary-400 dark:to-accent-400">
-              Everything You Need to Build
+              Ship in 3 Steps
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              A complete backend platform with all the features you expect from modern infrastructure
+              No dashboards. No SQL migrations. No context switching. Stay in your editor.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Feature 1 */}
-            <div className="p-8 rounded-2xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-850 border border-gray-200 dark:border-gray-700 card-hover">
-              <div className="text-4xl mb-4">🗄️</div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Real-time Database</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {/* Step 1 */}
+            <div className="text-center p-8">
+              <div className="w-16 h-16 rounded-2xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">1</span>
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Install</h3>
+              <div className="bg-gray-900 dark:bg-gray-800 rounded-lg p-4 font-mono text-sm text-left">
+                <span className="text-gray-500">$</span>
+                <span className="text-green-400"> npm install @picobase/client</span>
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div className="text-center p-8">
+              <div className="w-16 h-16 rounded-2xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">2</span>
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Write Code</h3>
+              <div className="bg-gray-900 dark:bg-gray-800 rounded-lg p-4 font-mono text-sm text-left">
+                <div className="text-gray-500">// Collections auto-create</div>
+                <div className="text-gray-200">pb.collection(<span className="text-green-400">&apos;posts&apos;</span>)</div>
+                <div className="text-gray-200">&nbsp;&nbsp;.create({'{'} title <span className="text-green-400">})</span></div>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="text-center p-8">
+              <div className="w-16 h-16 rounded-2xl bg-primary-100 dark:bg-primary-900/30 flex items-center justify-center mx-auto mb-6">
+                <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">3</span>
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Ship</h3>
+              <div className="bg-gray-900 dark:bg-gray-800 rounded-lg p-4 font-mono text-sm text-left">
+                <span className="text-gray-500">$</span>
+                <span className="text-green-400"> git push</span>
+                <div className="text-gray-500 mt-1"># That&apos;s it. You&apos;re live.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features — Reframed for Vibe Coders */}
+      <section className="py-20 md:py-28 px-6 bg-gray-50 dark:bg-gray-800">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white">
+              Everything You Need. Nothing You Don&apos;t.
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              We handle the backend complexity so you can stay in the zone
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Feature: Zero-Config Database */}
+            <div className="p-8 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 card-hover">
+              <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Zero-Config Database</h3>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                Powerful SQLite database with instant synchronization and real-time updates
+                Just write data. Collections create themselves. No SQL, no migrations, no schema files to maintain.
               </p>
             </div>
 
-            {/* Feature 2 */}
-            <div className="p-8 rounded-2xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-850 border border-gray-200 dark:border-gray-700 card-hover">
-              <div className="text-4xl mb-4">🔐</div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Authentication</h3>
+            {/* Feature: Drop-in Auth */}
+            <div className="p-8 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 card-hover">
+              <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Drop-in Auth</h3>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                Built-in user management with secure authentication and authorization out of the box
+                One component. Email, password, OAuth. No auth provider config. Just <code className="text-sm bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">&lt;AuthForm /&gt;</code> and done.
               </p>
             </div>
 
-            {/* Feature 3 */}
-            <div className="p-8 rounded-2xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-850 border border-gray-200 dark:border-gray-700 card-hover">
-              <div className="text-4xl mb-4">💾</div>
+            {/* Feature: Realtime Built In */}
+            <div className="p-8 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 card-hover">
+              <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Realtime Built In</h3>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                Subscribe to changes with one line. No WebSocket setup, no Pusher, no polling. Data just updates.
+              </p>
+            </div>
+
+            {/* Feature: TypeScript-First */}
+            <div className="p-8 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 card-hover">
+              <div className="w-12 h-12 rounded-xl bg-sky-100 dark:bg-sky-900/30 flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-sky-600 dark:text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">TypeScript-First</h3>
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
+                Full autocomplete on every query. Generate types from your schema with one CLI command. Your AI coding tool will thank you.
+              </p>
+            </div>
+
+            {/* Feature: File Storage */}
+            <div className="p-8 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 card-hover">
+              <div className="w-12 h-12 rounded-xl bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-orange-600 dark:text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
               <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">File Storage</h3>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                Scalable cloud storage with automatic backups and CDN delivery
+                Upload files as part of any record. Automatic thumbnails, CDN delivery. No S3 bucket to configure.
               </p>
             </div>
 
-            {/* Feature 4 */}
-            <div className="p-8 rounded-2xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-850 border border-gray-200 dark:border-gray-700 card-hover">
-              <div className="text-4xl mb-4">⚡</div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Instant APIs</h3>
+            {/* Feature: AI-Friendly */}
+            <div className="p-8 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 card-hover">
+              <div className="w-12 h-12 rounded-xl bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center mb-4">
+                <svg className="w-6 h-6 text-pink-600 dark:text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">AI-Friendly</h3>
               <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                REST and real-time APIs generated automatically from your data models
-              </p>
-            </div>
-
-            {/* Feature 5 */}
-            <div className="p-8 rounded-2xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-850 border border-gray-200 dark:border-gray-700 card-hover">
-              <div className="text-4xl mb-4">📊</div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Admin Dashboard</h3>
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                Visual interface for managing data, users, and configurations
-              </p>
-            </div>
-
-            {/* Feature 6 */}
-            <div className="p-8 rounded-2xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-850 border border-gray-200 dark:border-gray-700 card-hover">
-              <div className="text-4xl mb-4">🌐</div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Custom Domains</h3>
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                Professional subdomain access for each project instance
-              </p>
-            </div>
-
-            {/* Feature 7 */}
-            <div className="p-8 rounded-2xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-850 border border-gray-200 dark:border-gray-700 card-hover">
-              <div className="text-4xl mb-4">🔄</div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Automatic Backups</h3>
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                Continuous data protection with point-in-time recovery
-              </p>
-            </div>
-
-            {/* Feature 8 */}
-            <div className="p-8 rounded-2xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-850 border border-gray-200 dark:border-gray-700 card-hover">
-              <div className="text-4xl mb-4">🏢</div>
-              <h3 className="text-xl font-bold mb-3 text-gray-900 dark:text-white">Multi-tenancy</h3>
-              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                Isolated instances for each project with complete data separation
+                Simple SDK that Cursor, Windsurf, and Claude understand perfectly. No complex SQL for your AI to hallucinate on.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Value Proposition */}
-      <section className="py-20 md:py-28 px-6 bg-gray-50 dark:bg-gray-800">
+      {/* The Vibe Coder Stack */}
+      <section className="py-20 md:py-28 px-6 bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-4xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-white">
-                Stop Managing Infrastructure.
+                Built for How
                 <br />
-                <span className="gradient-text from-primary-600 to-accent-600">Start Building Products.</span>
+                <span className="gradient-text from-primary-600 to-accent-600">You Actually Work</span>
               </h2>
               <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
-                Focus on what matters — your application logic and user experience. We handle the complexity of backend infrastructure, scaling, and maintenance.
+                You don&apos;t need a DBA. You need a data store that keeps up with your ideas. PicoBase gets out of your way so you can ship what matters.
               </p>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
@@ -179,8 +253,8 @@ export default function Home() {
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   <div>
-                    <p className="font-semibold text-gray-900 dark:text-white">Deploy in Seconds</p>
-                    <p className="text-gray-600 dark:text-gray-300">Instant provisioning with zero configuration required</p>
+                    <p className="font-semibold text-gray-900 dark:text-white">No Dashboard Required</p>
+                    <p className="text-gray-600 dark:text-gray-300">Manage your entire backend from your code editor. No browser tab switching.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -188,8 +262,8 @@ export default function Home() {
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   <div>
-                    <p className="font-semibold text-gray-900 dark:text-white">Production Ready</p>
-                    <p className="text-gray-600 dark:text-gray-300">Enterprise-grade security and reliability from day one</p>
+                    <p className="font-semibold text-gray-900 dark:text-white">Reads from Your .env</p>
+                    <p className="text-gray-600 dark:text-gray-300">Call <code className="text-sm bg-gray-100 dark:bg-gray-800 px-1.5 py-0.5 rounded">createClient()</code> with zero arguments. URL and key come from your environment.</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -197,37 +271,114 @@ export default function Home() {
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   <div>
-                    <p className="font-semibold text-gray-900 dark:text-white">Scale Effortlessly</p>
-                    <p className="text-gray-600 dark:text-gray-300">Automatic scaling to handle your growth</p>
+                    <p className="font-semibold text-gray-900 dark:text-white">Cold Start? Handled.</p>
+                    <p className="text-gray-600 dark:text-gray-300">Instances wake up automatically. The SDK retries with backoff so your users never see a 503.</p>
                   </div>
                 </div>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-6">
-              <div className="text-center p-8 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
+              <div className="text-center p-8 bg-gray-50 dark:bg-gray-800 rounded-2xl">
                 <div className="text-4xl font-bold gradient-text from-primary-600 to-accent-600 mb-2">
-                  &lt;60s
+                  3 min
                 </div>
-                <p className="text-gray-600 dark:text-gray-400 font-medium">Average Setup Time</p>
+                <p className="text-gray-600 dark:text-gray-400 font-medium">Install to Production</p>
               </div>
-              <div className="text-center p-8 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
+              <div className="text-center p-8 bg-gray-50 dark:bg-gray-800 rounded-2xl">
                 <div className="text-4xl font-bold gradient-text from-primary-600 to-accent-600 mb-2">
-                  99.9%
+                  0
                 </div>
-                <p className="text-gray-600 dark:text-gray-400 font-medium">Uptime SLA</p>
+                <p className="text-gray-600 dark:text-gray-400 font-medium">Config Files Needed</p>
               </div>
-              <div className="text-center p-8 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
+              <div className="text-center p-8 bg-gray-50 dark:bg-gray-800 rounded-2xl">
                 <div className="text-4xl font-bold gradient-text from-primary-600 to-accent-600 mb-2">
-                  24/7
+                  1 line
                 </div>
-                <p className="text-gray-600 dark:text-gray-400 font-medium">Automatic Backups</p>
+                <p className="text-gray-600 dark:text-gray-400 font-medium">To Add Auth</p>
               </div>
-              <div className="text-center p-8 bg-white dark:bg-gray-900 rounded-2xl shadow-lg">
+              <div className="text-center p-8 bg-gray-50 dark:bg-gray-800 rounded-2xl">
                 <div className="text-4xl font-bold gradient-text from-primary-600 to-accent-600 mb-2">
                   Free
                 </div>
-                <p className="text-gray-600 dark:text-gray-400 font-medium">Starter Plan</p>
+                <p className="text-gray-600 dark:text-gray-400 font-medium">To Start</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SDK Showcase */}
+      <section className="py-20 md:py-28 px-6 bg-gray-50 dark:bg-gray-800">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white">
+              Code That Feels Right
+            </h2>
+            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+              Clean, predictable APIs that work the way you think
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Auth example */}
+            <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+              <div className="px-5 py-3 bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Authentication</span>
+              </div>
+              <div className="bg-white dark:bg-gray-900 p-5 font-mono text-sm leading-relaxed">
+                <div className="text-gray-500">// React: Drop-in auth UI</div>
+                <div className="text-gray-900 dark:text-gray-200">{'import { '}<span className="text-blue-600 dark:text-blue-400">AuthForm</span>{' } from '}<span className="text-green-600 dark:text-green-400">&apos;@picobase/react&apos;</span></div>
+                <div className="text-gray-900 dark:text-gray-200 mt-2">{'<'}<span className="text-blue-600 dark:text-blue-400">AuthForm</span></div>
+                <div className="text-gray-900 dark:text-gray-200">&nbsp;&nbsp;providers={'{['}
+                  <span className="text-green-600 dark:text-green-400">&apos;google&apos;</span>, <span className="text-green-600 dark:text-green-400">&apos;github&apos;</span>
+                  {']}'}</div>
+                <div className="text-gray-900 dark:text-gray-200">&nbsp;&nbsp;redirectTo=<span className="text-green-600 dark:text-green-400">&quot;/dashboard&quot;</span></div>
+                <div className="text-gray-900 dark:text-gray-200">{'/>'}</div>
+              </div>
+            </div>
+
+            {/* Query example */}
+            <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+              <div className="px-5 py-3 bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Data Queries</span>
+              </div>
+              <div className="bg-white dark:bg-gray-900 p-5 font-mono text-sm leading-relaxed">
+                <div className="text-gray-500">// Filter, sort, paginate</div>
+                <div className="text-gray-900 dark:text-gray-200"><span className="text-purple-600 dark:text-purple-400">const</span> posts = <span className="text-purple-600 dark:text-purple-400">await</span></div>
+                <div className="text-gray-900 dark:text-gray-200">&nbsp;&nbsp;pb.collection(<span className="text-green-600 dark:text-green-400">&apos;posts&apos;</span>)</div>
+                <div className="text-gray-900 dark:text-gray-200">&nbsp;&nbsp;.getList(1, 20, {'{'}</div>
+                <div className="text-gray-900 dark:text-gray-200">&nbsp;&nbsp;&nbsp;&nbsp;filter: <span className="text-green-600 dark:text-green-400">&apos;published = true&apos;</span>,</div>
+                <div className="text-gray-900 dark:text-gray-200">&nbsp;&nbsp;&nbsp;&nbsp;sort: <span className="text-green-600 dark:text-green-400">&apos;-created&apos;</span>,</div>
+                <div className="text-gray-900 dark:text-gray-200">&nbsp;&nbsp;{'}'})</div>
+              </div>
+            </div>
+
+            {/* Realtime example */}
+            <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+              <div className="px-5 py-3 bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Realtime</span>
+              </div>
+              <div className="bg-white dark:bg-gray-900 p-5 font-mono text-sm leading-relaxed">
+                <div className="text-gray-500">// Subscribe to changes</div>
+                <div className="text-gray-900 dark:text-gray-200">pb.collection(<span className="text-green-600 dark:text-green-400">&apos;messages&apos;</span>)</div>
+                <div className="text-gray-900 dark:text-gray-200">&nbsp;&nbsp;.subscribe((e) =&gt; {'{'}</div>
+                <div className="text-gray-900 dark:text-gray-200">&nbsp;&nbsp;&nbsp;&nbsp;console.log(e.action, e.record)</div>
+                <div className="text-gray-900 dark:text-gray-200">&nbsp;&nbsp;{'}'})</div>
+              </div>
+            </div>
+
+            {/* React hook example */}
+            <div className="rounded-xl overflow-hidden border border-gray-200 dark:border-gray-700">
+              <div className="px-5 py-3 bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">React Hook</span>
+              </div>
+              <div className="bg-white dark:bg-gray-900 p-5 font-mono text-sm leading-relaxed">
+                <div className="text-gray-500">// One hook, full CRUD</div>
+                <div className="text-gray-900 dark:text-gray-200"><span className="text-purple-600 dark:text-purple-400">const</span> {'{ items, loading }'} =</div>
+                <div className="text-gray-900 dark:text-gray-200">&nbsp;&nbsp;useCollection(<span className="text-green-600 dark:text-green-400">&apos;posts&apos;</span>, {'{'}</div>
+                <div className="text-gray-900 dark:text-gray-200">&nbsp;&nbsp;&nbsp;&nbsp;sort: <span className="text-green-600 dark:text-green-400">&apos;-created&apos;</span></div>
+                <div className="text-gray-900 dark:text-gray-200">&nbsp;&nbsp;{'}'})</div>
               </div>
             </div>
           </div>
@@ -239,10 +390,10 @@ export default function Home() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900 dark:text-white">
-              Simple, Transparent Pricing
+              Start Free. Scale When You&apos;re Ready.
             </h2>
             <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Start for free, scale when you're ready
+              No credit card. No commitment. Just start building.
             </p>
           </div>
 
@@ -341,14 +492,14 @@ export default function Home() {
       <section className="py-20 md:py-28 px-6 bg-gray-950">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Ready to Build Something Amazing?
+            Make Your Weekend Project,<br />Not Your Infrastructure
           </h2>
-          <p className="text-xl text-white/90 mb-10">
-            Join the waitlist to get early access when we launch. Share your link to move up the list!
+          <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto">
+            Join developers who ship faster by leaving backend complexity behind. Get early access when we launch.
           </p>
           <WaitlistForm />
-          <p className="mt-6 text-white/70 text-sm">
-            No credit card required — Get notified when it's your turn
+          <p className="mt-6 text-white/50 text-sm">
+            No credit card required. No setup. Just vibes.
           </p>
         </div>
       </section>
