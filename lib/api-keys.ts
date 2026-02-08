@@ -87,3 +87,83 @@ export async function deleteApiKey(id: string, instanceId: string) {
     args: [id, instanceId],
   })
 }
+
+/**
+ * Rotate an API key - creates a new key and marks the old one for deletion.
+ * The old key remains valid for a grace period (default 24 hours).
+ */
+export async function rotateApiKey(
+  id: string,
+  instanceId: string,
+  gracePeriodHours: number = 24
+): Promise<{ newKey: string; oldKeyId: string; expiresAt: string }> {
+  // Get the current key info
+  const currentKeyResult = await db.execute({
+    sql: 'SELECT name FROM api_keys WHERE id = ? AND instance_id = ?',
+    args: [id, instanceId],
+  })
+
+  if (currentKeyResult.rows.length === 0) {
+    throw new Error('API key not found')
+  }
+
+  const keyName = currentKeyResult.rows[0].name as string
+
+  // Create new key with same name (appended with " (rotated)")
+  const newKeyName = `${keyName} (rotated)`
+  const gracePeriodExpiry = new Date(Date.now() + gracePeriodHours * 60 * 60 * 1000).toISOString()
+
+  // Set old key to expire after grace period
+  await db.execute({
+    sql: 'UPDATE api_keys SET expires_at = ? WHERE id = ? AND instance_id = ?',
+    args: [gracePeriodExpiry, id, instanceId],
+  })
+
+  // Create new key
+  const newKey = await createApiKey(instanceId, newKeyName)
+
+  return {
+    newKey: newKey.key,
+    oldKeyId: id,
+    expiresAt: gracePeriodExpiry,
+  }
+}
+
+/**
+ * Get API key usage statistics.
+ */
+export async function getApiKeyStats(apiKeyId: string): Promise<{
+  totalRequests: number
+  lastUsedAt: string | null
+  createdAt: string
+} | null> {
+  try {
+    const keyResult = await db.execute({
+      sql: 'SELECT last_used_at, created_at FROM api_keys WHERE id = ?',
+      args: [apiKeyId],
+    })
+
+    if (keyResult.rows.length === 0) {
+      return null
+    }
+
+    const key = keyResult.rows[0]
+
+    // Count requests in usage_logs
+    const usageResult = await db.execute({
+      sql: `SELECT COUNT(*) as total
+            FROM usage_logs
+            WHERE JSON_EXTRACT(metadata, '$.api_key_id') = ?`,
+      args: [apiKeyId],
+    })
+
+    return {
+      totalRequests: Number(usageResult.rows[0].total) || 0,
+      lastUsedAt: key.last_used_at as string | null,
+      createdAt: key.created_at as string,
+    }
+  } catch (error) {
+    console.error('[ApiKeys] Failed to get API key stats:', error)
+    return null
+  }
+}
