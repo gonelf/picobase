@@ -2,7 +2,7 @@ import { getSession } from '@/lib/session'
 import { redirect } from 'next/navigation'
 import { getInstanceStatus } from '@/lib/pocketbase'
 import { getAuthUrl } from '@/lib/auth-utils'
-import AuthUsersPanel from '@/components/AuthUsersPanel'
+import AuthDashboard from '@/components/AuthDashboard'
 
 export default async function AuthPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getSession()
@@ -26,10 +26,10 @@ export default async function AuthPage({ params }: { params: Promise<{ id: strin
         <h1 className="text-sm font-medium text-white">Authentication</h1>
       </div>
 
-      <div className="flex-1 overflow-auto p-6">
-        {isRunning ? (
-          <AuthUsersPanel instanceId={id} />
-        ) : (
+      {isRunning ? (
+        <AuthDashboard instanceId={id} />
+      ) : (
+        <div className="flex-1 overflow-auto p-6">
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
               <div className="w-12 h-12 mx-auto mb-4 rounded-lg bg-gray-800 flex items-center justify-center">
@@ -38,11 +38,11 @@ export default async function AuthPage({ params }: { params: Promise<{ id: strin
                 </svg>
               </div>
               <h3 className="text-sm font-medium text-white mb-1">Project is not running</h3>
-              <p className="text-xs text-gray-500">Start your project from Settings to view auth users.</p>
+              <p className="text-xs text-gray-500">Start your project from Settings to manage authentication.</p>
             </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }
