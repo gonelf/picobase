@@ -4,6 +4,8 @@ import { useState } from 'react'
 import AuthUsersPanel from './AuthUsersPanel'
 import AuthSettingsPanel from './AuthSettingsPanel'
 import AuthProvidersPanel from './AuthProvidersPanel'
+import AuthEmailTemplatesPanel from './AuthEmailTemplatesPanel'
+import AuthWebhooksPanel from './AuthWebhooksPanel'
 
 interface Props {
   instanceId: string
@@ -13,6 +15,8 @@ const TABS = [
   { key: 'users', label: 'Users' },
   { key: 'settings', label: 'Settings' },
   { key: 'providers', label: 'Providers' },
+  { key: 'emails', label: 'Email Templates' },
+  { key: 'webhooks', label: 'Webhooks' },
 ] as const
 
 type TabKey = (typeof TABS)[number]['key']
@@ -46,6 +50,8 @@ export default function AuthDashboard({ instanceId }: Props) {
         {activeTab === 'users' && <AuthUsersPanel instanceId={instanceId} />}
         {activeTab === 'settings' && <AuthSettingsPanel instanceId={instanceId} />}
         {activeTab === 'providers' && <AuthProvidersPanel instanceId={instanceId} />}
+        {activeTab === 'emails' && <AuthEmailTemplatesPanel instanceId={instanceId} />}
+        {activeTab === 'webhooks' && <AuthWebhooksPanel instanceId={instanceId} />}
       </div>
     </div>
   )

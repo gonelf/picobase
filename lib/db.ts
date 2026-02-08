@@ -69,6 +69,17 @@ export interface WaitlistEntry {
   created_at: string
 }
 
+export interface Webhook {
+  id: string
+  instance_id: string
+  url: string
+  events: string
+  enabled: number
+  secret: string
+  created_at: string
+  updated_at: string
+}
+
 // Helper function to lookup instance by subdomain
 export async function getInstanceBySubdomain(subdomain: string) {
   const result = await db.execute({

@@ -1,0 +1,52 @@
+{
+  "name": "@picobase/react",
+  "version": "0.1.0",
+  "description": "PicoBase React components — drop-in auth UI and hooks",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean --external react --external react-dom --external @picobase/client",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch --external react --external react-dom --external @picobase/client",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "@picobase/client": "workspace:*"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tsup": "^8.4.0",
+    "typescript": "^5.7.3"
+  },
+  "keywords": [
+    "picobase",
+    "react",
+    "auth",
+    "components",
+    "hooks"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gonelf/picobase",
+    "directory": "packages/react"
+  }
+}
