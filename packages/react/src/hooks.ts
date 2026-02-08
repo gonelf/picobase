@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { usePicoBaseContext } from './PicoBaseProvider'
-import type { PicoBaseClient, RecordModel, AuthResponse } from '@picobase/client'
+import type { PicoBaseClient, RecordModel, AuthResponse } from '@picobase_app/client'
 
 // ── useAuth ───────────────────────────────────────────────────────────────────
 

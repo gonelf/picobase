@@ -92,9 +92,9 @@ export async function initCommand(projectName?: string, options?: InitOptions): 
       } else {
         info('Get started with:');
         console.log('');
-        console.log('  npm install @picobase/client');
+        console.log('  npm install @picobase_app/client');
         console.log('');
-        console.log(`  import { createClient } from '@picobase/client'`);
+        console.log(`  import { createClient } from '@picobase_app/client'`);
         console.log(`  const pb = createClient('${instance.url}', '${apiKey.key}')`);
         console.log('');
       }
@@ -180,8 +180,8 @@ async function createNextTemplate(projectDir: string, url: string, apiKey: strin
       start: 'next start',
     },
     dependencies: {
-      '@picobase/client': '^0.1.0',
-      '@picobase/react': '^0.1.0',
+      '@picobase_app/client': '^0.1.0',
+      '@picobase_app/react': '^0.1.0',
       next: '^14.0.0',
       react: '^18.2.0',
       'react-dom': '^18.2.0',
@@ -203,7 +203,7 @@ async function createNextTemplate(projectDir: string, url: string, apiKey: strin
 
   // Create layout.tsx
   const layoutContent = `import type { Metadata } from 'next'
-import { PicoBaseProvider } from '@picobase/react'
+import { PicoBaseProvider } from '@picobase_app/react'
 
 export const metadata: Metadata = {
   title: '${path.basename(projectDir)}',
@@ -234,7 +234,7 @@ export default function RootLayout({
 
   // Create page.tsx
   const pageContent = `'use client'
-import { useAuth } from '@picobase/react'
+import { useAuth } from '@picobase_app/react'
 
 export default function Home() {
   const { user, loading, signIn, signOut } = useAuth()

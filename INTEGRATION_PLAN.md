@@ -75,7 +75,7 @@ PicoBase is a **multi-tenant BaaS platform** built on PocketBase. It currently p
 
 ## Implementation Plan
 
-### Phase 1: Client SDK (`@picobase/client`)
+### Phase 1: Client SDK (`@picobase_app/client`)
 
 **Objective:** Ship a JavaScript/TypeScript SDK that developers `npm install` and use with two config values.
 
@@ -84,7 +84,7 @@ PicoBase is a **multi-tenant BaaS platform** built on PocketBase. It currently p
 Create a new package `packages/client/` (or a separate repo `picobase-js`).
 
 ```typescript
-import { createClient } from '@picobase/client'
+import { createClient } from '@picobase_app/client'
 
 const pb = createClient('https://myapp.picobase.com', 'pbk_abc123...')
 ```
@@ -108,7 +108,7 @@ packages/
       storage.ts            # File storage operations
       realtime.ts           # Realtime subscription wrapper
       types.ts              # TypeScript type definitions
-    package.json            # @picobase/client
+    package.json            # @picobase_app/client
     tsconfig.json
     README.md
 ```
@@ -150,7 +150,7 @@ pb.realtime.unsubscribe('posts')
 
 #### 1.2 SDK Distribution
 
-- Publish to npm as `@picobase/client` (or `picobase`)
+- Publish to npm as `@picobase_app/client` (or `picobase`)
 - Provide ESM and CJS builds
 - Include TypeScript declarations
 - Zero dependencies beyond `pocketbase` SDK
@@ -261,10 +261,10 @@ Allow developers to run custom logic on auth events:
 
 #### 3.3 Pre-built Auth UI Components
 
-Provide drop-in React components (optional package `@picobase/react`):
+Provide drop-in React components (optional package `@picobase_app/react`):
 
 ```tsx
-import { AuthForm, useAuth } from '@picobase/react'
+import { AuthForm, useAuth } from '@picobase_app/react'
 
 function LoginPage() {
   return <AuthForm
@@ -324,7 +324,7 @@ picobase init --template svelte  # SvelteKit + PicoBase
 ```
 
 Each template includes:
-- Pre-configured `@picobase/client`
+- Pre-configured `@picobase_app/client`
 - Auth pages (login, signup, password reset)
 - Example CRUD operations
 - Environment variable setup
@@ -418,7 +418,7 @@ This gives developers Supabase-like local dev parity without needing Docker.
 ## Implementation Priority & Phases
 
 ### Phase 1: Client SDK (Foundation)
-1. Create `@picobase/client` package wrapping PocketBase SDK
+1. Create `@picobase_app/client` package wrapping PocketBase SDK
 2. Implement `createClient(url, apiKey)` initialization
 3. Add automatic API key injection into all requests
 4. Add cold-start retry logic

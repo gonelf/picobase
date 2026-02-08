@@ -1,5 +1,5 @@
 {
-  "name": "@picobase/client",
+  "name": "@picobase_app/client",
   "version": "0.1.0",
   "description": "PicoBase client SDK — auth, database, storage, and realtime for your apps",
   "main": "dist/index.js",

@@ -224,7 +224,7 @@ The CLI stores configuration in `~/.picobase/config.json`:
 Creates a Next.js 14 app with:
 - App Router
 - TypeScript
-- `@picobase/client` and `@picobase/react` pre-configured
+- `@picobase_app/client` and `@picobase_app/react` pre-configured
 - Example authentication flow
 - Environment variables setup
 

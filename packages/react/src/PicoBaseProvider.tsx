@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { createClient, PicoBaseClient } from '@picobase/client'
-import type { PicoBaseClientOptions, RecordModel, AuthEvent } from '@picobase/client'
+import { createClient, PicoBaseClient } from '@picobase_app/client'
+import type { PicoBaseClientOptions, RecordModel, AuthEvent } from '@picobase_app/client'
 
 // ── Context ───────────────────────────────────────────────────────────────────
 
@@ -29,7 +29,7 @@ export interface PicoBaseProviderProps {
  *
  * @example
  * ```tsx
- * import { PicoBaseProvider } from '@picobase/react'
+ * import { PicoBaseProvider } from '@picobase_app/react'
  *
  * function App() {
  *   return (

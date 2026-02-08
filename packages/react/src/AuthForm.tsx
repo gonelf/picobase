@@ -179,7 +179,7 @@ const styles = {
  *
  * @example
  * ```tsx
- * import { AuthForm } from '@picobase/react'
+ * import { AuthForm } from '@picobase_app/react'
  *
  * function LoginPage() {
  *   return (

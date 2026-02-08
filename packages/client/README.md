@@ -1,17 +1,17 @@
-# @picobase/client
+# @picobase_app/client
 
 TypeScript SDK for PicoBase — add auth, database, realtime, and file storage to your app.
 
 ## Install
 
 ```bash
-npm install @picobase/client
+npm install @picobase_app/client
 ```
 
 ## Quickstart
 
 ```typescript
-import { createClient } from '@picobase/client'
+import { createClient } from '@picobase_app/client'
 
 const pb = createClient('https://myapp.picobase.com', 'pbk_xxxxxxxx_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
 ```
@@ -198,7 +198,7 @@ const pb = createClient('https://myapp.picobase.com', 'pbk_...', {
 ### Error handling
 
 ```typescript
-import { PicoBaseError, InstanceUnavailableError, AuthorizationError } from '@picobase/client'
+import { PicoBaseError, InstanceUnavailableError, AuthorizationError } from '@picobase_app/client'
 
 try {
   await pb.collection('posts').getList()
