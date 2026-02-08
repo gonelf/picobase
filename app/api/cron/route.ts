@@ -5,21 +5,14 @@ import { runScheduledTasks } from '@/lib/scheduler'
  * Cron job endpoint for scheduled tasks.
  *
  * Configure this with Vercel Cron or external cron service.
- * Example vercel.json:
+ *
+ * @example
+ * // vercel.json
  * {
  *   "crons": [
- *     {
- *       "path": "/api/cron?task=health",
- *       "schedule": "*/5 * * * *"
- *     },
- *     {
- *       "path": "/api/cron?task=backup",
- *       "schedule": "0 * * * *"
- *     },
- *     {
- *       "path": "/api/cron?task=cleanup",
- *       "schedule": "0 0 * * *"
- *     }
+ *     { "path": "/api/cron?task=health", "schedule": "every 5 minutes" },
+ *     { "path": "/api/cron?task=backup", "schedule": "every hour" },
+ *     { "path": "/api/cron?task=cleanup", "schedule": "every day" }
  *   ]
  * }
  */
