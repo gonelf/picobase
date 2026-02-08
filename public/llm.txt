@@ -1,0 +1,25 @@
+# PicoBase
+
+PicoBase is an instant backend infrastructure platform. It provides a multi-tenant backend with real-time database, authentication, file storage, and instant APIs.
+
+## Core Features
+- **Zero-Config Database**: Auto-creating collections, no migrations.
+- **Drop-in Auth**: Email, password, OAuth, with a pre-built UI component.
+- **Realtime**: Subscribe to data changes instantly.
+- **File Storage**: Integrated file uploads with CDN delivery.
+- **TypeScript-First**: Full autocomplete and type generation.
+
+## Documentation
+Full documentation is available at: https://picobase.xyz/docs
+
+## Quickstart
+1. Install: `npm install @picobase_app/client`
+2. Initialize:
+   ```typescript
+   import { createClient } from '@picobase_app/client';
+   const pb = createClient(process.env.PICOBASE_URL);
+   ```
+3. Use:
+   ```typescript
+   const records = await pb.collection('posts').getList(1, 20);
+   ```

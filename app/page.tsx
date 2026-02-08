@@ -8,6 +8,24 @@ export default function Home() {
 
   return (
     <main className="min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'SoftwareApplication',
+            name: 'PicoBase',
+            applicationCategory: 'DeveloperApplication',
+            operatingSystem: 'Any',
+            offers: {
+              '@type': 'Offer',
+              price: '0',
+              priceCurrency: 'USD',
+            },
+            description: 'The open source Firebase alternative for vibe coders. Instant backend infrastructure with real-time database, authentication, and file storage.',
+          }),
+        }}
+      />
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gray-950">
 
@@ -53,10 +71,11 @@ export default function Home() {
                 The backend for flow state
               </p>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-                Backend at the
+                <span className="block text-4xl md:text-5xl mb-2 text-white/90">The Open Source</span>
+                Backend for
                 <br />
                 <span className="gradient-text from-primary-400 to-accent-400">
-                  Speed of Thought
+                  Vibe Coders
                 </span>
               </h1>
 
@@ -107,7 +126,7 @@ export default function Home() {
       <section className="py-12 px-6 bg-gray-900 border-y border-white/10">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-white mb-2">Ready for your vibe</h3>
+            <h3 className="text-2xl font-bold text-white mb-2">Build with your favorite AI tools</h3>
             <p className="text-white/60 text-sm">Works seamlessly with your favorite AI coding tools</p>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
