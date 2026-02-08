@@ -120,7 +120,7 @@ export default function Home() {
               <div className="bg-gray-900 dark:bg-gray-800 rounded-lg p-4 font-mono text-sm text-left">
                 <div className="text-gray-500">// Collections auto-create</div>
                 <div className="text-gray-200">pb.collection(<span className="text-green-400">&apos;posts&apos;</span>)</div>
-                <div className="text-gray-200">&nbsp;&nbsp;.create({'{'} title <span className="text-green-400">})</span></div>
+                <div className="text-gray-200">&nbsp;&nbsp;.create({'{ title }'})</div>
               </div>
             </div>
 
