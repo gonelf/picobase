@@ -1,13 +1,22 @@
 # PicoBase
 
-PicoBase is an instant backend infrastructure platform. It provides a multi-tenant backend with real-time database, authentication, file storage, and instant APIs.
+The Open Source Backend for Vibe Coders.
+The backend for flow state. Stop managing migrations. Start vibing.
+
+PicoBase is an instant backend infrastructure platform designed to work seamlessly with AI coding tools like Cursor, Windsurf, v0, and Bolt.new.
+
+## Validated for AI Tools
+- **Cursor**: optimized for context windows
+- **Windsurf**: clean API patterns
+- **v0**: rapid UI integration
+- **Bolt.new**: instant deployment
 
 ## Core Features
-- **Zero-Config Database**: Auto-creating collections, no migrations.
-- **Drop-in Auth**: Email, password, OAuth, with a pre-built UI component.
-- **Realtime**: Subscribe to data changes instantly.
-- **File Storage**: Integrated file uploads with CDN delivery.
-- **TypeScript-First**: Full autocomplete and type generation.
+- **Zero-Config Database**: Auto-creating collections, no migrations. Just write data.
+- **Drop-in Auth**: Email, password, OAuth, with a pre-built `<AuthForm />` component.
+- **Realtime Built In**: Subscribe to data changes instantly without WebSocket setup.
+- **File Storage**: Integrated uploads with CDN. No S3 configuration needed.
+- **TypeScript-First**: Full autocomplete. Generate types from your schema with one CLI command.
 
 ## Documentation
 Full documentation is available at: https://picobase.app/docs
@@ -16,10 +25,15 @@ Full documentation is available at: https://picobase.app/docs
 1. Install: `npm install @picobase_app/client`
 2. Initialize:
    ```typescript
+   // Reads automatically from .env
    import { createClient } from '@picobase_app/client';
-   const pb = createClient(process.env.PICOBASE_URL);
+   const pb = createClient(); 
    ```
 3. Use:
    ```typescript
-   const records = await pb.collection('posts').getList(1, 20);
+   // Collections auto-create on write
+   const post = await pb.collection('posts').create({
+     title: 'Hello World',
+     content: 'Written at the speed of thought'
+   });
    ```

@@ -6,13 +6,13 @@ import { AuthProvider } from './components/auth-provider'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://picobase.xyz'),
+  metadataBase: new URL('https://picobase.app'),
   title: {
-    default: 'PicoBase - Instant Backend Infrastructure',
+    default: 'PicoBase - The Open Source Backend for Vibe Coders',
     template: '%s | PicoBase',
   },
-  description: 'Multi-tenant backend platform with real-time database, authentication, file storage, and instant APIs. The open source Firebase alternative for vibe coders.',
-  keywords: ['backend', 'database', 'realtime', 'authentication', 'storage', 'open source', 'firebase alternative', 'supabase alternative', 'pocketbase'],
+  description: 'The backend for flow state. Stop managing migrations. Start vibing. Multi-tenant backend platform with real-time database, authentication, file storage, and instant APIs.',
+  keywords: ['backend', 'database', 'realtime', 'authentication', 'storage', 'open source', 'firebase alternative', 'supabase alternative', 'pocketbase', 'vibe coding', 'ai backend', 'cursor', 'windsurf', 'v0'],
   authors: [{ name: 'PicoBase Team' }],
   robots: {
     index: true,
@@ -26,9 +26,9 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'PicoBase - Instant Backend Infrastructure',
-    description: 'Multi-tenant backend platform with real-time database, authentication, file storage, and instant APIs. The open source Firebase alternative.',
-    url: 'https://picobase.xyz',
+    title: 'PicoBase - The Open Source Backend for Vibe Coders',
+    description: 'The backend for flow state. Stop managing migrations. Start vibing.',
+    url: 'https://picobase.app',
     siteName: 'PicoBase',
     images: [
       {
@@ -43,8 +43,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'PicoBase - Instant Backend Infrastructure',
-    description: 'Multi-tenant backend platform with real-time database, authentication, file storage, and instant APIs.',
+    title: 'PicoBase - The Open Source Backend for Vibe Coders',
+    description: 'The backend for flow state. Stop managing migrations. Start vibing.',
     images: ['/preview.png'],
     creator: '@picobase',
   },
