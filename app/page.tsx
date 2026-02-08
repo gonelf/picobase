@@ -94,6 +94,61 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Ready for your vibe */}
+      <section className="py-12 px-6 bg-gray-900 border-y border-white/10">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-8">
+            <h3 className="text-2xl font-bold text-white mb-2">Ready for your vibe</h3>
+            <p className="text-white/60 text-sm">Works seamlessly with your favorite AI coding tools</p>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-8 md:gap-12">
+            <div className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L2 7v10l10 5 10-5V7L12 2z" />
+              </svg>
+              <span className="font-semibold">Cursor</span>
+            </div>
+            <div className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2L2 7l10 5 10-5-10-5z" />
+              </svg>
+              <span className="font-semibold">v0</span>
+            </div>
+            <div className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <circle cx="12" cy="12" r="3" />
+                <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83" />
+              </svg>
+              <span className="font-semibold">bolt.new</span>
+            </div>
+            <div className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+              </svg>
+              <span className="font-semibold">lovable</span>
+            </div>
+            <div className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" />
+              </svg>
+              <span className="font-semibold">Claude</span>
+            </div>
+            <div className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+              </svg>
+              <span className="font-semibold">Windsurf</span>
+            </div>
+            <div className="flex items-center gap-2 text-white/70 hover:text-white transition-colors">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <rect x="3" y="3" width="18" height="18" rx="2" />
+              </svg>
+              <span className="font-semibold">Codex</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* How it Works — 3 Steps */}
       <section className="py-20 md:py-28 px-6 bg-white dark:bg-gray-900">
         <div className="max-w-7xl mx-auto">

@@ -2,51 +2,32 @@
 
 import { useState, useEffect } from 'react'
 
-const CODE_LINES = [
-  { text: '// 1. Define your data shape', type: 'comment' as const },
-  { text: 'interface Todo {', type: 'code' as const },
-  { text: '  id: string', type: 'code' as const },
-  { text: '  title: string', type: 'code' as const },
-  { text: '  done: boolean', type: 'code' as const },
-  { text: '}', type: 'code' as const },
-  { text: '', type: 'code' as const },
-  { text: '// 2. Just write data. We handle the rest.', type: 'comment' as const },
-  { text: 'const pb = createClient()', type: 'code' as const },
-  { text: '', type: 'code' as const },
-  { text: 'await pb.collection("todos").create({', type: 'code' as const },
-  { text: '  title: "Ship my app",', type: 'code' as const },
-  { text: '  done: false,', type: 'code' as const },
-  { text: '})', type: 'code' as const },
-]
-
-const STATUS_LINES = [
-  { text: 'Connected', delay: 800 },
-  { text: 'Collection "todos" created automatically', delay: 1600 },
-  { text: 'Record inserted', delay: 2200 },
+const CLI_LINES = [
+  { text: '$ claude', type: 'prompt' as const, delay: 0 },
+  { text: '', type: 'space' as const, delay: 200 },
+  { text: 'You: Can you add authentication with PicoBase?', type: 'user' as const, delay: 400 },
+  { text: '', type: 'space' as const, delay: 600 },
+  { text: 'Claude: I\'ll add authentication with PicoBase for you.', type: 'assistant' as const, delay: 800 },
+  { text: '', type: 'space' as const, delay: 1200 },
+  { text: '$ npm install @picobase_app/client', type: 'command' as const, delay: 1400 },
+  { text: '✓ Installed @picobase_app/client', type: 'success' as const, delay: 1800 },
+  { text: '', type: 'space' as const, delay: 2000 },
+  { text: '✓ Created components/AuthForm.tsx', type: 'success' as const, delay: 2200 },
+  { text: '✓ Added /login and /register routes', type: 'success' as const, delay: 2500 },
+  { text: '✓ Configured auth context', type: 'success' as const, delay: 2800 },
+  { text: '', type: 'space' as const, delay: 3000 },
+  { text: 'Claude: Done! /login and /register are ready to be tested.', type: 'assistant-done' as const, delay: 3200 },
 ]
 
 export default function CodeDemo() {
   const [visibleLines, setVisibleLines] = useState(0)
-  const [statusIndex, setStatusIndex] = useState(-1)
 
   useEffect(() => {
-    // Type out code lines
-    const lineTimer = setInterval(() => {
-      setVisibleLines(prev => {
-        if (prev >= CODE_LINES.length) {
-          clearInterval(lineTimer)
-          return prev
-        }
-        return prev + 1
-      })
-    }, 120)
-
-    // Show status lines after code is "typed"
-    STATUS_LINES.forEach((status, i) => {
-      setTimeout(() => setStatusIndex(i), CODE_LINES.length * 120 + status.delay)
+    CLI_LINES.forEach((line, i) => {
+      setTimeout(() => {
+        setVisibleLines(i + 1)
+      }, line.delay)
     })
-
-    return () => clearInterval(lineTimer)
   }, [])
 
   return (
@@ -56,30 +37,36 @@ export default function CodeDemo() {
         <div className="w-3 h-3 rounded-full bg-red-500/80" />
         <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
         <div className="w-3 h-3 rounded-full bg-green-500/80" />
-        <span className="ml-3 text-white/40 text-xs font-mono">app.ts</span>
+        <span className="ml-3 text-white/40 text-xs font-mono">Claude Code CLI</span>
       </div>
 
-      {/* Code area */}
+      {/* CLI area */}
       <div className="p-5 font-mono text-sm leading-relaxed min-h-[320px]">
-        {CODE_LINES.slice(0, visibleLines).map((line, i) => (
-          <div key={i} className={line.type === 'comment' ? 'text-gray-500' : 'text-gray-200'}>
-            {line.text || '\u00A0'}
-          </div>
-        ))}
-
-        {/* Status bar */}
-        {statusIndex >= 0 && (
-          <div className="mt-4 pt-4 border-t border-white/10 space-y-1">
-            {STATUS_LINES.slice(0, statusIndex + 1).map((status, i) => (
-              <div key={i} className="text-xs flex items-center gap-2">
-                <span className="text-green-400">
-                  {i === 0 ? '\u25CF' : '\u26A1'}
-                </span>
-                <span className="text-green-400/80">{status.text}</span>
+        {CLI_LINES.slice(0, visibleLines).map((line, i) => {
+          if (line.type === 'space') {
+            return <div key={i}>&nbsp;</div>
+          }
+          if (line.type === 'prompt') {
+            return <div key={i} className="text-primary-400">{line.text}</div>
+          }
+          if (line.type === 'user') {
+            return <div key={i} className="text-white">{line.text}</div>
+          }
+          if (line.type === 'assistant' || line.type === 'assistant-done') {
+            return <div key={i} className="text-blue-300">{line.text}</div>
+          }
+          if (line.type === 'command') {
+            return <div key={i} className="text-gray-400">{line.text}</div>
+          }
+          if (line.type === 'success') {
+            return (
+              <div key={i} className="text-green-400 flex items-center gap-2">
+                <span>{line.text}</span>
               </div>
-            ))}
-          </div>
-        )}
+            )
+          }
+          return <div key={i} className="text-gray-200">{line.text}</div>
+        })}
       </div>
     </div>
   )
