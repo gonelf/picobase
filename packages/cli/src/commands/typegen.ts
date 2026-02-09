@@ -96,7 +96,45 @@ function generateTypes(collections: any[]): string {
     const typeName = pascalCase(collection.name) + 'Record';
     output += `  ${collection.name}: ${typeName};\n`;
   });
-  output += `}\n`;
+  output += `}\n\n`;
+
+  // Generate typed client helper — this is the DX magic
+  output += `// ── Typed client helper ────────────────────────────────────────────────\n`;
+  output += `// Use this instead of raw createClient() to get full autocomplete on\n`;
+  output += `// collection names and record types — no more magic strings!\n`;
+  output += `//\n`;
+  output += `// Usage:\n`;
+  output += `//   import { pb } from './types/picobase'\n`;
+  output += `//   const posts = await pb.collection('posts').getList()  // fully typed!\n`;
+  output += `//   posts.items[0].title  // autocomplete works here\n`;
+  output += `//\n\n`;
+
+  output += `import { createClient, type PicoBaseClient, type PicoBaseClientOptions, PicoBaseCollection } from '@picobase_app/client'\n\n`;
+
+  output += `/** PicoBase client with typed collections. */\n`;
+  output += `export interface TypedPicoBaseClient extends PicoBaseClient {\n`;
+  output += `  collection<K extends CollectionName>(name: K): PicoBaseCollection<CollectionRecords[K]>\n`;
+  output += `  collection<T = import('@picobase_app/client').RecordModel>(name: string): PicoBaseCollection<T>\n`;
+  output += `}\n\n`;
+
+  output += `/**\n`;
+  output += ` * Create a typed PicoBase client. Collections are fully typed based on your schema.\n`;
+  output += ` *\n`;
+  output += ` * @example\n`;
+  output += ` * \`\`\`ts\n`;
+  output += ` * const pb = createTypedClient()\n`;
+  output += ` * const posts = await pb.collection('posts').getList(1, 20)\n`;
+  output += ` * //                                ^-- autocomplete!  ^-- PostsRecord[]\n`;
+  output += ` * \`\`\`\n`;
+  output += ` */\n`;
+  output += `export function createTypedClient(options?: PicoBaseClientOptions): TypedPicoBaseClient\n`;
+  output += `export function createTypedClient(url: string, apiKey: string, options?: PicoBaseClientOptions): TypedPicoBaseClient\n`;
+  output += `export function createTypedClient(...args: any[]): TypedPicoBaseClient {\n`;
+  output += `  return (createClient as any)(...args) as TypedPicoBaseClient\n`;
+  output += `}\n\n`;
+
+  output += `/** Pre-configured typed client instance (reads from env vars). */\n`;
+  output += `export const pb = createTypedClient()\n`;
 
   return output;
 }

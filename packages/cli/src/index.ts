@@ -57,6 +57,8 @@ program
   .command('dev')
   .description('Start local PocketBase instance for development')
   .option('-p, --port <port>', 'Port to run on', '8090')
+  .option('-a, --with-app', 'Also start your app dev server (npm run dev)')
+  .option('-r, --run <command>', 'Custom command to start your app (e.g., "npm run dev")')
   .action(devCommand);
 
 program.parse(process.argv);
