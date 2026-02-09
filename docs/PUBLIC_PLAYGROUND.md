@@ -54,49 +54,52 @@ Add the demo instance ID to your `.env` file:
 DEMO_INSTANCE_ID=your-demo-instance-id
 ```
 
-### Step 3: Set Up Auto-Reset (Recommended)
+### Step 3: Set Up Auto-Reset (Daily Reset Recommended)
 
-To maintain data integrity, set up a cron job to reset demo data periodically:
+To maintain data integrity, set up a cron job to reset demo data daily.
 
-```bash
-# Reset demo instance every 6 hours
-0 */6 * * * /path/to/reset-demo-instance.sh
-```
+**Quick Setup:**
 
-Example reset script:
+1. Generate a reset secret:
+   ```bash
+   openssl rand -base64 32
+   ```
 
-```bash
-#!/bin/bash
-# reset-demo-instance.sh
+2. Add to `.env`:
+   ```env
+   DEMO_RESET_SECRET=<generated-secret>
+   ```
 
-INSTANCE_ID="your-demo-instance-id"
-API_URL="https://your-api.railway.app"
-API_KEY="your-api-key"
+3. Set up daily cron job (runs at 3 AM):
+   ```bash
+   crontab -e
+   # Add: 0 3 * * * /path/to/picobase/scripts/reset-demo-instance.sh
+   ```
 
-# Delete all records
-curl -X DELETE "$API_URL/instances/$INSTANCE_ID/reset" \
-  -H "X-API-Key: $API_KEY"
+**📖 For complete setup instructions, see:** [DEMO_RESET_SETUP.md](./DEMO_RESET_SETUP.md)
 
-# Re-seed with fresh data
-curl -X POST "$API_URL/instances/$INSTANCE_ID/seed" \
-  -H "X-API-Key: $API_KEY" \
-  -H "Content-Type: application/json" \
-  -d @demo-seed-data.json
-```
+The automated reset script:
+- Deletes all records from demo collections
+- Re-seeds with fresh sample data (posts, users, comments)
+- Logs all operations with timestamps
+- Supports notifications (Slack, Email)
+- Runs daily to ensure consistent user experience
 
 ## Security Checklist
 
 Before deploying the public playground to production:
 
 - [ ] Demo instance ID is set in environment variables
+- [ ] Demo reset secret is generated and set (32+ characters)
 - [ ] Demo instance uses separate database (not production)
 - [ ] Rate limiting is configured appropriately
 - [ ] Referrer validation is enabled (production mode)
-- [ ] Auto-reset cron job is set up
+- [ ] Auto-reset cron job is set up and tested
 - [ ] Demo data contains no sensitive information
 - [ ] Write operations are confirmed blocked
 - [ ] Response size limits are enforced
 - [ ] Monitoring/alerting is configured for abuse detection
+- [ ] Reset logs are being generated and rotated
 
 ## API Endpoints
 
