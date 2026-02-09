@@ -3,18 +3,18 @@
 import { useState, useEffect } from 'react'
 
 const CLI_LINES = [
-  { text: 'Can you add authentication with PicoBase?', type: 'user' as const, delay: 0 },
+  { text: 'How do I start using PicoBase?', type: 'user' as const, delay: 0 },
   { text: '', type: 'space' as const, delay: 800 },
-  { text: 'I\'ll add authentication with PicoBase for you. Let me install the client and set everything up.', type: 'assistant' as const, delay: 1000 },
+  { text: 'Just run the login command. I\'ll handle the rest.', type: 'assistant' as const, delay: 1000 },
   { text: '', type: 'space' as const, delay: 2000 },
-  { text: '$ npm install @picobase_app/client', type: 'command' as const, delay: 2200 },
-  { text: '', type: 'space' as const, delay: 2800 },
-  { text: '✓ Created components/AuthForm.tsx', type: 'output' as const, delay: 3000 },
-  { text: '✓ Added /login route', type: 'output' as const, delay: 3300 },
-  { text: '✓ Added /register route', type: 'output' as const, delay: 3600 },
-  { text: '✓ Configured authentication context', type: 'output' as const, delay: 3900 },
-  { text: '', type: 'space' as const, delay: 4200 },
-  { text: 'Done! /login and /register are ready to be tested. The auth form includes email/password and OAuth support.', type: 'assistant' as const, delay: 4400 },
+  { text: '$ npx @picobase_app/cli login --email you@example.com', type: 'command' as const, delay: 2200 },
+  { text: '', type: 'space' as const, delay: 3000 },
+  { text: '✓ Code sent to email', type: 'output' as const, delay: 3200 },
+  { text: 'Enter code: ******', type: 'command' as const, delay: 4000 },
+  { text: '✓ Successfully logged in!', type: 'output' as const, delay: 4500 },
+  { text: '✓ API Key saved to .env', type: 'output' as const, delay: 4800 },
+  { text: '', type: 'space' as const, delay: 5100 },
+  { text: 'You\'re authenticated. Now you can use createClient() without any config.', type: 'assistant' as const, delay: 5300 },
 ]
 
 export default function CodeDemo() {
