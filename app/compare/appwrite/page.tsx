@@ -1,15 +1,31 @@
 import type { Metadata } from 'next'
 import ComparisonLayout from '../ComparisonLayout'
-import type { FeatureComparison, CodeExample } from '../ComparisonLayout'
+import type { FeatureComparison, CodeExample, FAQItem } from '../ComparisonLayout'
 
 export const metadata: Metadata = {
-  title: 'PicoBase vs Appwrite — Comparison',
+  title: 'PicoBase vs Appwrite — Comparison (2025)',
   description:
-    'Compare PicoBase and Appwrite. See how PicoBase offers a simpler setup, auto-creating collections, and a leaner developer experience.',
+    'Compare PicoBase and Appwrite side-by-side. No database IDs, auto-creating collections, single-binary deployment, and lower pricing. See code comparisons and feature tables.',
+  keywords: [
+    'picobase vs appwrite', 'appwrite alternative', 'appwrite competitor', 'best appwrite alternative',
+    'appwrite vs supabase', 'backend as a service', 'baas comparison', 'open source baas',
+    'appwrite pricing', 'self-hosted backend', 'pocketbase alternative',
+  ],
+  alternates: {
+    canonical: 'https://picobase.app/compare/appwrite',
+  },
   openGraph: {
     title: 'PicoBase vs Appwrite — Which Backend Should You Choose?',
     description:
-      'Side-by-side comparison of PicoBase and Appwrite for database, auth, realtime, and file storage.',
+      'Side-by-side comparison of PicoBase and Appwrite. Simpler setup, auto-creating collections, lower pricing.',
+    url: 'https://picobase.app/compare/appwrite',
+    siteName: 'PicoBase',
+    type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'PicoBase vs Appwrite — Which Backend Should You Choose?',
+    description: 'No database IDs, auto-creating collections, single-binary deployment.',
   },
 }
 
@@ -193,10 +209,34 @@ const whySwitch = [
   },
 ]
 
+const faqItems: FAQItem[] = [
+  {
+    question: 'How is PicoBase different from Appwrite?',
+    answer: 'Both are open-source BaaS platforms, but PicoBase focuses on zero-config simplicity. Appwrite requires you to create databases, collections, and define attributes before storing data. PicoBase collections auto-create on first write. PicoBase also uses a relational model vs Appwrite\'s document model.',
+  },
+  {
+    question: 'Is PicoBase easier to self-host than Appwrite?',
+    answer: 'Yes. Appwrite requires Docker with multiple containers (MariaDB, Redis, SMTP, etc.). PicoBase is a single Go binary you can deploy anywhere — no Docker, no container orchestration, no dependency management.',
+  },
+  {
+    question: 'Why doesn\'t PicoBase require database IDs like Appwrite?',
+    answer: 'Appwrite uses a database-collection-document hierarchy where you need to reference database IDs and collection IDs in every query. PicoBase simplifies this to just collection names — pb.collection(\'posts\') is all you need.',
+  },
+  {
+    question: 'Does PicoBase have cloud functions like Appwrite?',
+    answer: 'PicoBase currently focuses on database, auth, realtime, and file storage. For server-side logic, you can use your existing backend framework (Next.js API routes, Express, etc.) alongside PicoBase. Cloud functions are on our roadmap.',
+  },
+  {
+    question: 'Can I migrate from Appwrite to PicoBase?',
+    answer: 'Yes. You can export your Appwrite documents and import them into PicoBase collections. The SDK migration is straightforward since PicoBase\'s API is simpler — most Appwrite operations map to fewer lines of PicoBase code.',
+  },
+]
+
 export default function PicoBaseVsAppwrite() {
   return (
     <ComparisonLayout
       competitor="Appwrite"
+      competitorSlug="appwrite"
       tagline="Less Config, More Shipping"
       subtitle="Same open-source values. Radically simpler developer experience."
       heroDescription="Appwrite is a solid open-source BaaS, but it requires you to set up databases, collections, and attributes before writing any code. PicoBase skips all that — just install and start building."
@@ -204,6 +244,7 @@ export default function PicoBaseVsAppwrite() {
       codeExamples={codeExamples}
       whySwitch={whySwitch}
       competitorDescription="Appwrite is an open-source Backend-as-a-Service platform that provides database, authentication, functions, storage, and messaging. It's self-hostable via Docker and also offers a managed cloud service. While comprehensive, it requires manual setup of databases, collections, and attribute definitions before you can store data."
+      faqItems={faqItems}
     />
   )
 }

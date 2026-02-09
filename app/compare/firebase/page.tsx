@@ -1,15 +1,31 @@
 import type { Metadata } from 'next'
 import ComparisonLayout from '../ComparisonLayout'
-import type { FeatureComparison, CodeExample } from '../ComparisonLayout'
+import type { FeatureComparison, CodeExample, FAQItem } from '../ComparisonLayout'
 
 export const metadata: Metadata = {
-  title: 'PicoBase vs Firebase — Comparison',
+  title: 'PicoBase vs Firebase — Comparison (2025)',
   description:
-    'Compare PicoBase and Firebase. See how PicoBase offers open-source flexibility, simpler pricing, and a more developer-friendly experience.',
+    'Compare PicoBase and Firebase side-by-side. Open source, predictable pricing, no vendor lock-in, relational data model. See code comparisons and feature tables.',
+  keywords: [
+    'picobase vs firebase', 'firebase alternative', 'firebase alternative open source', 'best firebase alternative',
+    'firebase competitor', 'firestore alternative', 'backend as a service', 'baas comparison',
+    'firebase pricing', 'firebase open source alternative', 'firebase vendor lock-in',
+  ],
+  alternates: {
+    canonical: 'https://picobase.app/compare/firebase',
+  },
   openGraph: {
     title: 'PicoBase vs Firebase — Which Backend Should You Choose?',
     description:
-      'Side-by-side comparison of PicoBase and Firebase for database, auth, realtime, and file storage.',
+      'Side-by-side comparison of PicoBase and Firebase. Open source, predictable pricing, no vendor lock-in.',
+    url: 'https://picobase.app/compare/firebase',
+    siteName: 'PicoBase',
+    type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'PicoBase vs Firebase — Which Backend Should You Choose?',
+    description: 'Open source, predictable pricing, no vendor lock-in. See the full comparison.',
   },
 }
 
@@ -207,10 +223,34 @@ const whySwitch = [
   },
 ]
 
+const faqItems: FAQItem[] = [
+  {
+    question: 'Is PicoBase a drop-in replacement for Firebase?',
+    answer: 'PicoBase covers the core Firebase features — database, auth, realtime, and file storage. However, PicoBase uses a relational data model instead of Firebase\'s NoSQL document model. For most apps, this is an upgrade, but if you heavily depend on Firestore\'s nested document structure or offline-first sync, the migration requires some data restructuring.',
+  },
+  {
+    question: 'Will I get surprise bills with PicoBase like Firebase?',
+    answer: 'No. PicoBase uses flat, predictable monthly pricing starting at $7/mo. There are no per-read or per-write charges. You know exactly what you\'ll pay before you ship, unlike Firebase\'s pay-per-operation model.',
+  },
+  {
+    question: 'Can I use PicoBase without a Google account?',
+    answer: 'Yes. PicoBase is completely independent of Google. You can sign up with any email, self-host on any infrastructure, and export your data at any time. No Google Cloud dependency.',
+  },
+  {
+    question: 'Does PicoBase support offline-first like Firebase?',
+    answer: 'PicoBase currently focuses on online-first with realtime subscriptions. If your app requires extensive offline support with automatic sync (like Firebase\'s Firestore offline persistence), Firebase may be a better fit for that specific use case.',
+  },
+  {
+    question: 'Why choose PicoBase over Firebase for a new project?',
+    answer: 'PicoBase offers open-source transparency, a relational data model that scales without denormalization, predictable pricing, zero vendor lock-in, and a simpler SDK surface that works perfectly with AI coding tools. If you\'re starting fresh, PicoBase gets you to production faster with less complexity.',
+  },
+]
+
 export default function PicoBaseVsFirebase() {
   return (
     <ComparisonLayout
       competitor="Firebase"
+      competitorSlug="firebase"
       tagline="The Open Source Firebase Alternative"
       subtitle="Open source. Predictable pricing. No vendor lock-in."
       heroDescription="Firebase gives you a lot of features tied to Google Cloud. PicoBase gives you the essentials — database, auth, realtime, storage — without the complexity, the lock-in, or the surprise bills."
@@ -218,6 +258,7 @@ export default function PicoBaseVsFirebase() {
       codeExamples={codeExamples}
       whySwitch={whySwitch}
       competitorDescription="Firebase is Google's Backend-as-a-Service platform. It offers a NoSQL document database (Firestore), authentication, cloud functions, hosting, and file storage. While feature-rich and well-integrated with Google Cloud, it uses proprietary formats, has a complex pricing model based on reads/writes, and creates significant vendor lock-in."
+      faqItems={faqItems}
     />
   )
 }

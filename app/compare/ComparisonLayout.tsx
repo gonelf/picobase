@@ -17,8 +17,14 @@ export interface CodeExample {
   competitor: string
 }
 
+export interface FAQItem {
+  question: string
+  answer: string
+}
+
 interface ComparisonLayoutProps {
   competitor: string
+  competitorSlug: string
   tagline: string
   subtitle: string
   heroDescription: string
@@ -26,6 +32,7 @@ interface ComparisonLayoutProps {
   codeExamples: CodeExample[]
   whySwitch: { title: string; description: string }[]
   competitorDescription: string
+  faqItems: FAQItem[]
 }
 
 function CheckIcon() {
@@ -61,6 +68,7 @@ function renderValue(val: string | boolean) {
 
 export default function ComparisonLayout({
   competitor,
+  competitorSlug,
   tagline,
   subtitle,
   heroDescription,
@@ -68,6 +76,7 @@ export default function ComparisonLayout({
   codeExamples,
   whySwitch,
   competitorDescription,
+  faqItems,
 }: ComparisonLayoutProps) {
   const signInUrl = getAuthUrl('signin')
 
@@ -79,8 +88,76 @@ export default function ComparisonLayout({
     { name: 'Nhost', href: '/compare/nhost' },
   ].filter((a) => a.name.toLowerCase() !== competitor.toLowerCase())
 
+  const pageUrl = `https://picobase.app/compare/${competitorSlug}`
+
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': pageUrl,
+        url: pageUrl,
+        name: `PicoBase vs ${competitor} — Comparison`,
+        description: subtitle,
+        isPartOf: { '@id': 'https://picobase.app/#website' },
+        breadcrumb: {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://picobase.app' },
+            { '@type': 'ListItem', position: 2, name: 'Compare', item: 'https://picobase.app/compare' },
+            { '@type': 'ListItem', position: 3, name: `PicoBase vs ${competitor}`, item: pageUrl },
+          ],
+        },
+      },
+      {
+        '@type': 'SoftwareApplication',
+        name: 'PicoBase',
+        applicationCategory: 'DeveloperApplication',
+        operatingSystem: 'Any',
+        url: 'https://picobase.app',
+        offers: {
+          '@type': 'Offer',
+          price: '0',
+          priceCurrency: 'USD',
+        },
+        description:
+          'The open source Firebase alternative for vibe coders. Instant backend infrastructure with real-time database, authentication, and file storage.',
+        featureList: [
+          'Zero-config setup',
+          'Auto-creating collections',
+          'Real-time database',
+          'Built-in authentication',
+          'File storage',
+          'TypeScript SDK',
+          'React hooks',
+          'REST API',
+          'Open source',
+          'Self-hostable',
+        ],
+        applicationSubCategory: 'Backend-as-a-Service',
+        softwareVersion: '1.0',
+      },
+      {
+        '@type': 'FAQPage',
+        mainEntity: faqItems.map((item) => ({
+          '@type': 'Question',
+          name: item.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: item.answer,
+          },
+        })),
+      },
+    ],
+  }
+
   return (
     <main className="min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+
       {/* Nav */}
       <div className="relative bg-gray-950">
         <div className="max-w-7xl mx-auto px-6 pt-6 flex items-center justify-between">
@@ -275,8 +352,38 @@ export default function ComparisonLayout({
         </div>
       </section>
 
+      {/* FAQ Section */}
+      <section className="py-20 md:py-28 px-6 bg-gray-50 dark:bg-gray-800">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300">
+              Common questions about PicoBase vs {competitor}
+            </p>
+          </div>
+
+          <div className="space-y-6">
+            {faqItems.map((item) => (
+              <div
+                key={item.question}
+                className="rounded-xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 p-6"
+              >
+                <h3 className="text-base font-bold text-gray-900 dark:text-white mb-3">
+                  {item.question}
+                </h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
+                  {item.answer}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Other Comparisons */}
-      <section className="py-12 px-6 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+      <section className="py-12 px-6 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-4">
             Other Comparisons
@@ -286,7 +393,7 @@ export default function ComparisonLayout({
               <Link
                 key={alt.name}
                 href={alt.href}
-                className="px-4 py-2 text-sm font-medium rounded-lg bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
+                className="px-4 py-2 text-sm font-medium rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 transition-colors"
               >
                 PicoBase vs {alt.name}
               </Link>

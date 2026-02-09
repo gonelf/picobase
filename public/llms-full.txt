@@ -1,0 +1,255 @@
+# PicoBase — Complete Reference
+
+> The open source backend for vibe coders. A managed Backend-as-a-Service (BaaS) platform — the Supabase/Firebase alternative built on PocketBase.
+
+PicoBase gives developers zero-config database, auth, realtime, and file storage without managing infrastructure. From `npm install` to production data in 3 minutes. No Docker, no local env setup, no config fatigue.
+
+## Architecture
+
+PicoBase is built on PocketBase (a lightweight Go binary) with per-tenant SQLite instances. The platform manages provisioning, scaling, and lifecycle. Each project gets its own isolated instance.
+
+## Packages
+
+### @picobase_app/client (SDK)
+
+The core SDK wraps PocketBase with cold-start retry, API key injection, and typed collections.
+
+```ts
+import { createClient } from '@picobase_app/client'
+
+// Zero-config — reads PICOBASE_URL and PICOBASE_API_KEY from env
+const pb = createClient()
+```
+
+### @picobase_app/react (React Hooks)
+
+React hooks and components for PicoBase.
+
+```tsx
+import { PicoBaseProvider, useAuth, useCollection } from '@picobase_app/react'
+
+<PicoBaseProvider url={process.env.PICOBASE_URL!} apiKey={process.env.PICOBASE_API_KEY!}>
+  <App />
+</PicoBaseProvider>
+
+const { user, signIn, signOut } = useAuth()
+const { data: posts, loading } = useCollection('posts')
+```
+
+### @picobase_app/cli (CLI)
+
+CLI tool for scaffolding, local dev, and type generation.
+
+```bash
+picobase init        # Project scaffolding
+picobase dev         # Local dev server
+picobase typegen     # TypeScript type generation
+```
+
+## SDK API Reference
+
+### Client Initialization
+
+```ts
+import { createClient } from '@picobase_app/client'
+
+// Auto-reads from environment variables
+const pb = createClient()
+
+// Or explicit configuration
+const pb = createClient({
+  url: 'https://myapp.picobase.com',
+  apiKey: 'pbk_...',
+})
+```
+
+### Authentication
+
+```ts
+// Sign up
+const user = await pb.auth.signUp({
+  email: 'user@example.com',
+  password: 'secure123',
+})
+
+// Sign in
+await pb.auth.signIn({
+  email: 'user@example.com',
+  password: 'secure123',
+})
+
+// Sign out
+await pb.auth.signOut()
+
+// Get current user
+const user = pb.auth.user
+```
+
+### CRUD Operations
+
+Collections auto-create on first write. No schema setup required.
+
+```ts
+// Create
+const post = await pb.collection('posts').create({
+  title: 'Hello World',
+  published: true,
+})
+
+// Read one
+const post = await pb.collection('posts').getOne('record_id')
+
+// Read list with filters
+const posts = await pb.collection('posts').getList(1, 20, {
+  filter: 'published = true',
+  sort: '-created',
+  expand: 'author',
+})
+
+// Update
+const updated = await pb.collection('posts').update('record_id', {
+  title: 'Updated Title',
+})
+
+// Delete
+await pb.collection('posts').delete('record_id')
+```
+
+### Filter Syntax
+
+PicoBase uses PocketBase's query language:
+
+```
+filter: 'published = true'
+filter: 'status = "active" && created > "2024-01-01"'
+filter: 'author.name ~ "John"'        // contains
+filter: 'tags ?~ "featured"'           // array contains
+sort: '-created'                        // descending
+sort: '+title,-created'                 // multi-field
+expand: 'author,comments'              // load relations
+```
+
+### Realtime Subscriptions
+
+```ts
+// Subscribe to all changes in a collection
+const unsub = await pb.collection('messages').subscribe((e) => {
+  console.log(e.action, e.record)
+  // e.action: 'create' | 'update' | 'delete'
+})
+
+// Unsubscribe
+unsub()
+```
+
+### React Hooks
+
+```tsx
+import { useAuth, useCollection, useRealtime } from '@picobase_app/react'
+
+// Auth hook
+const { user, signIn, signOut, loading } = useAuth()
+
+// Collection hook with auto-fetch
+const { data: posts, loading, error } = useCollection('posts', {
+  filter: 'published = true',
+  sort: '-created',
+})
+
+// Auth form component
+import { AuthForm } from '@picobase_app/react'
+
+<AuthForm
+  providers={['google', 'github']}
+  redirectTo="/dashboard"
+/>
+```
+
+## Environment Variables
+
+- `PICOBASE_URL` — Instance URL (e.g., `https://myapp.picobase.com`)
+- `PICOBASE_API_KEY` — API key starting with `pbk_`
+- Next.js client-side: prefix with `NEXT_PUBLIC_`
+- Vite client-side: prefix with `VITE_`
+
+## Pricing
+
+- **Free**: $0/mo — 2 projects, 1 GB storage, fair-use traffic
+- **Starter**: $7/mo — 10 projects, 10 GB storage
+- **Pro**: $19/mo — Unlimited projects, 50 GB storage
+
+No credit card required for the free tier.
+
+## Comparisons with Alternatives
+
+### PicoBase vs Supabase
+
+PicoBase is simpler than Supabase. Key differences:
+- Zero-config start (no SQL migrations, no RLS policies)
+- Auto-creating collections (no schema editor needed)
+- 3.5x cheaper paid plans ($7/mo vs $25/mo)
+- Per-tenant isolation (no shared database)
+- Simpler API surface (better for AI-assisted development)
+
+Supabase advantages: Edge functions, raw SQL access, GraphQL support, larger ecosystem.
+
+Full comparison: https://picobase.app/compare/supabase
+
+### PicoBase vs Firebase
+
+PicoBase is open source, unlike Firebase. Key differences:
+- Open source and self-hostable (no vendor lock-in)
+- Predictable pricing (no per-read/write charges)
+- Relational data model (no denormalization needed)
+- Simpler SDK (fewer imports and boilerplate)
+- No Google account required
+
+Firebase advantages: Offline-first sync, cloud functions, phone auth, anonymous auth, massive ecosystem.
+
+Full comparison: https://picobase.app/compare/firebase
+
+### PicoBase vs Appwrite
+
+Both are open-source BaaS, but PicoBase is simpler. Key differences:
+- No database IDs to manage (just collection names)
+- Auto-creating collections (no console setup needed)
+- Single-binary deployment (no Docker required)
+- Relational data model
+- Lower pricing ($7/mo vs $15/mo)
+
+Appwrite advantages: Cloud functions, teams & roles, magic link auth, messaging.
+
+Full comparison: https://picobase.app/compare/appwrite
+
+### PicoBase vs Convex
+
+PicoBase has built-in auth and no custom query language. Key differences:
+- Built-in authentication (no Clerk/Auth0 required)
+- No schema boilerplate or server-side query functions
+- Standard REST API (usable from any language)
+- Self-hostable and open source
+- Simpler pricing ($7/mo vs $25/mo)
+
+Convex advantages: Automatic reactivity, server functions, scheduled jobs, ACID transactions.
+
+Full comparison: https://picobase.app/compare/convex
+
+### PicoBase vs Nhost
+
+PicoBase doesn't require GraphQL. Key differences:
+- No GraphQL knowledge needed (REST API + TypeScript SDK)
+- No SQL migrations or Hasura configuration
+- Single-binary self-hosting (no multi-container setup)
+- Better AI compatibility (REST vs GraphQL)
+- Lower pricing ($7/mo vs $25/mo)
+
+Nhost advantages: GraphQL flexibility, serverless functions, magic link auth, SMS auth.
+
+Full comparison: https://picobase.app/compare/nhost
+
+## Links
+
+- Website: https://picobase.app
+- Documentation: https://picobase.app/docs
+- GitHub: https://github.com/picobase/picobase
+- Twitter: https://twitter.com/picobase

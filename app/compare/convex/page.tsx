@@ -1,15 +1,31 @@
 import type { Metadata } from 'next'
 import ComparisonLayout from '../ComparisonLayout'
-import type { FeatureComparison, CodeExample } from '../ComparisonLayout'
+import type { FeatureComparison, CodeExample, FAQItem } from '../ComparisonLayout'
 
 export const metadata: Metadata = {
-  title: 'PicoBase vs Convex — Comparison',
+  title: 'PicoBase vs Convex — Comparison (2025)',
   description:
-    'Compare PicoBase and Convex. See how PicoBase offers a simpler model with zero config, no custom query language, and straightforward pricing.',
+    'Compare PicoBase and Convex side-by-side. Built-in auth, no custom query language, self-hostable, and simpler pricing. See code comparisons and feature tables.',
+  keywords: [
+    'picobase vs convex', 'convex alternative', 'convex competitor', 'best convex alternative',
+    'convex backend', 'reactive backend', 'backend as a service', 'baas comparison',
+    'convex pricing', 'convex open source', 'realtime database',
+  ],
+  alternates: {
+    canonical: 'https://picobase.app/compare/convex',
+  },
   openGraph: {
     title: 'PicoBase vs Convex — Which Backend Should You Choose?',
     description:
-      'Side-by-side comparison of PicoBase and Convex for database, auth, realtime, and developer experience.',
+      'Side-by-side comparison of PicoBase and Convex. Built-in auth, no boilerplate, self-hostable.',
+    url: 'https://picobase.app/compare/convex',
+    siteName: 'PicoBase',
+    type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'PicoBase vs Convex — Which Backend Should You Choose?',
+    description: 'Built-in auth, no custom query language, self-hostable. See the full comparison.',
   },
 }
 
@@ -202,10 +218,34 @@ const whySwitch = [
   },
 ]
 
+const faqItems: FAQItem[] = [
+  {
+    question: 'How does PicoBase compare to Convex for realtime?',
+    answer: 'Both platforms support realtime data. Convex makes every query reactive by default through its custom query system. PicoBase uses WebSocket subscriptions you can add to any collection. The key difference is PicoBase doesn\'t require you to write server-side query functions — you subscribe directly from the client.',
+  },
+  {
+    question: 'Does PicoBase require a third-party auth provider?',
+    answer: 'No. PicoBase ships with built-in email/password authentication and OAuth provider support. Convex has no built-in auth and requires you to integrate Clerk, Auth0, or another third-party auth service, adding cost and complexity.',
+  },
+  {
+    question: 'Can I self-host PicoBase unlike Convex?',
+    answer: 'Yes. PicoBase is fully open source and self-hostable as a single binary. Convex is a proprietary cloud-only platform with no self-hosting option, creating vendor lock-in.',
+  },
+  {
+    question: 'Why doesn\'t PicoBase use a custom query language?',
+    answer: 'PicoBase uses simple filter strings (e.g., \'published = true\') and a REST API, which means any developer or AI tool can use it immediately. Convex\'s custom query builder requires learning a new API and writing server-side functions for every data access pattern.',
+  },
+  {
+    question: 'Is PicoBase good for React apps like Convex?',
+    answer: 'Yes. PicoBase has a dedicated React package (@picobase_app/react) with hooks like useCollection and useAuth, plus a PicoBaseProvider component. You get the same React-first developer experience without the schema boilerplate.',
+  },
+]
+
 export default function PicoBaseVsConvex() {
   return (
     <ComparisonLayout
       competitor="Convex"
+      competitorSlug="convex"
       tagline="All the Reactivity, None of the Boilerplate"
       subtitle="Realtime data without schema files, server functions, or third-party auth."
       heroDescription="Convex offers powerful reactive queries, but requires you to define schemas, write server-side functions, and bring your own auth provider. PicoBase gives you realtime data, built-in auth, and auto-creating collections with a standard REST API."
@@ -213,6 +253,7 @@ export default function PicoBaseVsConvex() {
       codeExamples={codeExamples}
       whySwitch={whySwitch}
       competitorDescription="Convex is a reactive backend platform that provides a document database with automatic realtime updates, server functions, and file storage. It uses a custom query language and requires schema definitions and server-side query/mutation functions. Auth requires a third-party integration like Clerk or Auth0."
+      faqItems={faqItems}
     />
   )
 }

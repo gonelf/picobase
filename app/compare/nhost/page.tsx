@@ -1,15 +1,31 @@
 import type { Metadata } from 'next'
 import ComparisonLayout from '../ComparisonLayout'
-import type { FeatureComparison, CodeExample } from '../ComparisonLayout'
+import type { FeatureComparison, CodeExample, FAQItem } from '../ComparisonLayout'
 
 export const metadata: Metadata = {
-  title: 'PicoBase vs Nhost — Comparison',
+  title: 'PicoBase vs Nhost — Comparison (2025)',
   description:
-    'Compare PicoBase and Nhost. See how PicoBase offers zero-config setup without requiring GraphQL or Hasura knowledge.',
+    'Compare PicoBase and Nhost side-by-side. No GraphQL required, no SQL migrations, single-binary self-hosting, and lower pricing. See code comparisons and feature tables.',
+  keywords: [
+    'picobase vs nhost', 'nhost alternative', 'nhost competitor', 'best nhost alternative',
+    'nhost vs supabase', 'graphql backend', 'hasura alternative', 'backend as a service',
+    'baas comparison', 'nhost pricing', 'open source baas',
+  ],
+  alternates: {
+    canonical: 'https://picobase.app/compare/nhost',
+  },
   openGraph: {
     title: 'PicoBase vs Nhost — Which Backend Should You Choose?',
     description:
-      'Side-by-side comparison of PicoBase and Nhost for database, auth, realtime, and developer experience.',
+      'Side-by-side comparison of PicoBase and Nhost. No GraphQL required, no SQL migrations, simpler stack.',
+    url: 'https://picobase.app/compare/nhost',
+    siteName: 'PicoBase',
+    type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'PicoBase vs Nhost — Which Backend Should You Choose?',
+    description: 'No GraphQL required, no SQL migrations, single-binary self-hosting.',
   },
 }
 
@@ -214,10 +230,34 @@ const whySwitch = [
   },
 ]
 
+const faqItems: FAQItem[] = [
+  {
+    question: 'Do I need to know GraphQL to use PicoBase?',
+    answer: 'No. PicoBase uses a simple REST API with a chainable TypeScript SDK. There are no GraphQL queries, mutations, or subscriptions to write. If you\'re tired of writing gql template literals, PicoBase is a welcome change.',
+  },
+  {
+    question: 'Is PicoBase still relational like Nhost?',
+    answer: 'Yes. Both PicoBase and Nhost use relational databases under the hood. The difference is that PicoBase doesn\'t require Postgres migrations or a GraphQL engine (Hasura) to access your data. You get the benefits of relational data with a simpler access layer.',
+  },
+  {
+    question: 'Can AI coding tools work with PicoBase better than Nhost?',
+    answer: 'Yes. GraphQL mutations and queries are notoriously hard for AI tools like Cursor, Claude, and v0 to generate correctly — the syntax is complex and error-prone. PicoBase\'s REST API and simple filter strings are easy for AI to get right every time.',
+  },
+  {
+    question: 'How does self-hosting PicoBase compare to self-hosting Nhost?',
+    answer: 'Self-hosting Nhost requires running Postgres, Hasura, an auth service, and potentially more containers. PicoBase is a single Go binary — download it, run it, done. No Docker, no container orchestration, no multi-service management.',
+  },
+  {
+    question: 'Does PicoBase support serverless functions like Nhost?',
+    answer: 'PicoBase currently focuses on database, auth, realtime, and file storage. For server-side logic, you can pair PicoBase with your existing framework (Next.js API routes, Vercel functions, etc.). Dedicated serverless functions are on our roadmap.',
+  },
+]
+
 export default function PicoBaseVsNhost() {
   return (
     <ComparisonLayout
       competitor="Nhost"
+      competitorSlug="nhost"
       tagline="Skip the GraphQL. Ship Faster."
       subtitle="All the backend power without the GraphQL complexity."
       heroDescription="Nhost pairs Postgres with Hasura and GraphQL, giving you power at the cost of complexity. PicoBase gives you a relational backend with a simple REST API — no GraphQL, no migrations, no Hasura configuration."
@@ -225,6 +265,7 @@ export default function PicoBaseVsNhost() {
       codeExamples={codeExamples}
       whySwitch={whySwitch}
       competitorDescription="Nhost is an open-source Firebase alternative built on Postgres, Hasura (GraphQL engine), and a custom auth service. It provides a GraphQL API, authentication, file storage, and serverless functions. While powerful, it requires knowledge of GraphQL, Postgres migrations, and Hasura permissions to use effectively."
+      faqItems={faqItems}
     />
   )
 }

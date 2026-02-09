@@ -1,15 +1,31 @@
 import type { Metadata } from 'next'
 import ComparisonLayout from '../ComparisonLayout'
-import type { FeatureComparison, CodeExample } from '../ComparisonLayout'
+import type { FeatureComparison, CodeExample, FAQItem } from '../ComparisonLayout'
 
 export const metadata: Metadata = {
-  title: 'PicoBase vs Supabase — Comparison',
+  title: 'PicoBase vs Supabase — Comparison (2025)',
   description:
-    'Compare PicoBase and Supabase. See how PicoBase offers zero-config setup, auto-creating collections, and a simpler developer experience for shipping fast.',
+    'Compare PicoBase and Supabase side-by-side. Zero-config setup, auto-creating collections, and 3.5x cheaper pricing. See code comparisons, feature tables, and why developers switch.',
+  keywords: [
+    'picobase vs supabase', 'supabase alternative', 'supabase competitor', 'best supabase alternative',
+    'supabase alternative open source', 'firebase alternative', 'backend as a service',
+    'baas comparison', 'supabase pricing', 'pocketbase vs supabase', 'database hosting',
+  ],
+  alternates: {
+    canonical: 'https://picobase.app/compare/supabase',
+  },
   openGraph: {
     title: 'PicoBase vs Supabase — Which Backend Should You Choose?',
     description:
-      'Side-by-side comparison of PicoBase and Supabase for database, auth, realtime, and file storage.',
+      'Side-by-side comparison of PicoBase and Supabase for database, auth, realtime, and file storage. See code examples and feature tables.',
+    url: 'https://picobase.app/compare/supabase',
+    siteName: 'PicoBase',
+    type: 'article',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'PicoBase vs Supabase — Which Backend Should You Choose?',
+    description: 'Side-by-side comparison: zero config, auto-creating collections, 3.5x cheaper.',
   },
 }
 
@@ -187,10 +203,34 @@ const whySwitch = [
   },
 ]
 
+const faqItems: FAQItem[] = [
+  {
+    question: 'Is PicoBase a drop-in replacement for Supabase?',
+    answer: 'PicoBase covers the core Supabase features — database, auth, realtime, and file storage — with a simpler API. If you rely on Supabase Edge Functions or raw Postgres SQL, you may need to adjust your approach. For most CRUD-based apps, PicoBase is a direct replacement with far less setup.',
+  },
+  {
+    question: 'Can I migrate from Supabase to PicoBase?',
+    answer: 'Yes. Since both platforms store relational data, you can export your Supabase tables and import them into PicoBase collections. PicoBase uses a REST-based API, so you\'ll swap out Supabase client calls for PicoBase\'s SDK, which is typically simpler.',
+  },
+  {
+    question: 'Does PicoBase support SQL like Supabase?',
+    answer: 'PicoBase uses a filter syntax for queries (e.g., \'published = true && author.name ~ "John"\') rather than raw SQL. This makes queries simpler to write and easier for AI coding tools to generate correctly, but if you need complex multi-table JOINs, Supabase\'s raw SQL access may be more flexible.',
+  },
+  {
+    question: 'Why is PicoBase cheaper than Supabase?',
+    answer: 'PicoBase runs on PocketBase (a lightweight Go binary) instead of a full Postgres cluster, which requires significantly less infrastructure. This lets us offer plans starting at $7/mo vs Supabase\'s $25/mo while providing the same core capabilities.',
+  },
+  {
+    question: 'Is PicoBase open source like Supabase?',
+    answer: 'Yes. PicoBase is fully open source and self-hostable. It\'s built on PocketBase, which is also open source. You can run PicoBase anywhere — on your own server, a VPS, or use our managed hosting.',
+  },
+]
+
 export default function PicoBaseVsSupabase() {
   return (
     <ComparisonLayout
       competitor="Supabase"
+      competitorSlug="supabase"
       tagline="The Simpler Supabase Alternative"
       subtitle="Same power. Less complexity. Ship in minutes, not hours."
       heroDescription="Supabase gives you a powerful Postgres-backed platform, but it comes with SQL migrations, RLS policies, and configuration overhead. PicoBase gives you the same capabilities with zero config."
@@ -198,6 +238,7 @@ export default function PicoBaseVsSupabase() {
       codeExamples={codeExamples}
       whySwitch={whySwitch}
       competitorDescription="Supabase is an open-source Firebase alternative built on top of PostgreSQL. It provides a full suite of backend tools including a Postgres database, authentication, realtime subscriptions, edge functions, and file storage. It's a powerful platform, but requires SQL knowledge, migration management, and row-level security policies to get started."
+      faqItems={faqItems}
     />
   )
 }
