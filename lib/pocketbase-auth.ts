@@ -3,6 +3,8 @@
  * Handles admin authentication for proxied PocketBase instances
  */
 
+import { wakeInstance } from './instance-wake'
+
 const RAILWAY_API_URL = process.env.RAILWAY_API_URL
 const RAILWAY_API_KEY = process.env.RAILWAY_API_KEY
 
@@ -15,6 +17,11 @@ function normalizeUrl(url: string): string {
 
 const NORMALIZED_RAILWAY_API_URL = RAILWAY_API_URL ? normalizeUrl(RAILWAY_API_URL) : ''
 
+/** Max attempts when auto-waking a paused instance */
+const WAKE_MAX_ATTEMPTS = 3
+/** Delay between wake retries (multiplied by attempt number) */
+const WAKE_RETRY_DELAY_MS = 5_000
+
 interface PocketBaseAuthResponse {
   token: string
   admin: {
@@ -24,7 +31,11 @@ interface PocketBaseAuthResponse {
 }
 
 /**
- * Authenticate with a PocketBase instance and get an admin token
+ * Authenticate with a PocketBase instance and get an admin token.
+ *
+ * If Railway has paused the PocketBase process, this will automatically
+ * attempt to wake it and retry the authentication.
+ *
  * @param instanceId - The instance ID
  * @param email - Admin email
  * @param password - Admin password
@@ -39,29 +50,46 @@ export async function authenticateWithPocketBase(
     throw new Error('Railway API not configured')
   }
 
-  // Authenticate with PocketBase admin API
   const authUrl = `${NORMALIZED_RAILWAY_API_URL}/instances/${instanceId}/proxy/api/admins/auth-with-password`
 
-  const response = await fetch(authUrl, {
-    method: 'POST',
-    headers: {
-      'X-API-Key': RAILWAY_API_KEY,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      identity: email,
-      password: password,
-    }),
-  })
+  for (let attempt = 0; attempt < WAKE_MAX_ATTEMPTS; attempt++) {
+    const response = await fetch(authUrl, {
+      method: 'POST',
+      headers: {
+        'X-API-Key': RAILWAY_API_KEY!,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        identity: email,
+        password: password,
+      }),
+    })
 
-  if (!response.ok) {
+    if (response.ok) {
+      const data: PocketBaseAuthResponse = await response.json()
+      return data.token
+    }
+
     const errorText = await response.text()
+
+    // Detect "Instance not running" — Railway has paused the PocketBase process
+    if (errorText.includes('Instance not running') && attempt < WAKE_MAX_ATTEMPTS - 1) {
+      console.log(
+        `[PBAuth] Instance ${instanceId} not running, attempting wake (attempt ${attempt + 1}/${WAKE_MAX_ATTEMPTS})...`
+      )
+      await wakeInstance(instanceId)
+      // Give Railway time to start the process — increases with each attempt
+      await new Promise(resolve => setTimeout(resolve, WAKE_RETRY_DELAY_MS * (attempt + 1)))
+      continue
+    }
+
+    // Non-recoverable error or last attempt — throw
     console.error(`PocketBase auth failed: ${response.status} ${errorText}`)
     throw new Error(`Failed to authenticate with PocketBase: ${errorText}`)
   }
 
-  const data: PocketBaseAuthResponse = await response.json()
-  return data.token
+  // Should not be reachable, but satisfy TypeScript
+  throw new Error('Failed to authenticate with PocketBase after retries')
 }
 
 /**
