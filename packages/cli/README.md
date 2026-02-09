@@ -145,58 +145,61 @@ export interface PostsRecord extends BaseRecord {
   published: boolean;
 }
 
-export interface UsersRecord extends BaseRecord {
-  email: string;
-  name: string;
-  avatar?: string;
-}
+export type CollectionName = 'posts' | 'users' | 'comments';
 
-// Use with SDK
-import { PostsRecord } from './types/picobase'
-const posts = await pb.collection<PostsRecord>('posts').getList()
+export interface CollectionRecords {
+  posts: PostsRecord;
+  users: UsersRecord;
+  comments: CommentsRecord;
+}
+```
+
+**Typed client helper** — `typegen` also generates a `createTypedClient()` and a pre-configured `pb` instance:
+
+```typescript
+// Import the typed client — collection names autocomplete, record fields are typed
+import { pb } from './src/types/picobase'
+
+const posts = await pb.collection('posts').getList(1, 20)
+//                                ^-- autocomplete!  ^-- PostsRecord[]
+posts.items[0].title  // typed!
+
+// Or create your own typed client
+import { createTypedClient } from './src/types/picobase'
+const pb = createTypedClient('https://myapp.picobase.com', 'pbk_...')
 ```
 
 ### `picobase dev`
 
-Start a local PocketBase instance for development.
+Start a local PocketBase instance for development — optionally with your app dev server too.
 
 ```bash
-# Start on default port (8090)
+# Start PocketBase only (default port 8090)
 picobase dev
 
-# Start on custom port
-picobase dev --port 8080
+# Start PocketBase + your app dev server in one command
+picobase dev --with-app
+
+# Start PocketBase + a custom app command
+picobase dev --run "vite"
+
+# Custom port
+picobase dev --port 8080 --with-app
 ```
 
 **Options:**
 - `-p, --port <port>` - Port to run on (default: 8090)
+- `-a, --with-app` - Also start your app dev server (`npm run dev`)
+- `-r, --run <command>` - Custom command to start your app (e.g., `"vite"`, `"next dev"`)
 
 This command will:
 1. Download PocketBase if not already installed (stored in `~/.picobase/dev/`)
 2. Start a local PocketBase instance
 3. Create a `pb_data` directory in your current working directory
-4. Open the admin UI at `http://127.0.0.1:8090/_/`
+4. Admin UI available at `http://127.0.0.1:8090/_/`
+5. With `--with-app` or `--run`: start your app dev server alongside PocketBase, with `PICOBASE_URL`, `NEXT_PUBLIC_PICOBASE_URL`, and `VITE_PICOBASE_URL` automatically injected
 
-**Development workflow:**
-
-```bash
-# Terminal 1: Start local PocketBase
-picobase dev
-
-# Terminal 2: Start your app
-npm run dev
-```
-
-In your app, use the local instance:
-
-```typescript
-const pb = createClient(
-  process.env.NODE_ENV === 'development'
-    ? 'http://127.0.0.1:8090'
-    : process.env.PICOBASE_URL,
-  process.env.PICOBASE_API_KEY
-)
-```
+Both processes share a single Ctrl+C shutdown.
 
 ## Configuration
 
@@ -235,13 +238,24 @@ npm install
 npm run dev
 ```
 
-### React Template (Coming Soon)
+### React Template
 
-Creates a React app with Vite, TypeScript, and PicoBase.
+Creates a React + Vite + TypeScript app with PicoBase pre-configured.
 
 ```bash
 picobase init my-app --template react
+cd my-app
+npm install
+npm run dev
 ```
+
+Includes:
+- Vite with React plugin and TypeScript
+- `@picobase_app/client` and `@picobase_app/react` pre-installed
+- `src/picobase.ts` — single-file client setup
+- `src/App.tsx` — example authentication flow
+- `src/vite-env.d.ts` — typed `import.meta.env` for Vite env vars
+- `.env` with `VITE_PICOBASE_URL` and `VITE_PICOBASE_API_KEY`
 
 ### Vue Template (Coming Soon)
 
@@ -308,13 +322,16 @@ import { PostsRecord } from './src/types/picobase'
 ### Local development with PocketBase
 
 ```bash
-# 1. Start local PocketBase instance
-picobase dev
+# Option A: Start both PocketBase and your app in one command
+picobase dev --with-app
+# PocketBase runs on :8090, your app on its default port
+# PICOBASE_URL is auto-injected into your app's environment
 
-# 2. Open http://127.0.0.1:8090/_/ in browser
-# 3. Create an admin account
-# 4. Set up your collections
-# 5. Use in your app with http://127.0.0.1:8090
+# Option B: PocketBase only (if you want separate terminals)
+picobase dev
+# Then in another terminal: npm run dev
+
+# Open http://127.0.0.1:8090/_/ to set up collections in the admin UI
 ```
 
 ## Troubleshooting

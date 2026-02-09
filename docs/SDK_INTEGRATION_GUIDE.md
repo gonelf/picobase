@@ -485,6 +485,10 @@ console.log(result.items)      // array of posts
 console.log(result.totalItems) // total count
 ```
 
+> **Need more filter examples?** See the full
+> [Filter Syntax Reference](./FILTER_SYNTAX.md) for 20+ copy-paste examples
+> covering comparisons, string matching, dates, relations, sorting, and more.
+
 ### Get a single record
 
 ```typescript
@@ -806,12 +810,92 @@ console.log(posts.items) // [{ id: '...', title: '...' }, ...]
 
 ---
 
+## Typed Collections (no more magic strings)
+
+Run `picobase typegen` to generate TypeScript types from your collection
+schemas. The generated file includes a pre-configured typed client:
+
+```bash
+picobase typegen
+# Output: ./src/types/picobase.ts
+```
+
+Then import and use it — collection names autocomplete, record fields are typed:
+
+```typescript
+import { pb } from './src/types/picobase'
+
+// Collection names autocomplete here
+const result = await pb.collection('posts').getList(1, 20, {
+  filter: 'published = true',
+})
+
+// Record fields are typed
+result.items[0].title    // string
+result.items[0].published // boolean
+```
+
+Run `picobase typegen` again whenever you change your collection schemas.
+
+---
+
+## Error Handling
+
+SDK errors include actionable fix suggestions so you never have to Google an
+error code:
+
+```typescript
+import { PicoBaseError, CollectionNotFoundError } from '@picobase_app/client'
+
+try {
+  await pb.collection('psots').getList()  // typo!
+} catch (err) {
+  if (err instanceof PicoBaseError) {
+    console.log(err.message)  // Collection "psots" not found.
+    console.log(err.code)     // COLLECTION_NOT_FOUND
+    console.log(err.fix)      // Make sure the collection "psots" exists...
+  }
+}
+```
+
+**Error types and their codes:**
+
+| Error | Code | Fix hint |
+|---|---|---|
+| `ConfigurationError` | `CONFIGURATION_ERROR` | Tells you which env var is missing and how to set it |
+| `AuthorizationError` | `UNAUTHORIZED` | Reminds you keys start with `pbk_`, links to dashboard |
+| `CollectionNotFoundError` | `COLLECTION_NOT_FOUND` | Explains auto-creation and how to create in dashboard |
+| `RecordNotFoundError` | `RECORD_NOT_FOUND` | Explains ID format |
+| `InstanceUnavailableError` | `INSTANCE_UNAVAILABLE` | Suggests checking status or restarting |
+| `RequestError` | `REQUEST_FAILED` | Status-specific hints (400: check fields, 403: check rules, 429: add delay) |
+
+---
+
+## Local Development
+
+Start both PocketBase and your app dev server in one command:
+
+```bash
+picobase dev --with-app
+```
+
+This starts PocketBase on `http://127.0.0.1:8090` and runs `npm run dev` with
+`PICOBASE_URL` automatically injected. Use `--run "vite"` for a custom command.
+
+---
+
 ## Next Steps
 
 - **Create collections** in the dashboard to define your data structure
 - **Set up collection rules** to control who can read/write data
 - **Enable OAuth providers** in your instance's auth settings
-- **Generate TypeScript types** with `picobase typegen` for type-safe queries
+- **Generate typed collections** with `picobase typegen` for full autocomplete
+- **Learn the filter syntax** — see the
+  [Filter Syntax Reference](./FILTER_SYNTAX.md) for 20+ copy-paste examples
+- **Migrating from Supabase or Firebase?** — see the
+  [Migration Guide](./MIGRATION_GUIDE.md) for side-by-side code comparisons
+- **Use AI tools** — the project includes `CLAUDE.md` and `.cursorrules` so
+  Cursor, Claude, and Windsurf understand your PicoBase project
 - **Read the full API reference** in the
   [@picobase/client README](https://github.com/picobase/picobase/tree/main/packages/client)
 
@@ -820,7 +904,7 @@ console.log(posts.items) // [{ id: '...', title: '...' }, ...]
 ## Quick Reference
 
 ```typescript
-import { createClient } from '@picobase/client'
+import { createClient } from '@picobase_app/client'
 const pb = createClient(url, apiKey)
 
 // Auth
@@ -849,4 +933,11 @@ await unsub()
 // Storage
 pb.storage.getFileUrl(record, filename)
 pb.storage.getFileUrl(record, filename, { thumb: '100x100' })
+
+// Error handling — every error has a .fix suggestion
+try { ... } catch (err) {
+  if (err instanceof PicoBaseError) {
+    console.log(err.fix) // actionable fix suggestion
+  }
+}
 ```

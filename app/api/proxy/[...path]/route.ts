@@ -6,6 +6,7 @@ import { touchInstanceActivity } from '@/lib/activity'
 import { validateApiKey } from '@/lib/api-keys'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { logApiRequest } from '@/lib/usage-log'
+import { wakeInstance } from '@/lib/instance-wake'
 
 const RAILWAY_API_URL = process.env.RAILWAY_API_URL
 const RAILWAY_API_KEY = process.env.RAILWAY_API_KEY
@@ -128,14 +129,20 @@ async function handleProxyRequest(request: NextRequest) {
             }
         }
 
-        // Check if instance is running
+        // If instance is not running, attempt to wake it automatically
         if (instance.status !== 'running') {
-            return errorResponse(
-                request,
-                'INSTANCE_UNAVAILABLE',
-                `Instance is not running (status: ${instance.status})`,
-                503,
-            )
+            console.log(`[Proxy] Instance ${instance.id} status is '${instance.status}', attempting auto-wake...`)
+            const woke = await wakeInstance(instance.id)
+            if (!woke) {
+                return errorResponse(
+                    request,
+                    'INSTANCE_UNAVAILABLE',
+                    `Instance is not running (status: ${instance.status}). Auto-wake failed.`,
+                    503,
+                )
+            }
+            // Give Railway time to start the process before forwarding
+            await new Promise(resolve => setTimeout(resolve, 5000))
         }
 
         // Extract the path that should be forwarded to PocketBase
@@ -192,8 +199,8 @@ async function handleProxyRequest(request: NextRequest) {
                         console.warn('[Proxy] Failed to send start command, continuing anyway:', e)
                     }
 
-                    // Wait a bit increasing with attempts: 1s, 2s, 3s, 4s
-                    await new Promise(resolve => setTimeout(resolve, attempt * 1000))
+                    // Wait for Railway cold-start: 3s, 6s, 9s, 12s
+                    await new Promise(resolve => setTimeout(resolve, attempt * 3000))
                 }
 
                 // Forward important request headers
@@ -233,7 +240,9 @@ async function handleProxyRequest(request: NextRequest) {
                     try {
                         const errorBody = await clone.json()
                         if (errorBody.error === 'Instance not running') {
-                            console.log(`[Proxy] Instance ${instance.id} reported not running. Retrying...`)
+                            console.log(`[Proxy] Instance ${instance.id} reported not running (attempt ${attempt + 1}). Waking...`)
+                            // Also trigger a full wake (updates DB status + port)
+                            wakeInstance(instance.id).catch(() => {})
                             lastError = new Error('Instance not running')
                             continue // Retry loop will trigger start
                         }

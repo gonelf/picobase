@@ -3,7 +3,7 @@ import { PicoBaseAuth } from './auth'
 import { PicoBaseCollection } from './collection'
 import { PicoBaseRealtime } from './realtime'
 import { PicoBaseStorage } from './storage'
-import { InstanceUnavailableError, AuthorizationError } from './errors'
+import { InstanceUnavailableError, AuthorizationError, CollectionNotFoundError, RecordNotFoundError, ConfigurationError } from './errors'
 import type { PicoBaseClientOptions, RecordModel, SendOptions } from './types'
 
 const DEFAULT_OPTIONS: Required<Omit<PicoBaseClientOptions, 'fetch'>> & { fetch?: typeof globalThis.fetch } = {
@@ -26,6 +26,28 @@ export class PicoBaseClient {
   private readonly options: typeof DEFAULT_OPTIONS
 
   constructor(url: string, apiKey: string, options: PicoBaseClientOptions = {}) {
+    // Validate inputs with clear messages
+    if (!url) {
+      throw new ConfigurationError(
+        'PicoBase URL is required.',
+        'Pass the URL as the first argument: createClient("https://myapp.picobase.com", "pbk_...") ' +
+        'or set PICOBASE_URL in your .env file.',
+      )
+    }
+    if (!apiKey) {
+      throw new ConfigurationError(
+        'PicoBase API key is required.',
+        'Pass the API key as the second argument: createClient("https://...", "pbk_your_key") ' +
+        'or set PICOBASE_API_KEY in your .env file. Get a key from your dashboard.',
+      )
+    }
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      throw new ConfigurationError(
+        `Invalid URL: "${url}". Must start with http:// or https://.`,
+        `Use the full URL: createClient("https://${url}", "...")`,
+      )
+    }
+
     this.apiKey = apiKey
     this.options = { ...DEFAULT_OPTIONS, ...options }
 
@@ -127,6 +149,15 @@ export class PicoBaseClient {
             }
           }
 
+          // Detect collection-not-found for a clearer message
+          if (status === 404) {
+            const msg = (err as { message?: string })?.message ?? ''
+            if (msg.toLowerCase().includes('missing collection') || msg.toLowerCase().includes('not found collection')) {
+              const match = msg.match(/["']([^"']+)["']/)
+              throw new CollectionNotFoundError(match?.[1] ?? 'unknown')
+            }
+          }
+
           throw err
         }
       }
@@ -183,9 +214,21 @@ export function createClient(
     const apiKey = env.PICOBASE_API_KEY || env.NEXT_PUBLIC_PICOBASE_API_KEY
 
     if (!url || !apiKey) {
-      throw new Error(
-        'createClient() called without arguments, but PICOBASE_URL and PICOBASE_API_KEY ' +
-        'environment variables are not set. Either pass them explicitly or add them to your .env file.'
+      const missing = [
+        !url && 'PICOBASE_URL (or NEXT_PUBLIC_PICOBASE_URL)',
+        !apiKey && 'PICOBASE_API_KEY (or NEXT_PUBLIC_PICOBASE_API_KEY)',
+      ].filter(Boolean).join(' and ')
+
+      throw new ConfigurationError(
+        `Missing environment variable${!url && !apiKey ? 's' : ''}: ${missing}`,
+        'Add them to your .env.local file:\n\n' +
+        '  PICOBASE_URL=https://your-app.picobase.com\n' +
+        '  PICOBASE_API_KEY=pbk_your_key_here\n\n' +
+        'Or for Next.js (client-side access), prefix with NEXT_PUBLIC_:\n\n' +
+        '  NEXT_PUBLIC_PICOBASE_URL=https://your-app.picobase.com\n' +
+        '  NEXT_PUBLIC_PICOBASE_API_KEY=pbk_your_key_here\n\n' +
+        'Get your URL and API key from: https://picobase.com/dashboard\n' +
+        'Or run: picobase init',
       )
     }
 

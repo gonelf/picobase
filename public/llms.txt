@@ -1,0 +1,68 @@
+# PicoBase
+
+> The open source backend for vibe coders. A managed Backend-as-a-Service (BaaS) platform — the Supabase/Firebase alternative built on PocketBase.
+
+PicoBase gives developers zero-config database, auth, realtime, and file storage without managing infrastructure. From `npm install` to production data in 3 minutes.
+
+## Key Features
+
+- Zero-config setup — reads PICOBASE_URL and PICOBASE_API_KEY from environment
+- Auto-creating collections — write to any collection name and it exists
+- Real-time database with WebSocket subscriptions
+- Built-in authentication (email/password + OAuth)
+- File storage
+- TypeScript-first SDK
+- React hooks and components
+- REST API for every collection
+- Open source and self-hostable
+- Per-tenant isolation
+
+## Quick Start
+
+```
+npm install @picobase_app/client
+```
+
+```ts
+import { createClient } from '@picobase_app/client'
+const pb = createClient()
+
+// CRUD — collections auto-create on first write
+const post = await pb.collection('posts').create({ title: 'Hello' })
+const posts = await pb.collection('posts').getList(1, 20, {
+  filter: 'published = true',
+  sort: '-created',
+})
+
+// Auth
+await pb.auth.signUp({ email: '...', password: '...' })
+await pb.auth.signIn({ email: '...', password: '...' })
+
+// Realtime
+const unsub = await pb.collection('posts').subscribe((e) => {
+  console.log(e.action, e.record)
+})
+```
+
+## Pricing
+
+- Free: $0/mo — 2 projects, 1 GB storage
+- Starter: $7/mo — 10 projects, 10 GB storage
+- Pro: $19/mo — Unlimited projects, 50 GB storage
+
+## Documentation
+
+- Docs: https://picobase.app/docs
+- GitHub: https://github.com/picobase/picobase
+
+## Comparisons
+
+- PicoBase vs Supabase: https://picobase.app/compare/supabase
+- PicoBase vs Firebase: https://picobase.app/compare/firebase
+- PicoBase vs Appwrite: https://picobase.app/compare/appwrite
+- PicoBase vs Convex: https://picobase.app/compare/convex
+- PicoBase vs Nhost: https://picobase.app/compare/nhost
+
+## Optional
+
+- llms-full.txt: https://picobase.app/llms-full.txt
