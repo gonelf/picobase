@@ -6,6 +6,9 @@ import { touchInstanceActivity } from '@/lib/activity'
 import { validateApiKey } from '@/lib/api-keys'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { logApiRequest } from '@/lib/usage-log'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('Proxy')
 
 const RAILWAY_API_URL = process.env.RAILWAY_API_URL
 const RAILWAY_API_KEY = process.env.RAILWAY_API_KEY
@@ -181,7 +184,7 @@ async function handleProxyRequest(request: NextRequest) {
                 if (attempt > 0) {
                     // Check if we need to start it (only if we suspect it's down)
                     // But simpler strategy: just ensure it's started if we are failing
-                    console.log(`[Proxy] Retry attempt ${attempt + 1} for ${instance.id}...`)
+                    log.info({ instanceId: instance.id, attempt: attempt + 1 }, 'Retrying proxy request')
 
                     // Trigger start (idempotent-ish in our new route, but explicit start helps)
                     try {
@@ -189,7 +192,7 @@ async function handleProxyRequest(request: NextRequest) {
                         const freshPort = await ensureInstancePort(instance.id, instance.port || 8090)
                         await startRailwayInstance(instance.id, freshPort)
                     } catch (e) {
-                        console.warn('[Proxy] Failed to send start command, continuing anyway:', e)
+                        log.warn({ err: e, instanceId: instance.id }, 'Failed to send start command, continuing anyway')
                     }
 
                     // Wait a bit increasing with attempts: 1s, 2s, 3s, 4s
@@ -233,7 +236,7 @@ async function handleProxyRequest(request: NextRequest) {
                     try {
                         const errorBody = await clone.json()
                         if (errorBody.error === 'Instance not running') {
-                            console.log(`[Proxy] Instance ${instance.id} reported not running. Retrying...`)
+                            log.info({ instanceId: instance.id }, 'Instance reported not running, retrying')
                             lastError = new Error('Instance not running')
                             continue // Retry loop will trigger start
                         }
@@ -246,7 +249,7 @@ async function handleProxyRequest(request: NextRequest) {
                 break
 
             } catch (error) {
-                console.warn(`[Proxy] Fetch error on attempt ${attempt + 1}:`, error)
+                log.warn({ err: error, instanceId: instance.id, attempt: attempt + 1 }, 'Fetch error during proxy')
                 lastError = error
                 // Continue to next attempt which will try to recover
             }
@@ -314,7 +317,7 @@ async function handleProxyRequest(request: NextRequest) {
             headers: responseHeaders,
         })
     } catch (error) {
-        console.error('Proxy error:', error)
+        log.error({ err: error, method: request.method, url: request.url }, 'Proxy error')
         return errorResponse(
             request,
             'PROXY_ERROR',

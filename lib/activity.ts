@@ -1,4 +1,7 @@
 import { db } from './db'
+import { createModuleLogger } from './logger'
+
+const log = createModuleLogger('Activity')
 
 /**
  * In-memory cache to debounce activity updates.
@@ -28,7 +31,7 @@ export async function touchInstanceActivity(instanceId: string): Promise<void> {
     })
   } catch (error) {
     // Non-critical - don't let activity tracking break requests
-    console.error(`Failed to update activity for instance ${instanceId}:`, error)
+    log.error({ err: error, instanceId }, 'Failed to update activity')
   }
 }
 

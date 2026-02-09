@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
 import { db } from '@/lib/db'
 import { getHealthMetrics, getRecentHealthChecks } from '@/lib/health-monitor'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Health')
 
 export async function GET(
   request: NextRequest,
@@ -43,7 +46,7 @@ export async function GET(
       recentChecks,
     })
   } catch (error) {
-    console.error('[Health] Failed to get health data:', error)
+    log.error({ err: error }, '[Health] Failed to get health data')
     return NextResponse.json(
       {
         error: 'Failed to get health data',

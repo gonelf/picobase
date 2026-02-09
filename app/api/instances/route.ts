@@ -3,6 +3,9 @@ import { getAuthSession } from '@/lib/auth-provider'
 import { createInstance } from '@/lib/pocketbase'
 import { z } from 'zod'
 import { nanoid } from 'nanoid'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances')
 
 const createInstanceSchema = z.object({
   name: z.string().min(1).max(100),
@@ -42,7 +45,7 @@ export async function POST(request: NextRequest) {
     }, { status: 201 })
   } catch (error: any) {
     if (error instanceof z.ZodError) {
-      console.error('Validation error:', error.errors)
+      log.error({ validationErrors: error.errors }, 'Validation error')
       return NextResponse.json({
         error: 'Invalid input',
         details: error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
@@ -53,7 +56,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
 
-    console.error('Create instance error:', error)
+    log.error({ err: error }, 'Create instance error')
 
     // Check if it's a database error
     if (error.message?.includes('no such column')) {

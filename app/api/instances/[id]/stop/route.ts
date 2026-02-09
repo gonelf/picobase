@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthSession } from '@/lib/auth-provider'
 import { stopRailwayInstance } from '@/lib/railway-client'
 import { db } from '@/lib/db'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Stop')
 
 export async function POST(
   request: NextRequest,
@@ -31,7 +34,7 @@ export async function POST(
     } catch (error: any) {
       // If Railway service fails (not running, connection error, etc.), 
       // we assume the instance is effectively unreachable/stopped and update DB to reflect reality.
-      console.warn(`[Stop] Failed to stop on Railway (proceeding to DB update): ${error.message}`)
+      log.warn({ error_message: error.message }, '[Stop] Failed to stop on Railway (proceeding to DB update):')
     }
 
     // Update instance status in database
@@ -42,7 +45,7 @@ export async function POST(
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Stop instance error:', error)
+    log.error({ err: error }, 'Stop instance error')
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

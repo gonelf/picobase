@@ -1,5 +1,8 @@
 import { db } from './db'
 import { nanoid } from 'nanoid'
+import { createModuleLogger } from './logger'
+
+const log = createModuleLogger('IpAllowlist')
 
 /**
  * IP allowlisting for API access control.
@@ -90,7 +93,7 @@ export async function getIpAllowlist(instanceId: string): Promise<IpAllowlistEnt
       createdAt: row.created_at as string,
     }))
   } catch (error) {
-    console.error('[IpAllowlist] Failed to get IP allowlist:', error)
+    log.error({ err: error, instanceId }, 'Failed to get IP allowlist')
     return []
   }
 }
@@ -128,7 +131,7 @@ export async function isIpAllowed(instanceId: string, ipAddress: string): Promis
 
     return false
   } catch (error) {
-    console.error('[IpAllowlist] Failed to check IP allowlist:', error)
+    log.error({ err: error, instanceId, ipAddress }, 'Failed to check IP allowlist')
     // On error, default to allowing (fail open) to prevent lockouts
     return true
   }

@@ -1,5 +1,8 @@
 import { db } from './db'
 import { nanoid } from 'nanoid'
+import { createModuleLogger } from './logger'
+
+const log = createModuleLogger('Alerts')
 
 /**
  * Alerting system for instance health and operational issues.
@@ -115,7 +118,7 @@ export async function getActiveAlerts(instanceId: string): Promise<Alert[]> {
       createdAt: row.created_at as string,
     }))
   } catch (error) {
-    console.error('[Alerts] Failed to get active alerts:', error)
+    log.error({ err: error, instanceId }, 'Failed to get active alerts')
     return []
   }
 }
@@ -149,7 +152,7 @@ export async function getAlertHistory(
       createdAt: row.created_at as string,
     }))
   } catch (error) {
-    console.error('[Alerts] Failed to get alert history:', error)
+    log.error({ err: error, instanceId }, 'Failed to get alert history')
     return []
   }
 }
@@ -172,7 +175,7 @@ async function sendAlertNotifications(alert: Alert): Promise<void> {
       }
     }
   } catch (error) {
-    console.error('[Alerts] Failed to send alert notifications:', error)
+    log.error({ err: error, instanceId: alert.instanceId }, 'Failed to send alert notifications')
   }
 }
 
@@ -181,7 +184,7 @@ async function sendAlertNotifications(alert: Alert): Promise<void> {
  */
 async function sendEmailAlert(email: string, alert: Alert): Promise<void> {
   // TODO: Integrate with email service (SendGrid, Resend, etc.)
-  console.log(`[Alerts] Would send email to ${email}:`, alert)
+  log.info({ email, alertId: alert.id, alertType: alert.type }, 'Would send email alert')
 }
 
 /**
@@ -200,7 +203,7 @@ async function sendWebhookAlert(webhookUrl: string, alert: Alert): Promise<void>
       }),
     })
   } catch (error) {
-    console.error('[Alerts] Failed to send webhook alert:', error)
+    log.error({ err: error, alertId: alert.id }, 'Failed to send webhook alert')
   }
 }
 
@@ -252,7 +255,7 @@ export async function getAlertChannels(instanceId: string): Promise<AlertChannel
       createdAt: row.created_at as string,
     }))
   } catch (error) {
-    console.error('[Alerts] Failed to get alert channels:', error)
+    log.error({ err: error, instanceId }, 'Failed to get alert channels')
     return []
   }
 }
@@ -273,6 +276,6 @@ export async function checkAndResolveAlerts(instanceId: string): Promise<void> {
       }
     }
   } catch (error) {
-    console.error('[Alerts] Failed to check and resolve alerts:', error)
+    log.error({ err: error, instanceId }, 'Failed to check and resolve alerts')
   }
 }

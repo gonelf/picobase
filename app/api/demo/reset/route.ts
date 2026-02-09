@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Demo/Reset')
 
 const DEMO_INSTANCE_ID = process.env.DEMO_INSTANCE_ID || 'demo'
 const RAILWAY_API_URL = process.env.RAILWAY_API_URL
@@ -33,7 +36,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (providedSecret !== DEMO_RESET_SECRET) {
-      console.warn('Unauthorized demo reset attempt')
+      log.warn('Unauthorized demo reset attempt')
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
@@ -53,7 +56,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json().catch(() => ({}))
     const seedData = body.seedData || getDefaultSeedData()
 
-    console.log(`Starting demo instance reset for ${DEMO_INSTANCE_ID}...`)
+    log.info({ DEMO_INSTANCE_ID: DEMO_INSTANCE_ID }, 'Starting demo instance reset for ...')
 
     // Step 1: Get all collections
     const collectionsUrl = `${NORMALIZED_RAILWAY_API_URL}/instances/${DEMO_INSTANCE_ID}/proxy/api/collections`
@@ -103,11 +106,11 @@ export async function POST(request: NextRequest) {
           }
         }
       } catch (err) {
-        console.error(`Error deleting records from ${collection.name}:`, err)
+        log.error({ err: err, collection_name: collection.name }, 'Error deleting records from')
       }
     }
 
-    console.log(`Deleted ${deletedCount} records from demo instance`)
+    log.info({ deletedCount: deletedCount }, 'Deleted records from demo instance')
 
     // Step 3: Re-seed with fresh data
     let createdCount = 0
@@ -130,14 +133,14 @@ export async function POST(request: NextRequest) {
             createdCount++
           }
         } catch (err) {
-          console.error(`Error creating record in ${collectionName}:`, err)
+          log.error({ err: err, collectionName: collectionName }, 'Error creating record in')
         }
       }
     }
 
     const duration = Date.now() - startTime
 
-    console.log(`Demo reset complete: deleted ${deletedCount}, created ${createdCount} records in ${duration}ms`)
+    log.info({ deletedCount: deletedCount, createdCount: createdCount, duration: duration }, 'Demo reset complete: deleted , created records in ms')
 
     return NextResponse.json({
       success: true,
@@ -150,7 +153,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Demo reset error:', error)
+    log.error({ err: error }, 'Demo reset error')
     return NextResponse.json(
       { error: 'Reset failed', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }

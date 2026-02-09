@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
 import { db } from '@/lib/db'
 import { createHmac } from 'crypto'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Webhooks/Test')
 
 /**
  * POST /api/instances/[id]/webhooks/test
@@ -94,7 +97,7 @@ export async function POST(
       return NextResponse.json({ message }, { status: 400 })
     }
   } catch (error) {
-    console.error('Error testing webhook:', error)
+    log.error({ err: error }, 'Error testing webhook')
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }

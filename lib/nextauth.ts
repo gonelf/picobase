@@ -1,6 +1,9 @@
 import NextAuth, { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { getUserByEmail, verifyPassword, syncUser } from './auth'
+import { createModuleLogger } from './logger'
+
+const log = createModuleLogger('NextAuth')
 
 export const authOptions: NextAuthOptions = {
     providers: [
@@ -34,7 +37,7 @@ export const authOptions: NextAuthOptions = {
                         name: user.name as string || null,
                     }
                 } catch (error) {
-                    console.error('Error in NextAuth authorize callback:', error)
+                    log.error({ err: error }, 'Error in authorize callback')
                     return null
                 }
             }

@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { findIdleInstances } from '@/lib/activity'
 import { stopRailwayInstance } from '@/lib/railway-client'
 import { db } from '@/lib/db'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Cron/Pause-idle')
 
 const CRON_SECRET = process.env.CRON_SECRET
 
@@ -36,7 +39,7 @@ export async function POST(request: NextRequest) {
         try {
           await stopRailwayInstance(instance.id)
         } catch (error: any) {
-          console.warn(`[PauseIdle] Failed to stop ${instance.id} on Railway: ${error.message}`)
+          log.warn({ err: error, instanceId: instance.id }, 'Failed to stop on Railway')
         }
 
         // Update DB status
@@ -45,10 +48,10 @@ export async function POST(request: NextRequest) {
           args: ['stopped', new Date().toISOString(), instance.id],
         })
 
-        console.log(`[PauseIdle] Paused idle instance ${instance.id} (last activity: ${instance.last_activity_at || 'never'})`)
+        log.info({ instanceId: instance.id, lastActivity: instance.last_activity_at || 'never' }, 'Paused idle instance')
         results.push({ id: instance.id, success: true })
       } catch (error: any) {
-        console.error(`[PauseIdle] Failed to pause ${instance.id}:`, error)
+        log.error({ err: error, instanceId: instance.id }, 'Failed to pause instance')
         results.push({ id: instance.id, success: false, error: error.message })
       }
     }
@@ -61,7 +64,7 @@ export async function POST(request: NextRequest) {
       results,
     })
   } catch (error) {
-    console.error('[PauseIdle] Cron error:', error)
+    log.error({ err: error }, 'Cron error')
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }

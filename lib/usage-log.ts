@@ -1,5 +1,8 @@
 import { db } from './db'
 import { nanoid } from 'nanoid'
+import { createModuleLogger } from './logger'
+
+const log = createModuleLogger('UsageLog')
 
 /**
  * Non-blocking usage logger for API requests.
@@ -60,7 +63,7 @@ async function flushBuffer(): Promise<void> {
     }
   } catch (error) {
     // Non-critical — don't let logging failures affect requests
-    console.error('[UsageLog] Failed to flush buffer:', error)
+    log.error({ err: error, count: entries.length }, 'Failed to flush buffer')
   }
 }
 

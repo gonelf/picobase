@@ -5,6 +5,9 @@ import { nanoid } from 'nanoid'
 import path from 'path'
 import fs from 'fs/promises'
 import { existsSync } from 'fs'
+import { createModuleLogger } from './logger'
+
+const log = createModuleLogger('PocketBase')
 
 const POCKETBASE_BINARY = process.env.POCKETBASE_BINARY_PATH || 'pocketbase'
 const INSTANCES_DIR = path.join(process.cwd(), 'instances')
@@ -71,7 +74,7 @@ export async function createInstance(
       await fs.mkdir(pbDataDir, { recursive: true })
     } catch (error) {
       // Ignore filesystem errors in serverless environments
-      console.log('Skipping local directory creation (serverless environment or read-only filesystem)')
+      log.info('Skipping local directory creation (serverless environment or read-only filesystem)')
     }
   }
 
@@ -100,16 +103,16 @@ async function createPocketBaseAdmin(port: number, email: string, password: stri
     })
 
     if (response.ok) {
-      console.log(`Successfully created admin user: ${email}`)
+      log.info({ email }, 'Successfully created admin user')
     } else if (response.status === 400) {
       // Admin already exists, which is fine
-      console.log(`Admin user already exists for port ${port}`)
+      log.info({ port }, 'Admin user already exists')
     } else {
       const errorText = await response.text()
-      console.error(`Failed to create admin user: ${response.status} ${errorText}`)
+      log.error({ status: response.status, errorText }, 'Failed to create admin user')
     }
   } catch (error) {
-    console.error('Error creating PocketBase admin:', error)
+    log.error({ err: error }, 'Error creating PocketBase admin')
     // Don't throw - this is not critical, admin can be created manually if needed
   }
 }
@@ -162,7 +165,7 @@ export async function startInstance(instanceId: string): Promise<{ port: number;
   runningInstances.set(instanceId, { process: pbProcess, port })
 
   pbProcess.on('exit', async (code) => {
-    console.log(`Instance ${instanceId} exited with code ${code}`)
+    log.info({ instanceId, exitCode: code }, 'Instance exited')
     runningInstances.delete(instanceId)
 
     if (existsSync(dbPath)) {
@@ -176,7 +179,7 @@ export async function startInstance(instanceId: string): Promise<{ port: number;
   })
 
   pbProcess.on('error', async (error) => {
-    console.error(`Instance ${instanceId} error:`, error)
+    log.error({ err: error, instanceId }, 'Instance error')
     runningInstances.delete(instanceId)
 
     await db.execute({
@@ -190,7 +193,7 @@ export async function startInstance(instanceId: string): Promise<{ port: number;
 
   // Automatically create admin account if this is first run and credentials are available
   if ((isFirstRun || !dbExistsInR2) && instance.admin_email && instance.admin_password) {
-    console.log(`Creating admin account for instance ${instanceId}...`)
+    log.info({ instanceId }, 'Creating admin account')
     await createPocketBaseAdmin(port, instance.admin_email, instance.admin_password)
   }
 

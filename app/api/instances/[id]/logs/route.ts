@@ -4,6 +4,9 @@ import { getInstanceCredentials } from '@/lib/get-instance-credentials'
 import { authenticatedPocketBaseRequest } from '@/lib/pocketbase-auth'
 import { db } from '@/lib/db'
 import { touchInstanceActivity } from '@/lib/activity'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Logs')
 
 export async function GET(
   request: NextRequest,
@@ -54,7 +57,7 @@ export async function GET(
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error(`Failed to fetch logs: ${response.status} ${errorText}`)
+      log.error({ response_status: response.status, errorText: errorText }, 'Failed to fetch logs:')
       return NextResponse.json(
         { error: 'Failed to fetch logs', details: errorText },
         { status: response.status }
@@ -66,7 +69,7 @@ export async function GET(
     return NextResponse.json(data)
 
   } catch (error) {
-    console.error('Error fetching logs:', error)
+    log.error({ err: error }, 'Error fetching logs')
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }

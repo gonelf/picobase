@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
 import { db } from '@/lib/db'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Webhooks')
 
 /**
  * GET /api/instances/[id]/webhooks
@@ -45,7 +48,7 @@ export async function GET(
 
     return NextResponse.json({ webhooks })
   } catch (error) {
-    console.error('Error fetching webhooks:', error)
+    log.error({ err: error }, 'Error fetching webhooks')
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
@@ -134,7 +137,7 @@ export async function PUT(
 
     return NextResponse.json({ webhooks, updated: webhooks.length })
   } catch (error) {
-    console.error('Error saving webhooks:', error)
+    log.error({ err: error }, 'Error saving webhooks')
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }

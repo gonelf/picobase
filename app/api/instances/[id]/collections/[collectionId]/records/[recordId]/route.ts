@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
 import { touchInstanceActivity } from '@/lib/activity'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Collections/CollectionId/Records/RecordId')
 
 const RAILWAY_API_URL = process.env.RAILWAY_API_URL
 const RAILWAY_API_KEY = process.env.RAILWAY_API_KEY
@@ -54,7 +57,7 @@ export async function GET(
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error(`Failed to fetch record: ${response.status} ${errorText}`)
+      log.error({ response_status: response.status, errorText: errorText }, 'Failed to fetch record:')
       return NextResponse.json(
         { error: 'Failed to fetch record', details: errorText },
         { status: response.status }
@@ -66,7 +69,7 @@ export async function GET(
     return NextResponse.json(data)
 
   } catch (error) {
-    console.error('Error fetching record:', error)
+    log.error({ err: error }, 'Error fetching record')
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
@@ -114,7 +117,7 @@ export async function PATCH(
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error(`Failed to update record: ${response.status} ${errorText}`)
+      log.error({ response_status: response.status, errorText: errorText }, 'Failed to update record:')
       return NextResponse.json(
         { error: 'Failed to update record', details: errorText },
         { status: response.status }
@@ -126,7 +129,7 @@ export async function PATCH(
     return NextResponse.json(data)
 
   } catch (error) {
-    console.error('Error updating record:', error)
+    log.error({ err: error }, 'Error updating record')
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
@@ -170,7 +173,7 @@ export async function DELETE(
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error(`Failed to delete record: ${response.status} ${errorText}`)
+      log.error({ response_status: response.status, errorText: errorText }, 'Failed to delete record:')
       return NextResponse.json(
         { error: 'Failed to delete record', details: errorText },
         { status: response.status }
@@ -187,7 +190,7 @@ export async function DELETE(
     return NextResponse.json(data)
 
   } catch (error) {
-    console.error('Error deleting record:', error)
+    log.error({ err: error }, 'Error deleting record')
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }

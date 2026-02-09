@@ -3,6 +3,9 @@ import { getSession } from '@/lib/session'
 import { getInstanceCredentials } from '@/lib/get-instance-credentials'
 import { authenticatedPocketBaseRequest } from '@/lib/pocketbase-auth'
 import { db } from '@/lib/db'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Stats')
 
 export async function GET(
   request: NextRequest,
@@ -97,7 +100,7 @@ export async function GET(
             }
           }
         } catch (error) {
-          console.error(`Error fetching count for ${collection.name}:`, error)
+          log.error({ err: error, collection_name: collection.name }, 'Error fetching count for')
         }
         return null
       })
@@ -109,7 +112,7 @@ export async function GET(
     return NextResponse.json(stats)
 
   } catch (error) {
-    console.error('Error fetching stats:', error)
+    log.error({ err: error }, 'Error fetching stats')
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }

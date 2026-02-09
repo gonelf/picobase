@@ -3,6 +3,9 @@ import { getSession } from '@/lib/session'
 import { db } from '@/lib/db'
 import { getBackupSchedule, setBackupSchedule, getBackupHistory } from '@/lib/backup-scheduler'
 import { logAuditEvent } from '@/lib/audit-log'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Backup-schedule')
 
 export async function GET(
   request: NextRequest,
@@ -39,7 +42,7 @@ export async function GET(
       history,
     })
   } catch (error) {
-    console.error('[BackupSchedule] Failed to get backup schedule:', error)
+    log.error({ err: error }, '[BackupSchedule] Failed to get backup schedule')
     return NextResponse.json(
       {
         error: 'Failed to get backup schedule',
@@ -95,7 +98,7 @@ export async function POST(
 
     return NextResponse.json(schedule)
   } catch (error) {
-    console.error('[BackupSchedule] Failed to set backup schedule:', error)
+    log.error({ err: error }, '[BackupSchedule] Failed to set backup schedule')
     return NextResponse.json(
       {
         error: 'Failed to set backup schedule',

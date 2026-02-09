@@ -3,6 +3,9 @@ import { getSession } from '@/lib/session'
 import { getInstanceCredentials } from '@/lib/get-instance-credentials'
 import { authenticatedPocketBaseRequest } from '@/lib/pocketbase-auth'
 import { db } from '@/lib/db'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Auth-settings')
 
 /**
  * GET /api/instances/[id]/auth-settings
@@ -82,7 +85,7 @@ export async function GET(
       settings,
     })
   } catch (error) {
-    console.error('Error fetching auth settings:', error)
+    log.error({ err: error }, 'Error fetching auth settings')
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
@@ -185,7 +188,7 @@ export async function PATCH(
 
     return NextResponse.json(results)
   } catch (error) {
-    console.error('Error updating auth settings:', error)
+    log.error({ err: error }, 'Error updating auth settings')
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }

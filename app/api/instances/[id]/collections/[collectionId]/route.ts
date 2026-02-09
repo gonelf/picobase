@@ -4,6 +4,9 @@ import { getInstanceCredentials } from '@/lib/get-instance-credentials'
 import { authenticatedPocketBaseRequest } from '@/lib/pocketbase-auth'
 import { db } from '@/lib/db'
 import { touchInstanceActivity } from '@/lib/activity'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Collections/CollectionId')
 
 async function getVerifiedInstance(instanceId: string, userId: string) {
   const instanceResult = await db.execute({
@@ -65,7 +68,7 @@ export async function PATCH(
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error(`Failed to update collection: ${response.status} ${errorText}`)
+      log.error({ response_status: response.status, errorText: errorText }, 'Failed to update collection:')
       return NextResponse.json(
         { error: 'Failed to update collection', details: errorText },
         { status: response.status }
@@ -77,7 +80,7 @@ export async function PATCH(
     return NextResponse.json(data)
 
   } catch (error) {
-    console.error('Error updating collection:', error)
+    log.error({ err: error }, 'Error updating collection')
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
@@ -121,7 +124,7 @@ export async function DELETE(
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error(`Failed to delete collection: ${response.status} ${errorText}`)
+      log.error({ response_status: response.status, errorText: errorText }, 'Failed to delete collection:')
       return NextResponse.json(
         { error: 'Failed to delete collection', details: errorText },
         { status: response.status }
@@ -136,7 +139,7 @@ export async function DELETE(
     return NextResponse.json({ success: true })
 
   } catch (error) {
-    console.error('Error deleting collection:', error)
+    log.error({ err: error }, 'Error deleting collection')
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }

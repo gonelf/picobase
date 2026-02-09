@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
 import { db } from '@/lib/db'
 import { getActiveAlerts, getAlertHistory, resolveAlert } from '@/lib/alerts'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Alerts')
 
 export async function GET(
   request: NextRequest,
@@ -39,7 +42,7 @@ export async function GET(
 
     return NextResponse.json({ alerts })
   } catch (error) {
-    console.error('[Alerts] Failed to get alerts:', error)
+    log.error({ err: error }, '[Alerts] Failed to get alerts')
     return NextResponse.json(
       {
         error: 'Failed to get alerts',
@@ -87,7 +90,7 @@ export async function POST(
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
   } catch (error) {
-    console.error('[Alerts] Failed to update alert:', error)
+    log.error({ err: error }, '[Alerts] Failed to update alert')
     return NextResponse.json(
       {
         error: 'Failed to update alert',

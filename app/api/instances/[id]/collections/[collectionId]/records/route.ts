@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
 import { touchInstanceActivity } from '@/lib/activity'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Collections/CollectionId/Records')
 
 const RAILWAY_API_URL = process.env.RAILWAY_API_URL
 const RAILWAY_API_KEY = process.env.RAILWAY_API_KEY
@@ -54,7 +57,7 @@ export async function GET(
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error(`Failed to fetch records: ${response.status} ${errorText}`)
+      log.error({ response_status: response.status, errorText: errorText }, 'Failed to fetch records:')
       return NextResponse.json(
         { error: 'Failed to fetch records', details: errorText },
         { status: response.status }
@@ -66,7 +69,7 @@ export async function GET(
     return NextResponse.json(data)
 
   } catch (error) {
-    console.error('Error fetching records:', error)
+    log.error({ err: error }, 'Error fetching records')
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
@@ -114,7 +117,7 @@ export async function POST(
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error(`Failed to create record: ${response.status} ${errorText}`)
+      log.error({ response_status: response.status, errorText: errorText }, 'Failed to create record:')
       return NextResponse.json(
         { error: 'Failed to create record', details: errorText },
         { status: response.status }
@@ -126,7 +129,7 @@ export async function POST(
     return NextResponse.json(data)
 
   } catch (error) {
-    console.error('Error creating record:', error)
+    log.error({ err: error }, 'Error creating record')
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }

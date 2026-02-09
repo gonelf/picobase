@@ -3,6 +3,9 @@ import { getSession } from '@/lib/session'
 import { db } from '@/lib/db'
 import { getIpAllowlist, addIpToAllowlist, removeIpFromAllowlist, toggleIpAllowlistEntry } from '@/lib/ip-allowlist'
 import { logAuditEvent } from '@/lib/audit-log'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Ip-allowlist')
 
 export async function GET(
   request: NextRequest,
@@ -35,7 +38,7 @@ export async function GET(
 
     return NextResponse.json({ allowlist })
   } catch (error) {
-    console.error('[IpAllowlist] Failed to get IP allowlist:', error)
+    log.error({ err: error }, '[IpAllowlist] Failed to get IP allowlist')
     return NextResponse.json(
       {
         error: 'Failed to get IP allowlist',
@@ -103,7 +106,7 @@ export async function POST(
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
   } catch (error) {
-    console.error('[IpAllowlist] Failed to update IP allowlist:', error)
+    log.error({ err: error }, '[IpAllowlist] Failed to update IP allowlist')
     return NextResponse.json(
       {
         error: 'Failed to update IP allowlist',

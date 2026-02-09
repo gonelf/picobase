@@ -1,5 +1,8 @@
 import { db } from './db'
 import { nanoid } from 'nanoid'
+import { createModuleLogger } from './logger'
+
+const log = createModuleLogger('Metrics')
 
 /**
  * Advanced metrics tracking for production monitoring.
@@ -53,7 +56,7 @@ export async function recordRequestMetric(metric: RequestMetric): Promise<void> 
     })
   } catch (error) {
     // Non-critical - don't let metrics failures affect requests
-    console.error('[Metrics] Failed to record request metric:', error)
+    log.error({ err: error }, 'Failed to record request metric')
   }
 }
 
@@ -110,7 +113,7 @@ export async function getMetricsSummary(
       requestsPerSecond: totalRequests / periodSeconds,
     }
   } catch (error) {
-    console.error('[Metrics] Failed to get metrics summary:', error)
+    log.error({ err: error }, 'Failed to get metrics summary')
     return null
   }
 }
@@ -146,7 +149,7 @@ export async function getEndpointMetrics(
       errorRate: Number(row.error_rate) || 0,
     }))
   } catch (error) {
-    console.error('[Metrics] Failed to get endpoint metrics:', error)
+    log.error({ err: error }, 'Failed to get endpoint metrics')
     return []
   }
 }
@@ -183,7 +186,7 @@ export async function getMetricsTimeSeries(
       errors: Number(row.errors),
     }))
   } catch (error) {
-    console.error('[Metrics] Failed to get time series metrics:', error)
+    log.error({ err: error }, 'Failed to get time series metrics')
     return []
   }
 }
@@ -206,8 +209,8 @@ export async function cleanupOldMetrics(daysToKeep: number = 30): Promise<void> 
       args: [cutoffTimestamp],
     })
 
-    console.log(`[Metrics] Cleaned up metrics older than ${daysToKeep} days`)
+    log.info({ daysToKeep }, 'Cleaned up old metrics')
   } catch (error) {
-    console.error('[Metrics] Failed to cleanup old metrics:', error)
+    log.error({ err: error }, 'Failed to cleanup old metrics')
   }
 }

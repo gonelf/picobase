@@ -5,6 +5,9 @@ import { cleanupOldMetrics } from './metrics'
 import { cleanupOldAuditLogs } from './audit-log'
 import { createAlert, checkAndResolveAlerts } from './alerts'
 import { shouldTriggerAlert } from './health-monitor'
+import { createModuleLogger } from './logger'
+
+const log = createModuleLogger('Scheduler')
 
 /**
  * Scheduled task runner for PicoBase.
@@ -18,7 +21,7 @@ import { shouldTriggerAlert } from './health-monitor'
  */
 export async function runHealthChecks(): Promise<void> {
   try {
-    console.log('[Scheduler] Running health checks...')
+    log.info('Running health checks')
 
     // Get all running instances
     const result = await db.execute({
@@ -54,9 +57,9 @@ export async function runHealthChecks(): Promise<void> {
       }
     }
 
-    console.log(`[Scheduler] Completed health checks for ${result.rows.length} instances`)
+    log.info({ count: result.rows.length }, 'Completed health checks')
   } catch (error) {
-    console.error('[Scheduler] Health check failed:', error)
+    log.error({ err: error }, 'Health check failed')
   }
 }
 
@@ -65,7 +68,7 @@ export async function runHealthChecks(): Promise<void> {
  */
 export async function runScheduledBackups(): Promise<void> {
   try {
-    console.log('[Scheduler] Running scheduled backups...')
+    log.info('Running scheduled backups')
 
     const instanceIds = await getInstancesDueForBackup()
 
@@ -83,9 +86,9 @@ export async function runScheduledBackups(): Promise<void> {
       }
     }
 
-    console.log(`[Scheduler] Completed scheduled backups for ${instanceIds.length} instances`)
+    log.info({ count: instanceIds.length }, 'Completed scheduled backups')
   } catch (error) {
-    console.error('[Scheduler] Scheduled backup failed:', error)
+    log.error({ err: error }, 'Scheduled backup failed')
   }
 }
 
@@ -94,7 +97,7 @@ export async function runScheduledBackups(): Promise<void> {
  */
 export async function runCleanup(): Promise<void> {
   try {
-    console.log('[Scheduler] Running cleanup tasks...')
+    log.info('Running cleanup tasks')
 
     // Clean up old metrics (keep 30 days)
     await cleanupOldMetrics(30)
@@ -112,9 +115,9 @@ export async function runCleanup(): Promise<void> {
       await cleanupOldBackups(row.instance_id as string)
     }
 
-    console.log('[Scheduler] Cleanup tasks completed')
+    log.info('Cleanup tasks completed')
   } catch (error) {
-    console.error('[Scheduler] Cleanup failed:', error)
+    log.error({ err: error }, 'Cleanup failed')
   }
 }
 
@@ -123,7 +126,7 @@ export async function runCleanup(): Promise<void> {
  * Call this from a cron job or Vercel Cron.
  */
 export async function runScheduledTasks(task: 'health' | 'backup' | 'cleanup' | 'all'): Promise<void> {
-  console.log(`[Scheduler] Starting scheduled task: ${task}`)
+  log.info({ task }, 'Starting scheduled task')
 
   const startTime = Date.now()
 
@@ -149,9 +152,9 @@ export async function runScheduledTasks(task: 'health' | 'backup' | 'cleanup' | 
     }
 
     const duration = Date.now() - startTime
-    console.log(`[Scheduler] Task ${task} completed in ${duration}ms`)
+    log.info({ task, duration }, 'Task completed')
   } catch (error) {
-    console.error(`[Scheduler] Task ${task} failed:`, error)
+    log.error({ task, err: error }, 'Task failed')
     throw error
   }
 }

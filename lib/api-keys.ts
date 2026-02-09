@@ -1,6 +1,9 @@
 import { nanoid } from 'nanoid'
 import bcrypt from 'bcryptjs'
 import { db } from './db'
+import { createModuleLogger } from './logger'
+
+const log = createModuleLogger('ApiKeys')
 
 export async function generateApiKey(): Promise<{ key: string; prefix: string }> {
   const prefix = `pbk_${nanoid(8)}`
@@ -163,7 +166,7 @@ export async function getApiKeyStats(apiKeyId: string): Promise<{
       createdAt: key.created_at as string,
     }
   } catch (error) {
-    console.error('[ApiKeys] Failed to get API key stats:', error)
+    log.error({ err: error, apiKeyId }, 'Failed to get API key stats')
     return null
   }
 }

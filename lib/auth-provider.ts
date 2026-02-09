@@ -2,6 +2,9 @@ import { cookies } from 'next/headers'
 import { getServerSession } from 'next-auth/next'
 import { getSession as getSupertokensSession } from './session'
 import { authOptions } from './nextauth'
+import { createModuleLogger } from './logger'
+
+const log = createModuleLogger('AuthProvider')
 
 export type AuthSession = {
     user: {
@@ -49,7 +52,7 @@ async function getNextAuthSession(): Promise<AuthSession> {
             }
         }
     } catch (error) {
-        console.error('Error getting NextAuth session:', error)
+        log.error({ err: error }, 'Error getting NextAuth session')
         return null
     }
 }

@@ -8,6 +8,10 @@
  * to fail fast with helpful messages instead of cryptic runtime errors.
  */
 
+import { createModuleLogger } from './logger'
+
+const log = createModuleLogger('Env')
+
 interface EnvVar {
   name: string
   required: boolean
@@ -167,16 +171,11 @@ export function checkEnvOrWarn(): boolean {
   const errors = validateEnv()
   if (errors.length === 0) return true
 
-  console.error('\n━━━ PicoBase: Missing environment variables ━━━\n')
+  log.error({ missingVars: errors.map(e => e.name) }, 'Missing environment variables')
 
   for (const err of errors) {
-    console.error(`  ${err.name}`)
-    console.error(`    ${err.description}`)
-    console.error(`    Example: ${err.example}\n`)
+    log.warn({ var: err.name, description: err.description, example: err.example }, 'Missing env var')
   }
-
-  console.error('Copy .env.example to .env.local and fill in the values:')
-  console.error('  cp .env.example .env.local\n')
 
   return false
 }

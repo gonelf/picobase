@@ -3,6 +3,10 @@
  * Handles admin authentication for proxied PocketBase instances
  */
 
+import { createModuleLogger } from './logger'
+
+const log = createModuleLogger('PocketBaseAuth')
+
 const RAILWAY_API_URL = process.env.RAILWAY_API_URL
 const RAILWAY_API_KEY = process.env.RAILWAY_API_KEY
 
@@ -56,7 +60,7 @@ export async function authenticateWithPocketBase(
 
   if (!response.ok) {
     const errorText = await response.text()
-    console.error(`PocketBase auth failed: ${response.status} ${errorText}`)
+    log.error({ instanceId, status: response.status, errorText }, 'PocketBase auth failed')
     throw new Error(`Failed to authenticate with PocketBase: ${errorText}`)
   }
 

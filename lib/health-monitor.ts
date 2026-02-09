@@ -1,6 +1,9 @@
 import { db } from './db'
 import { nanoid } from 'nanoid'
 import { getInstanceCredentials } from './get-instance-credentials'
+import { createModuleLogger } from './logger'
+
+const log = createModuleLogger('HealthMonitor')
 
 /**
  * Health monitoring service for PicoBase instances.
@@ -88,7 +91,7 @@ export async function recordHealthCheck(result: HealthCheckResult): Promise<void
       ],
     })
   } catch (error) {
-    console.error('[HealthMonitor] Failed to record health check:', error)
+    log.error({ err: error, instanceId: result.instanceId }, 'Failed to record health check')
   }
 }
 
@@ -127,7 +130,7 @@ export async function getHealthMetrics(
       lastCheckAt: row.last_check_at as string,
     }
   } catch (error) {
-    console.error('[HealthMonitor] Failed to get health metrics:', error)
+    log.error({ err: error, instanceId }, 'Failed to get health metrics')
     return null
   }
 }
@@ -157,7 +160,7 @@ export async function getRecentHealthChecks(
       errorMessage: row.error_message as string | undefined,
     }))
   } catch (error) {
-    console.error('[HealthMonitor] Failed to get recent health checks:', error)
+    log.error({ err: error, instanceId }, 'Failed to get recent health checks')
     return []
   }
 }
@@ -184,7 +187,7 @@ export async function shouldTriggerAlert(instanceId: string): Promise<boolean> {
     const allUnhealthy = result.rows.every(row => row.status === 'unhealthy')
     return allUnhealthy
   } catch (error) {
-    console.error('[HealthMonitor] Failed to check alert threshold:', error)
+    log.error({ err: error, instanceId }, 'Failed to check alert threshold')
     return false
   }
 }

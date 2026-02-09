@@ -3,6 +3,9 @@ import { getAuthSession } from '@/lib/auth-provider'
 import { createApiKey } from '@/lib/api-keys'
 import { db } from '@/lib/db'
 import { z } from 'zod'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Keys')
 
 const createKeySchema = z.object({
   name: z.string().min(1).max(100),
@@ -41,7 +44,7 @@ export async function POST(
       return NextResponse.json({ error: 'Invalid input' }, { status: 400 })
     }
 
-    console.error('Create API key error:', error)
+    log.error({ err: error }, 'Create API key error')
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

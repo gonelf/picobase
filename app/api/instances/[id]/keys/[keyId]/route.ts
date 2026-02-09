@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthSession } from '@/lib/auth-provider'
 import { deleteApiKey } from '@/lib/api-keys'
 import { db } from '@/lib/db'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Keys/KeyId')
 
 export async function DELETE(
   request: NextRequest,
@@ -29,7 +32,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Delete API key error:', error)
+    log.error({ err: error }, 'Delete API key error')
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
 import { db } from '@/lib/db'
 import { getMetricsSummary, getEndpointMetrics, getMetricsTimeSeries } from '@/lib/metrics'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Metrics')
 
 export async function GET(
   request: NextRequest,
@@ -46,7 +49,7 @@ export async function GET(
       timeSeries,
     })
   } catch (error) {
-    console.error('[Metrics] Failed to get metrics:', error)
+    log.error({ err: error }, '[Metrics] Failed to get metrics')
     return NextResponse.json(
       {
         error: 'Failed to get metrics',

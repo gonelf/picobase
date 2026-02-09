@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/session'
 import { db } from '@/lib/db'
 import { getAuditLogs, exportAuditLogs } from '@/lib/audit-log'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Audit-logs')
 
 export async function GET(
   request: NextRequest,
@@ -53,7 +56,7 @@ export async function GET(
 
     return NextResponse.json({ logs })
   } catch (error) {
-    console.error('[AuditLogs] Failed to get audit logs:', error)
+    log.error({ err: error }, '[AuditLogs] Failed to get audit logs')
     return NextResponse.json(
       {
         error: 'Failed to get audit logs',

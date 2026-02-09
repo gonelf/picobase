@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { validateDemoAccess } from '@/lib/demo-security'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Demo/Playground')
 
 // Demo instance configuration
 // This should point to a dedicated demo instance with sample data
@@ -101,7 +104,7 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error(`Demo API request failed: ${response.status} ${errorText}`)
+      log.error({ response_status: response.status, errorText: errorText }, 'Demo API request failed:')
       return NextResponse.json(
         { error: 'Request failed', details: errorText },
         { status: response.status }
@@ -118,7 +121,7 @@ export async function POST(request: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Demo playground error:', error)
+    log.error({ err: error }, 'Demo playground error')
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }

@@ -44,7 +44,8 @@ export async function middleware(request: NextRequest) {
       hasSession = request.cookies.has('sAccessToken')
     }
   } catch (error) {
-    console.error('Session check error:', error)
+    // Edge middleware can't use pino — structured JSON for log aggregation
+    console.error(JSON.stringify({ level: 'error', module: 'Middleware', msg: 'Session check error', err: String(error) }))
     hasSession = false
   }
 

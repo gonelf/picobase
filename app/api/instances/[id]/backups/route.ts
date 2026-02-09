@@ -4,6 +4,9 @@ import { getInstanceCredentials } from '@/lib/get-instance-credentials'
 import { authenticatedPocketBaseRequest } from '@/lib/pocketbase-auth'
 import { db } from '@/lib/db'
 import { touchInstanceActivity } from '@/lib/activity'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Backups')
 
 async function getVerifiedRunningInstance(instanceId: string, userId: string) {
   const instanceResult = await db.execute({
@@ -59,7 +62,7 @@ export async function GET(
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error(`Failed to fetch backups: ${response.status} ${errorText}`)
+      log.error({ response_status: response.status, errorText: errorText }, 'Failed to fetch backups:')
       return NextResponse.json(
         { error: 'Failed to fetch backups', details: errorText },
         { status: response.status }
@@ -71,7 +74,7 @@ export async function GET(
     return NextResponse.json(data)
 
   } catch (error) {
-    console.error('Error fetching backups:', error)
+    log.error({ err: error }, 'Error fetching backups')
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
@@ -121,7 +124,7 @@ export async function POST(
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error(`Failed to create backup: ${response.status} ${errorText}`)
+      log.error({ response_status: response.status, errorText: errorText }, 'Failed to create backup:')
       return NextResponse.json(
         { error: 'Failed to create backup', details: errorText },
         { status: response.status }
@@ -136,7 +139,7 @@ export async function POST(
     return NextResponse.json(data)
 
   } catch (error) {
-    console.error('Error creating backup:', error)
+    log.error({ err: error }, 'Error creating backup')
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }

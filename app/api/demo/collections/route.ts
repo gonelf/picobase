@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit, checkReferrer } from '@/lib/demo-security'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Demo/Collections')
 
 const DEMO_INSTANCE_ID = process.env.DEMO_INSTANCE_ID || 'demo'
 const RAILWAY_API_URL = process.env.RAILWAY_API_URL
@@ -54,7 +57,7 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error(`Failed to fetch demo collections: ${response.status} ${errorText}`)
+      log.error({ response_status: response.status, errorText: errorText }, 'Failed to fetch demo collections:')
       return NextResponse.json(
         { error: 'Failed to fetch collections' },
         { status: response.status }
@@ -69,7 +72,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(safeCollections)
 
   } catch (error) {
-    console.error('Error fetching demo collections:', error)
+    log.error({ err: error }, 'Error fetching demo collections')
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

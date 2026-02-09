@@ -3,6 +3,9 @@ import { getSession } from '@/lib/session'
 import { getInstanceCredentials } from '@/lib/get-instance-credentials'
 import { authenticatedPocketBaseRequest } from '@/lib/pocketbase-auth'
 import { db } from '@/lib/db'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Users')
 
 export async function GET(
   request: NextRequest,
@@ -66,7 +69,7 @@ export async function GET(
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error(`Failed to fetch users: ${response.status} ${errorText}`)
+      log.error({ response_status: response.status, errorText: errorText }, 'Failed to fetch users:')
       return NextResponse.json(
         { error: 'Failed to fetch users', details: errorText },
         { status: response.status }
@@ -77,7 +80,7 @@ export async function GET(
     return NextResponse.json(data)
 
   } catch (error) {
-    console.error('Error fetching users:', error)
+    log.error({ err: error }, 'Error fetching users')
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { joinWaitlist, getWaitlistEntryByReferralCode, getTotalWaitlistCount } from '@/lib/waitlist'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Waitlist')
 
 const joinSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -30,7 +33,7 @@ export async function POST(request: NextRequest) {
       totalCount,
     })
   } catch (error) {
-    console.error('Waitlist join error:', error)
+    log.error({ err: error }, 'Waitlist join error')
     return NextResponse.json(
       { error: 'Something went wrong. Please try again.' },
       { status: 500 }
@@ -61,7 +64,7 @@ export async function GET(request: NextRequest) {
       totalCount,
     })
   } catch (error) {
-    console.error('Waitlist status error:', error)
+    log.error({ err: error }, 'Waitlist status error')
     return NextResponse.json(
       { error: 'Something went wrong. Please try again.' },
       { status: 500 }

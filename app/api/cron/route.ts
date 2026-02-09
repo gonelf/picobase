@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { runScheduledTasks } from '@/lib/scheduler'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Cron')
 
 /**
  * Cron job endpoint for scheduled tasks.
@@ -47,7 +50,7 @@ export async function GET(request: NextRequest) {
       timestamp: new Date().toISOString(),
     })
   } catch (error) {
-    console.error('[Cron] Task execution failed:', error)
+    log.error({ err: error }, '[Cron] Task execution failed')
     return NextResponse.json(
       {
         error: 'Task execution failed',

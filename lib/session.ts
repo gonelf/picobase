@@ -3,6 +3,9 @@ import { cookies } from "next/headers";
 import SuperTokens, { getUser } from "supertokens-node";
 import { backendConfig } from "@/config/backend";
 import { syncUser } from "./auth";
+import { createModuleLogger } from './logger'
+
+const log = createModuleLogger('Session')
 
 import { getServerSession } from "next-auth";
 import { authOptions } from "./nextauth";
@@ -55,7 +58,7 @@ export async function getSupertokensSession() {
             },
         };
     } catch (error) {
-        console.error("Error fetching user", error);
+        log.error({ err: error, userId }, 'Error fetching user');
         return null;
     }
 }

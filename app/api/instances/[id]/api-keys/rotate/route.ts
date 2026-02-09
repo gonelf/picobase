@@ -3,6 +3,9 @@ import { getSession } from '@/lib/session'
 import { db } from '@/lib/db'
 import { rotateApiKey } from '@/lib/api-keys'
 import { logAuditEvent } from '@/lib/audit-log'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Api-keys/Rotate')
 
 export async function POST(
   request: NextRequest,
@@ -49,7 +52,7 @@ export async function POST(
 
     return NextResponse.json(result)
   } catch (error) {
-    console.error('[ApiKeys] Failed to rotate API key:', error)
+    log.error({ err: error }, '[ApiKeys] Failed to rotate API key')
     return NextResponse.json(
       {
         error: 'Failed to rotate API key',

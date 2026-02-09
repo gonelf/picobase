@@ -2,6 +2,9 @@ import { db } from './db'
 import { nanoid } from 'nanoid'
 import { getInstanceCredentials } from './get-instance-credentials'
 import { authenticatedPocketBaseRequest } from './pocketbase-auth'
+import { createModuleLogger } from './logger'
+
+const log = createModuleLogger('BackupScheduler')
 
 /**
  * Automated backup scheduling for PicoBase instances.
@@ -112,7 +115,7 @@ export async function getBackupSchedule(instanceId: string): Promise<BackupSched
       updatedAt: row.updated_at as string,
     }
   } catch (error) {
-    console.error('[BackupScheduler] Failed to get backup schedule:', error)
+    log.error({ err: error, instanceId }, 'Failed to get backup schedule')
     return null
   }
 }
@@ -129,7 +132,7 @@ export async function executeScheduledBackup(instanceId: string): Promise<boolea
     })
 
     if (result.rows.length === 0 || result.rows[0].status !== 'running') {
-      console.log(`[BackupScheduler] Skipping backup for ${instanceId} - instance not running`)
+      log.info({ instanceId }, 'Skipping backup - instance not running')
       return false
     }
 
@@ -137,7 +140,7 @@ export async function executeScheduledBackup(instanceId: string): Promise<boolea
     const credentials = await getInstanceCredentials(instanceId, userId)
 
     if (!credentials) {
-      console.error(`[BackupScheduler] No credentials found for instance ${instanceId}`)
+      log.error({ instanceId }, 'No credentials found for instance')
       return false
     }
 
@@ -176,10 +179,10 @@ export async function executeScheduledBackup(instanceId: string): Promise<boolea
       })
     }
 
-    console.log(`[BackupScheduler] Successfully created backup for instance ${instanceId}`)
+    log.info({ instanceId }, 'Successfully created backup')
     return true
   } catch (error) {
-    console.error(`[BackupScheduler] Failed to execute backup for ${instanceId}:`, error)
+    log.error({ err: error, instanceId }, 'Failed to execute backup')
 
     // Record failure
     await db.execute({
@@ -215,7 +218,7 @@ export async function getInstancesDueForBackup(): Promise<string[]> {
 
     return result.rows.map(row => row.instance_id as string)
   } catch (error) {
-    console.error('[BackupScheduler] Failed to get instances due for backup:', error)
+    log.error({ err: error }, 'Failed to get instances due for backup')
     return []
   }
 }
@@ -235,9 +238,9 @@ export async function cleanupOldBackups(instanceId: string): Promise<void> {
       args: [instanceId, cutoffDate],
     })
 
-    console.log(`[BackupScheduler] Cleaned up old backups for instance ${instanceId}`)
+    log.info({ instanceId }, 'Cleaned up old backups')
   } catch (error) {
-    console.error('[BackupScheduler] Failed to cleanup old backups:', error)
+    log.error({ err: error, instanceId }, 'Failed to cleanup old backups')
   }
 }
 
@@ -268,7 +271,7 @@ export async function getBackupHistory(
       createdAt: row.created_at as string,
     }))
   } catch (error) {
-    console.error('[BackupScheduler] Failed to get backup history:', error)
+    log.error({ err: error, instanceId }, 'Failed to get backup history')
     return []
   }
 }

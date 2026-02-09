@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getAuthSession } from '@/lib/auth-provider'
 import { deleteRailwayInstance } from '@/lib/railway-client'
 import { db } from '@/lib/db'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id')
 
 export async function DELETE(
   request: NextRequest,
@@ -32,7 +35,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error('Delete instance error:', error)
+    log.error({ err: error }, 'Delete instance error')
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

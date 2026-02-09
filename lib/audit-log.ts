@@ -1,5 +1,8 @@
 import { db } from './db'
 import { nanoid } from 'nanoid'
+import { createModuleLogger } from './logger'
+
+const log = createModuleLogger('AuditLog')
 
 /**
  * Audit logging for admin operations and security events.
@@ -78,7 +81,7 @@ export async function logAuditEvent(
     })
   } catch (error) {
     // Audit logging failures should not break operations, but should be logged
-    console.error('[AuditLog] Failed to log audit event:', error)
+    log.error({ err: error, userId, action, resourceType }, 'Failed to log audit event')
   }
 }
 
@@ -131,7 +134,7 @@ export async function getAuditLogs(
       createdAt: row.created_at as string,
     }))
   } catch (error) {
-    console.error('[AuditLog] Failed to get audit logs:', error)
+    log.error({ err: error, instanceId }, 'Failed to get audit logs')
     return []
   }
 }
@@ -166,7 +169,7 @@ export async function getUserAuditLogs(
       createdAt: row.created_at as string,
     }))
   } catch (error) {
-    console.error('[AuditLog] Failed to get user audit logs:', error)
+    log.error({ err: error, userId }, 'Failed to get user audit logs')
     return []
   }
 }
@@ -183,9 +186,9 @@ export async function cleanupOldAuditLogs(daysToKeep: number = 90): Promise<void
       args: [cutoffTimestamp],
     })
 
-    console.log(`[AuditLog] Cleaned up audit logs older than ${daysToKeep} days`)
+    log.info({ daysToKeep }, 'Cleaned up old audit logs')
   } catch (error) {
-    console.error('[AuditLog] Failed to cleanup old audit logs:', error)
+    log.error({ err: error, daysToKeep }, 'Failed to cleanup old audit logs')
   }
 }
 
@@ -224,7 +227,7 @@ export async function exportAuditLogs(
 
     return csv
   } catch (error) {
-    console.error('[AuditLog] Failed to export audit logs:', error)
+    log.error({ err: error, instanceId, startDate, endDate }, 'Failed to export audit logs')
     return ''
   }
 }

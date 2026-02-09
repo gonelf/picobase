@@ -3,6 +3,9 @@ import { getAuthSession } from '@/lib/auth-provider'
 import { startRailwayInstance } from '@/lib/railway-client'
 import { db } from '@/lib/db'
 import { ensureInstancePort } from '@/lib/instance-management'
+import { createModuleLogger } from '@/lib/logger'
+
+const log = createModuleLogger('API:Instances/Id/Start')
 
 export async function POST(
   request: NextRequest,
@@ -68,7 +71,7 @@ export async function POST(
       ...railwayResponse
     })
   } catch (error) {
-    console.error('Start instance error:', error)
+    log.error({ err: error }, 'Start instance error')
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
