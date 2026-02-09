@@ -1,6 +1,7 @@
 import SuperTokens from 'supertokens-node'
 import SessionNode from 'supertokens-node/recipe/session'
 import EmailPasswordNode from 'supertokens-node/recipe/emailpassword'
+import PasswordlessNode from 'supertokens-node/recipe/passwordless'
 import { appInfo } from './appInfo'
 import { TypeInput } from 'supertokens-node/types'
 
@@ -14,6 +15,10 @@ export const backendConfig = (): TypeInput => {
         appInfo,
         recipeList: [
             EmailPasswordNode.init(),
+            PasswordlessNode.init({
+                flowType: "USER_INPUT_CODE",
+                contactMethod: "EMAIL",
+            }),
             SessionNode.init(),
         ],
         isInServerlessEnv: true,

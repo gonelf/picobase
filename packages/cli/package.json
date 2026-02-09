@@ -1,6 +1,6 @@
 {
   "name": "@picobase_app/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CLI tool for managing PicoBase instances",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -21,17 +21,19 @@
   "author": "PicoBase",
   "license": "MIT",
   "dependencies": {
-    "commander": "^11.1.0",
-    "chalk": "^4.1.2",
-    "ora": "^5.4.1",
-    "inquirer": "^8.2.6",
     "axios": "^1.6.5",
+    "chalk": "^4.1.2",
+    "commander": "^11.1.0",
     "dotenv": "^16.4.1",
-    "node-fetch": "^2.7.0"
+    "inquirer": "^8.2.6",
+    "node-fetch": "^2.7.0",
+    "ora": "^5.4.1",
+    "prompts": "^2.4.2",
+    "supertokens-node": "^24.0.1"
   },
   "devDependencies": {
-    "@types/node": "^20.11.5",
     "@types/inquirer": "^8.2.10",
+    "@types/node": "^20.11.5",
     "typescript": "^5.3.3"
   },
   "engines": {

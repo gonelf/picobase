@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { getAuthUrl } from '@/lib/auth-utils'
 import WaitlistForm from '@/components/WaitlistForm'
 import CodeDemo from '@/components/CodeDemo'
+import ProductHuntBadge from '@/components/ProductHuntBadge'
 
 export default function Home() {
   const signInUrl = getAuthUrl('signin')
@@ -607,6 +608,7 @@ export default function Home() {
           </div>
         </div>
       </footer>
+      <ProductHuntBadge />
     </main >
   )
 }

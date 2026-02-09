@@ -21,6 +21,13 @@ PicoBase is an instant backend infrastructure platform designed to work seamless
 ## Documentation
 Full documentation is available at: https://picobase.app/docs
 
+## Authentication for Agents (Vibe Coding)
+To start using PicoBase without a pre-existing account, use the CLI to authenticate via email (OTP):
+
+1.  **Login**: `npx @picobase_app/cli login --email your@email.com`
+2.  **Verify**: Enter the code sent to your email.
+3.  **Code**: The CLI will automatically configure your local environment with the API key. You can then use `createClient()` immediately.
+
 ## Quickstart
 1. Install: `npm install @picobase_app/client`
 2. Initialize:
