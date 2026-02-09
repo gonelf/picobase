@@ -68,15 +68,15 @@ export function checkReferrer(request: NextRequest): { allowed: boolean; error?:
   try {
     const referrerUrl = new URL(referrer)
     const allowedDomains = [
-      'picobase.com',
-      'www.picobase.com',
+      'picobase.app',
+      'www.picobase.app',
       'localhost', // for development
     ]
 
     if (!allowedDomains.some(domain => referrerUrl.hostname === domain || referrerUrl.hostname.endsWith(`.${domain}`))) {
       return {
         allowed: false,
-        error: 'Demo API can only be accessed from picobase.com',
+        error: 'Demo API can only be accessed from picobase.app',
       }
     }
 

@@ -15,7 +15,7 @@ The public API playground allows users to test PicoBase's API without creating a
 - In-memory rate limiting (upgrade to Redis for production)
 
 ### 3. **Referrer Validation**
-- API requests must originate from `picobase.com` domain
+- API requests must originate from `picobase.app` domain
 - Prevents unauthorized external usage
 - Blocks attempts to use demo API in other projects
 

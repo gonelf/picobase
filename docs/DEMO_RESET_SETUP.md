@@ -108,7 +108,7 @@ jobs:
 ```
 
 Add secrets in GitHub repository settings:
-- `PLATFORM_URL`: Your platform URL (e.g., https://picobase.com)
+- `PLATFORM_URL`: Your platform URL (e.g., https://picobase.app)
 - `DEMO_RESET_SECRET`: Your reset secret
 
 ### 4. Verify Cron Setup
@@ -365,7 +365,7 @@ To manually reset the demo instance:
 Or via API:
 
 ```bash
-curl -X POST https://picobase.com/api/demo/reset \
+curl -X POST https://picobase.app/api/demo/reset \
   -H "Authorization: Bearer $DEMO_RESET_SECRET" \
   -H "Content-Type: application/json"
 ```
