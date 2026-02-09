@@ -90,12 +90,31 @@ export async function initCommand(projectName?: string, options?: InitOptions): 
       if (options?.template) {
         await createTemplate(projectName!, instance.url, apiKey.key, options.template);
       } else {
-        info('Get started with:');
+        // Even without a template, create a .env.local in current dir if it doesn't exist
+        const envPath = path.join(process.cwd(), '.env.local');
+        if (!fs.existsSync(envPath)) {
+          fs.writeFileSync(envPath, `PICOBASE_URL=${instance.url}\nPICOBASE_API_KEY=${apiKey.key}\n`);
+          success('Created .env.local with your credentials');
+        } else {
+          warning('.env.local already exists — add these variables manually if needed');
+        }
+
+        console.log('');
+        info('Get started:');
         console.log('');
         console.log('  npm install @picobase_app/client');
         console.log('');
         console.log(`  import { createClient } from '@picobase_app/client'`);
-        console.log(`  const pb = createClient('${instance.url}', '${apiKey.key}')`);
+        console.log(`  const pb = createClient()  // reads from .env automatically`);
+        console.log('');
+        info('Or scaffold a full project:');
+        console.log('');
+        console.log(`  picobase init ${projectName} --template next`);
+        console.log(`  picobase init ${projectName} --template react`);
+        console.log('');
+        info('Generate typed collections:');
+        console.log('');
+        console.log('  picobase typegen');
         console.log('');
       }
     } catch (err: any) {
@@ -306,8 +325,107 @@ module.exports = nextConfig
 }
 
 async function createReactTemplate(projectDir: string, url: string, apiKey: string): Promise<void> {
-  // Placeholder - would use create-react-app or vite
-  warning('React template coming soon. Use: npx create-react-app ' + path.basename(projectDir));
+  const projectName = path.basename(projectDir);
+
+  // package.json
+  const packageJson = {
+    name: projectName,
+    version: '0.1.0',
+    private: true,
+    type: 'module',
+    scripts: {
+      dev: 'vite',
+      build: 'tsc && vite build',
+      preview: 'vite preview',
+    },
+    dependencies: {
+      '@picobase_app/client': '^0.1.0',
+      '@picobase_app/react': '^0.1.0',
+      react: '^18.2.0',
+      'react-dom': '^18.2.0',
+    },
+    devDependencies: {
+      '@types/react': '^18.2.0',
+      '@types/react-dom': '^18.2.0',
+      '@vitejs/plugin-react': '^4.2.0',
+      typescript: '^5.0.0',
+      vite: '^5.0.0',
+    },
+  };
+
+  fs.writeFileSync(
+    path.join(projectDir, 'package.json'),
+    JSON.stringify(packageJson, null, 2)
+  );
+
+  // .env with Vite prefix
+  fs.writeFileSync(
+    path.join(projectDir, '.env'),
+    `VITE_PICOBASE_URL=${url}\nVITE_PICOBASE_API_KEY=${apiKey}\n`
+  );
+
+  // vite.config.ts
+  fs.writeFileSync(
+    path.join(projectDir, 'vite.config.ts'),
+    `import { defineConfig } from 'vite'\nimport react from '@vitejs/plugin-react'\n\nexport default defineConfig({\n  plugins: [react()],\n})\n`
+  );
+
+  // tsconfig.json
+  const tsconfig = {
+    compilerOptions: {
+      target: 'ES2020',
+      useDefineForClassFields: true,
+      lib: ['ES2020', 'DOM', 'DOM.Iterable'],
+      module: 'ESNext',
+      skipLibCheck: true,
+      moduleResolution: 'bundler',
+      allowImportingTsExtensions: true,
+      resolveJsonModule: true,
+      isolatedModules: true,
+      noEmit: true,
+      jsx: 'react-jsx',
+      strict: true,
+    },
+    include: ['src'],
+  };
+
+  fs.writeFileSync(
+    path.join(projectDir, 'tsconfig.json'),
+    JSON.stringify(tsconfig, null, 2)
+  );
+
+  // index.html
+  fs.writeFileSync(
+    path.join(projectDir, 'index.html'),
+    `<!DOCTYPE html>\n<html lang="en">\n  <head>\n    <meta charset="UTF-8" />\n    <meta name="viewport" content="width=device-width, initial-scale=1.0" />\n    <title>${projectName}</title>\n  </head>\n  <body>\n    <div id="root"></div>\n    <script type="module" src="/src/main.tsx"></script>\n  </body>\n</html>\n`
+  );
+
+  // src directory
+  fs.mkdirSync(path.join(projectDir, 'src'), { recursive: true });
+
+  // src/picobase.ts
+  fs.writeFileSync(
+    path.join(projectDir, 'src', 'picobase.ts'),
+    `import { createClient } from '@picobase_app/client'\n\nexport const pb = createClient(\n  import.meta.env.VITE_PICOBASE_URL,\n  import.meta.env.VITE_PICOBASE_API_KEY,\n)\n`
+  );
+
+  // src/main.tsx
+  fs.writeFileSync(
+    path.join(projectDir, 'src', 'main.tsx'),
+    `import React from 'react'\nimport ReactDOM from 'react-dom/client'\nimport { PicoBaseProvider } from '@picobase_app/react'\nimport App from './App'\n\nReactDOM.createRoot(document.getElementById('root')!).render(\n  <React.StrictMode>\n    <PicoBaseProvider\n      url={import.meta.env.VITE_PICOBASE_URL}\n      apiKey={import.meta.env.VITE_PICOBASE_API_KEY}\n    >\n      <App />\n    </PicoBaseProvider>\n  </React.StrictMode>,\n)\n`
+  );
+
+  // src/App.tsx
+  fs.writeFileSync(
+    path.join(projectDir, 'src', 'App.tsx'),
+    `import { useAuth } from '@picobase_app/react'\n\nexport default function App() {\n  const { user, loading, signIn, signOut } = useAuth()\n\n  if (loading) return <p>Loading...</p>\n\n  return (\n    <div style={{ fontFamily: 'system-ui', padding: '2rem', maxWidth: 480 }}>\n      <h1>Welcome to PicoBase</h1>\n      {user ? (\n        <>\n          <p>Signed in as <strong>{user.email}</strong></p>\n          <button onClick={() => signOut()}>Sign out</button>\n        </>\n      ) : (\n        <>\n          <p>Not signed in</p>\n          <button onClick={() => signIn({ email: 'test@example.com', password: 'password' })}>\n            Sign in\n          </button>\n        </>\n      )}\n    </div>\n  )\n}\n`
+  );
+
+  // src/vite-env.d.ts
+  fs.writeFileSync(
+    path.join(projectDir, 'src', 'vite-env.d.ts'),
+    `/// <reference types="vite/client" />\n\ninterface ImportMetaEnv {\n  readonly VITE_PICOBASE_URL: string\n  readonly VITE_PICOBASE_API_KEY: string\n}\n\ninterface ImportMeta {\n  readonly env: ImportMetaEnv\n}\n`
+  );
 }
 
 async function createVueTemplate(projectDir: string, url: string, apiKey: string): Promise<void> {

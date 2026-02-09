@@ -7,6 +7,10 @@ import axios from 'axios';
 
 interface DevOptions {
   port?: string;
+  /** Also run the app dev server alongside PocketBase. */
+  withApp?: boolean;
+  /** Custom command to start the app dev server. Defaults to "npm run dev". */
+  run?: string;
 }
 
 const POCKETBASE_VERSION = '0.22.0';
@@ -16,6 +20,16 @@ export async function devCommand(options?: DevOptions): Promise<void> {
   const pbDir = path.join(os.homedir(), '.picobase', 'dev');
   const pbPath = getPocketBasePath(pbDir);
   const dbPath = path.join(process.cwd(), 'pb_data');
+  const children: ReturnType<typeof spawn>[] = [];
+
+  function cleanup() {
+    console.log('');
+    info('Stopping all dev processes...');
+    for (const child of children) {
+      child.kill('SIGINT');
+    }
+    process.exit(0);
+  }
 
   try {
     // Check if PocketBase binary exists
@@ -31,15 +45,13 @@ export async function devCommand(options?: DevOptions): Promise<void> {
 
     success(`Starting PocketBase on http://127.0.0.1:${port}`);
     success(`Admin UI: http://127.0.0.1:${port}/_/`);
-    console.log('');
-    info('Press Ctrl+C to stop');
-    console.log('');
 
     // Start PocketBase
     const pb = spawn(pbPath, ['serve', '--http', `127.0.0.1:${port}`], {
       stdio: 'inherit',
       cwd: process.cwd(),
     });
+    children.push(pb);
 
     pb.on('error', (err) => {
       error(`Failed to start PocketBase: ${err.message}`);
@@ -53,13 +65,44 @@ export async function devCommand(options?: DevOptions): Promise<void> {
       }
     });
 
-    // Handle graceful shutdown
-    process.on('SIGINT', () => {
+    // Optionally start the app dev server too (--with-app or --run)
+    const appCmd = options?.run || (options?.withApp ? 'npm run dev' : null);
+    if (appCmd) {
       console.log('');
-      info('Stopping PocketBase...');
-      pb.kill('SIGINT');
-      process.exit(0);
-    });
+      success(`Starting app dev server: ${appCmd}`);
+      console.log('');
+
+      const [cmd, ...args] = appCmd.split(' ');
+      const appProcess = spawn(cmd, args, {
+        stdio: 'inherit',
+        cwd: process.cwd(),
+        shell: true,
+        env: {
+          ...process.env,
+          // Inject local PocketBase URL so the SDK auto-connects
+          PICOBASE_URL: `http://127.0.0.1:${port}`,
+          NEXT_PUBLIC_PICOBASE_URL: `http://127.0.0.1:${port}`,
+          VITE_PICOBASE_URL: `http://127.0.0.1:${port}`,
+        },
+      });
+      children.push(appProcess);
+
+      appProcess.on('error', (err) => {
+        error(`Failed to start app: ${err.message}`);
+      });
+    } else {
+      console.log('');
+      info('Tip: Run picobase dev --with-app to start both PocketBase and your app server.');
+      info('     Or: picobase dev --run "npm run dev" for a custom command.');
+    }
+
+    console.log('');
+    info('Press Ctrl+C to stop');
+    console.log('');
+
+    // Handle graceful shutdown
+    process.on('SIGINT', cleanup);
+    process.on('SIGTERM', cleanup);
   } catch (err: any) {
     error(err.message || 'Failed to start development server');
     process.exit(1);

@@ -1,0 +1,33 @@
+You are working on PicoBase, a managed BaaS (Backend-as-a-Service) platform built on PocketBase.
+
+Key facts:
+- Monorepo: Next.js 14 platform + @picobase_app/client SDK + @picobase_app/react hooks + @picobase_app/cli
+- TypeScript everywhere, Tailwind for styling
+- Platform DB: Turso (libsql). Per-tenant DB: PocketBase (SQLite on Railway)
+- SDK wraps PocketBase with cold-start retry logic and API key injection
+
+When writing SDK code (packages/client/):
+- Always throw errors from errors.ts with a `fix` suggestion
+- Use generics for collection types: `collection<T>(name: string)`
+- Cold-start retries are handled automatically — don't add retry logic in user-facing code
+- Environment auto-detection: PICOBASE_URL, NEXT_PUBLIC_PICOBASE_URL, VITE_PICOBASE_URL
+
+When writing React code (packages/react/):
+- Hooks must be used inside PicoBaseProvider
+- useCollection returns { data, loading, error } pattern
+- Auth state is managed via PocketBase authStore
+
+When writing platform code (app/, lib/):
+- Use db from lib/db.ts for all Turso queries
+- Validate env vars using lib/env.ts
+- API routes use Zod for input validation
+- Instance operations go through lib/pocketbase.ts
+
+When writing CLI code (packages/cli/):
+- Use chalk for colored output, ora for spinners, inquirer for prompts
+- Commands are in src/commands/ and registered in src/index.ts
+- Config stored at ~/.picobase/config.json
+
+Filter syntax (PocketBase): 'field = value', 'field ~ "partial"', 'field > 0', use && and || for logic.
+
+Common env vars: PICOBASE_URL, PICOBASE_API_KEY (prefix NEXT_PUBLIC_ for Next.js client, VITE_ for Vite).
