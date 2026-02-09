@@ -1,3 +1,30 @@
 User-agent: *
 Allow: /
+
 Sitemap: https://picobase.app/sitemap.xml
+
+# LLM-friendly content
+# See https://llmstxt.org for specification
+User-agent: GPTBot
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+User-agent: ChatGPT-User
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+User-agent: Claude-Web
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+User-agent: Anthropic-AI
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+User-agent: PerplexityBot
+Allow: /llms.txt
+Allow: /llms-full.txt
+
+User-agent: Bytespider
+Allow: /llms.txt
+Allow: /llms-full.txt

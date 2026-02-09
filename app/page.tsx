@@ -598,12 +598,29 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="bg-gray-950 border-t border-white/10 py-12 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 text-sm text-white/60">
-          <p>&copy; {new Date().getFullYear()} PicoBase. All rights reserved.</p>
-          <div className="flex gap-6">
-            <Link href="/docs" className="hover:text-white transition-colors">Documentation</Link>
-            <Link href="https://github.com/picobase/picobase" className="hover:text-white transition-colors">GitHub</Link>
-            <Link href="https://twitter.com/picobase" className="hover:text-white transition-colors">Twitter</Link>
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <p className="text-sm font-semibold text-white mb-3">Product</p>
+              <div className="flex flex-col gap-2">
+                <Link href="/docs" className="text-sm text-white/60 hover:text-white transition-colors">Documentation</Link>
+                <Link href="https://github.com/picobase/picobase" className="text-sm text-white/60 hover:text-white transition-colors">GitHub</Link>
+                <Link href="https://twitter.com/picobase" className="text-sm text-white/60 hover:text-white transition-colors">Twitter</Link>
+              </div>
+            </div>
+            <div className="col-span-2">
+              <p className="text-sm font-semibold text-white mb-3">Compare</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                <Link href="/compare/supabase" className="text-sm text-white/60 hover:text-white transition-colors">PicoBase vs Supabase</Link>
+                <Link href="/compare/firebase" className="text-sm text-white/60 hover:text-white transition-colors">PicoBase vs Firebase</Link>
+                <Link href="/compare/appwrite" className="text-sm text-white/60 hover:text-white transition-colors">PicoBase vs Appwrite</Link>
+                <Link href="/compare/convex" className="text-sm text-white/60 hover:text-white transition-colors">PicoBase vs Convex</Link>
+                <Link href="/compare/nhost" className="text-sm text-white/60 hover:text-white transition-colors">PicoBase vs Nhost</Link>
+              </div>
+            </div>
+          </div>
+          <div className="border-t border-white/10 pt-6 text-sm text-white/60">
+            <p>&copy; {new Date().getFullYear()} PicoBase. All rights reserved.</p>
           </div>
         </div>
       </footer>
