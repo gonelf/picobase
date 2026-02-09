@@ -485,6 +485,10 @@ console.log(result.items)      // array of posts
 console.log(result.totalItems) // total count
 ```
 
+> **Need more filter examples?** See the full
+> [Filter Syntax Reference](./FILTER_SYNTAX.md) for 20+ copy-paste examples
+> covering comparisons, string matching, dates, relations, sorting, and more.
+
 ### Get a single record
 
 ```typescript
@@ -886,6 +890,10 @@ This starts PocketBase on `http://127.0.0.1:8090` and runs `npm run dev` with
 - **Set up collection rules** to control who can read/write data
 - **Enable OAuth providers** in your instance's auth settings
 - **Generate typed collections** with `picobase typegen` for full autocomplete
+- **Learn the filter syntax** — see the
+  [Filter Syntax Reference](./FILTER_SYNTAX.md) for 20+ copy-paste examples
+- **Migrating from Supabase or Firebase?** — see the
+  [Migration Guide](./MIGRATION_GUIDE.md) for side-by-side code comparisons
 - **Use AI tools** — the project includes `CLAUDE.md` and `.cursorrules` so
   Cursor, Claude, and Windsurf understand your PicoBase project
 - **Read the full API reference** in the
