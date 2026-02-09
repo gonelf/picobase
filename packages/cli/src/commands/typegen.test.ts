@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import * as fs from 'fs'
 import * as path from 'path'
-import { typegenCommand } from './typegen'
+import { typegenCommand, hashSchema } from './typegen'
 import * as api from '../api'
 import * as config from '../config'
 
@@ -363,5 +363,50 @@ describe('typegen type generation', () => {
       expect.stringContaining('src/types'),
       { recursive: true }
     )
+  })
+})
+
+describe('hashSchema', () => {
+  it('should produce consistent hashes for the same schema', () => {
+    const collections = [
+      { name: 'posts', type: 'base', schema: [{ name: 'title', type: 'text' }] },
+    ]
+    const hash1 = hashSchema(collections)
+    const hash2 = hashSchema(collections)
+    expect(hash1).toBe(hash2)
+  })
+
+  it('should produce different hashes when schema changes', () => {
+    const collections1 = [
+      { name: 'posts', type: 'base', schema: [{ name: 'title', type: 'text' }] },
+    ]
+    const collections2 = [
+      { name: 'posts', type: 'base', schema: [
+        { name: 'title', type: 'text' },
+        { name: 'content', type: 'editor' },
+      ] },
+    ]
+    expect(hashSchema(collections1)).not.toBe(hashSchema(collections2))
+  })
+
+  it('should ignore non-schema fields (like timestamps)', () => {
+    const collections1 = [
+      { name: 'posts', type: 'base', schema: [], created: '2024-01-01', updated: '2024-01-01' },
+    ]
+    const collections2 = [
+      { name: 'posts', type: 'base', schema: [], created: '2024-06-01', updated: '2024-06-15' },
+    ]
+    expect(hashSchema(collections1)).toBe(hashSchema(collections2))
+  })
+
+  it('should detect when a collection is added', () => {
+    const collections1 = [
+      { name: 'posts', type: 'base', schema: [] },
+    ]
+    const collections2 = [
+      { name: 'posts', type: 'base', schema: [] },
+      { name: 'comments', type: 'base', schema: [] },
+    ]
+    expect(hashSchema(collections1)).not.toBe(hashSchema(collections2))
   })
 })
