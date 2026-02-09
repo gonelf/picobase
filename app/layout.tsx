@@ -30,14 +30,6 @@ export const metadata: Metadata = {
     description: 'The backend for flow state. Stop managing migrations. Start vibing.',
     url: 'https://picobase.app',
     siteName: 'PicoBase',
-    images: [
-      {
-        url: '/preview.png',
-        width: 1200,
-        height: 630,
-        alt: 'PicoBase Preview',
-      },
-    ],
     locale: 'en_US',
     type: 'website',
   },
@@ -45,7 +37,6 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'PicoBase - The Open Source Backend for Vibe Coders',
     description: 'The backend for flow state. Stop managing migrations. Start vibing.',
-    images: ['/preview.png'],
     creator: '@picobase',
   },
 }
