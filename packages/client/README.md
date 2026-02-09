@@ -197,18 +197,50 @@ const pb = createClient('https://myapp.picobase.com', 'pbk_...', {
 
 ### Error handling
 
+Every SDK error includes a `code` and `fix` property with actionable suggestions:
+
 ```typescript
-import { PicoBaseError, InstanceUnavailableError, AuthorizationError } from '@picobase_app/client'
+import {
+  PicoBaseError,
+  AuthorizationError,
+  InstanceUnavailableError,
+  CollectionNotFoundError,
+  RecordNotFoundError,
+  ConfigurationError,
+} from '@picobase_app/client'
 
 try {
   await pb.collection('posts').getList()
 } catch (err) {
-  if (err instanceof AuthorizationError) {
-    // Invalid API key
-  } else if (err instanceof InstanceUnavailableError) {
-    // Instance not available after retries
+  if (err instanceof PicoBaseError) {
+    console.log(err.message)  // "Collection 'posts' not found."
+    console.log(err.code)     // "COLLECTION_NOT_FOUND"
+    console.log(err.fix)      // "Make sure the collection 'posts' exists..."
   }
 }
+```
+
+**Error types:**
+
+| Error | Code | When |
+|---|---|---|
+| `ConfigurationError` | `CONFIGURATION_ERROR` | Missing URL, API key, or bad config |
+| `AuthorizationError` | `UNAUTHORIZED` | Invalid or missing API key |
+| `CollectionNotFoundError` | `COLLECTION_NOT_FOUND` | Collection doesn't exist |
+| `RecordNotFoundError` | `RECORD_NOT_FOUND` | Record ID not found |
+| `InstanceUnavailableError` | `INSTANCE_UNAVAILABLE` | Instance down after retries |
+| `RequestError` | `REQUEST_FAILED` | Generic HTTP error (includes status-specific fix hints) |
+
+### Typed collections with `picobase typegen`
+
+Run `picobase typegen` to generate types from your schema. The generated file includes a typed client:
+
+```typescript
+import { pb } from './src/types/picobase'
+
+// Collection names autocomplete, record fields are typed
+const result = await pb.collection('posts').getList(1, 20)
+result.items[0].title  // string — fully typed!
 ```
 
 ## API Reference
