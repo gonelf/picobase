@@ -9,11 +9,11 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   metadataBase: new URL('https://picobase.app'),
   title: {
-    default: 'PicoBase - The Open Source Backend for Vibe Coders',
+    default: 'PicoBase - The Backend for Vibe Coders',
     template: '%s | PicoBase',
   },
   description: 'The backend for flow state. Stop managing migrations. Start vibing. Multi-tenant backend platform with real-time database, authentication, file storage, and instant APIs.',
-  keywords: ['backend', 'database', 'realtime', 'authentication', 'storage', 'open source', 'firebase alternative', 'supabase alternative', 'pocketbase', 'vibe coding', 'ai backend', 'cursor', 'windsurf', 'v0'],
+  keywords: ['backend', 'database', 'realtime', 'authentication', 'storage', 'firebase alternative', 'supabase alternative', 'pocketbase', 'vibe coding', 'ai backend', 'cursor', 'windsurf', 'v0'],
   authors: [{ name: 'PicoBase Team' }],
   robots: {
     index: true,
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    title: 'PicoBase - The Open Source Backend for Vibe Coders',
+    title: 'PicoBase - The Backend for Vibe Coders',
     description: 'The backend for flow state. Stop managing migrations. Start vibing.',
     url: 'https://picobase.app',
     siteName: 'PicoBase',
@@ -36,9 +36,12 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'PicoBase - The Open Source Backend for Vibe Coders',
+    title: 'PicoBase - The Backend for Vibe Coders',
     description: 'The backend for flow state. Stop managing migrations. Start vibing.',
     creator: '@picobase',
+  },
+  icons: {
+    icon: '/logo.svg',
   },
 }
 

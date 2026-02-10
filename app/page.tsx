@@ -23,7 +23,7 @@ export default function Home() {
               price: '0',
               priceCurrency: 'USD',
             },
-            description: 'The open source Firebase alternative for vibe coders. Instant backend infrastructure with real-time database, authentication, and file storage.',
+            description: 'The Firebase alternative for vibe coders. Instant backend infrastructure with real-time database, authentication, and file storage.',
           }),
         }}
       />
@@ -73,7 +73,7 @@ export default function Home() {
                 The backend for flow state
               </p>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-                <span className="block text-4xl md:text-5xl mb-2 text-white/90">The Open Source</span>
+                <span className="block text-4xl md:text-5xl mb-2 text-white/90">The</span>
                 Backend for
                 <br />
                 <span className="gradient-text from-primary-400 to-accent-400">

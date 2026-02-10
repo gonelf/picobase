@@ -121,7 +121,7 @@ export default function ComparisonLayout({
           priceCurrency: 'USD',
         },
         description:
-          'The open source Firebase alternative for vibe coders. Instant backend infrastructure with real-time database, authentication, and file storage.',
+          'The Firebase alternative for vibe coders. Instant backend infrastructure with real-time database, authentication, and file storage.',
         featureList: [
           'Zero-config setup',
           'Auto-creating collections',
@@ -131,7 +131,6 @@ export default function ComparisonLayout({
           'TypeScript SDK',
           'React hooks',
           'REST API',
-          'Open source',
           'Self-hostable',
         ],
         applicationSubCategory: 'Backend-as-a-Service',
@@ -302,11 +301,10 @@ export default function ComparisonLayout({
                 {section.features.map((feature, fIdx) => (
                   <div
                     key={feature.name}
-                    className={`grid grid-cols-3 px-6 py-4 items-center ${
-                      fIdx < section.features.length - 1 || sIdx < featureComparisons.length - 1
+                    className={`grid grid-cols-3 px-6 py-4 items-center ${fIdx < section.features.length - 1 || sIdx < featureComparisons.length - 1
                         ? 'border-b border-gray-200 dark:border-gray-700'
                         : ''
-                    } bg-white dark:bg-gray-900/50`}
+                      } bg-white dark:bg-gray-900/50`}
                   >
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                       {feature.name}

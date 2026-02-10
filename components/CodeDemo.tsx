@@ -3,18 +3,22 @@
 import { useState, useEffect } from 'react'
 
 const CLI_LINES = [
-  { text: 'How do I start using PicoBase?', type: 'user' as const, delay: 0 },
+  { text: 'Can you add authentication with PicoBase?', type: 'user' as const, delay: 0 },
   { text: '', type: 'space' as const, delay: 800 },
-  { text: 'Just run the login command. I\'ll handle the rest.', type: 'assistant' as const, delay: 1000 },
+  { text: 'I\'ll add authentication with PicoBase for you. Let me set everything up.', type: 'assistant' as const, delay: 1000 },
   { text: '', type: 'space' as const, delay: 2000 },
   { text: '$ npx @picobase_app/cli login --email you@example.com', type: 'command' as const, delay: 2200 },
   { text: '', type: 'space' as const, delay: 3000 },
   { text: '✓ Code sent to email', type: 'output' as const, delay: 3200 },
   { text: 'Enter code: ******', type: 'command' as const, delay: 4000 },
   { text: '✓ Successfully logged in!', type: 'output' as const, delay: 4500 },
-  { text: '✓ API Key saved to .env', type: 'output' as const, delay: 4800 },
-  { text: '', type: 'space' as const, delay: 5100 },
-  { text: 'You\'re authenticated. Now you can use createClient() without any config.', type: 'assistant' as const, delay: 5300 },
+  { text: '✓ API Key saved to .env', type: 'output' as const, delay: 4700 },
+  { text: '✓ Created components/AuthForm.tsx', type: 'output' as const, delay: 4900 },
+  { text: '✓ Added /login route', type: 'output' as const, delay: 5100 },
+  { text: '✓ Added /register route', type: 'output' as const, delay: 5300 },
+  { text: '✓ Configured authentication context', type: 'output' as const, delay: 5500 },
+  { text: '', type: 'space' as const, delay: 5800 },
+  { text: 'Done! /login and /register are ready to be tested. The auth form includes email/password and OAuth support.', type: 'assistant' as const, delay: 6000 },
 ]
 
 export default function CodeDemo() {
@@ -34,7 +38,7 @@ export default function CodeDemo() {
       <div className="px-4 py-3 border-b border-amber-400/30">
         <div className="flex items-center justify-between">
           <span className="text-amber-400 text-xs">Claude Code v2.1.37</span>
-          <span className="text-gray-500 text-xs">~/picobase</span>
+          <span className="text-gray-500 text-xs">~/side_project</span>
         </div>
       </div>
 
