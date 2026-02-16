@@ -29,6 +29,7 @@ PicoBase is built on top of PocketBase, but you should **never install the `pock
    - [CRUD Operations](#supabase-crud-operations)
    - [Realtime](#supabase-realtime)
    - [Storage](#supabase-storage)
+   - [RPC (Remote Procedure Calls)](#supabase-rpc-remote-procedure-calls)
    - [Row-Level Security](#supabase-row-level-security)
    - [Environment Variables](#supabase-environment-variables)
 2. [From Firebase](#from-firebase)
@@ -332,6 +333,112 @@ await pb.collection('users').update(userId, formData)
 const url = pb.storage.getFileUrl(record, 'avatar.png')
 const thumbUrl = pb.storage.getFileUrl(record, 'avatar.png', { thumb: '100x100' })
 ```
+
+### Supabase RPC (Remote Procedure Calls)
+
+Supabase RPC calls PostgreSQL functions on the server. PicoBase provides two approaches:
+**Option 1:** Use the convenience `.rpc()` method (recommended)
+**Option 2:** Create custom API endpoints and call with `.send()`
+
+#### Simple RPC — calculations and aggregations
+
+```typescript
+// Supabase — call a PostgreSQL function
+const { data } = await supabase.rpc('calculate_cart_total', {
+  cart_id: '123'
+})
+
+// PicoBase — Option 1: Use .rpc() convenience method
+const result = await pb.rpc('calculate_cart_total', {
+  cart_id: '123'
+})
+
+// PicoBase — Option 2: Call custom endpoint directly
+const result = await pb.send('/api/rpc/calculate_cart_total', {
+  method: 'POST',
+  body: { cart_id: '123' },
+})
+```
+
+#### RPC with complex logic
+
+```typescript
+// Supabase — PostgreSQL function that joins tables
+CREATE FUNCTION get_user_dashboard(user_id uuid)
+RETURNS json AS $$
+  SELECT json_build_object(
+    'posts', (SELECT count(*) FROM posts WHERE author_id = user_id),
+    'comments', (SELECT count(*) FROM comments WHERE user_id = user_id),
+    'followers', (SELECT count(*) FROM follows WHERE following_id = user_id)
+  )
+$$ LANGUAGE sql;
+
+// Supabase — call from client
+const { data } = await supabase.rpc('get_user_dashboard', {
+  user_id: currentUser.id
+})
+
+// PicoBase — recreate as custom collection method or endpoint
+const dashboard = await pb.rpc('get_user_dashboard', {
+  user_id: currentUser.id
+})
+// or
+const dashboard = await pb.send('/api/users/dashboard', {
+  method: 'GET',
+  query: { user_id: currentUser.id },
+})
+```
+
+#### Common RPC patterns
+
+**Increment counters:**
+```typescript
+// Supabase
+await supabase.rpc('increment_views', { post_id: '123' })
+
+// PicoBase
+await pb.rpc('increment_views', { post_id: '123' })
+```
+
+**Complex search:**
+```typescript
+// Supabase
+const { data } = await supabase.rpc('search_products', {
+  query: 'laptop',
+  min_price: 500,
+  max_price: 2000,
+  category: 'electronics',
+})
+
+// PicoBase
+const results = await pb.rpc('search_products', {
+  query: 'laptop',
+  min_price: 500,
+  max_price: 2000,
+  category: 'electronics',
+})
+```
+
+**Transaction-like operations:**
+```typescript
+// Supabase — PostgreSQL function with transaction
+await supabase.rpc('transfer_funds', {
+  from_account: 'acc_1',
+  to_account: 'acc_2',
+  amount: 100,
+})
+
+// PicoBase — create custom endpoint with PocketBase hooks
+await pb.rpc('transfer_funds', {
+  from_account: 'acc_1',
+  to_account: 'acc_2',
+  amount: 100,
+})
+```
+
+> **Note:** PicoBase RPC methods map to custom API endpoints in your PocketBase instance.
+> You'll need to create corresponding custom routes in your PocketBase setup.
+> See the [PocketBase custom routes documentation](https://pocketbase.io/docs/js-routing/) for implementation details.
 
 ### Supabase Row-Level Security
 

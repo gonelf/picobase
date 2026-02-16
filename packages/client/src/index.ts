@@ -11,6 +11,7 @@ export {
   RecordNotFoundError,
   RequestError,
   ConfigurationError,
+  RpcError,
 } from './errors'
 
 // Collection types
