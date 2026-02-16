@@ -8,6 +8,7 @@ import ApiKeysList from '@/components/ApiKeysList'
 import QuickStats from '@/components/QuickStats'
 import DataBrowserSection from '@/components/DataBrowserSection'
 import AuthUsersPanel from '@/components/AuthUsersPanel'
+import QuickStartSection from '@/components/QuickStartSection'
 import { getAuthUrl } from '@/lib/auth-utils'
 
 export default async function InstanceDetail({ params }: { params: Promise<{ id: string }> }) {
@@ -66,6 +67,14 @@ export default async function InstanceDetail({ params }: { params: Promise<{ id:
       </div>
 
       <div className="space-y-6">
+        {instance.status === 'running' && (
+          <QuickStartSection
+            instanceId={id}
+            instanceUrl={publicUrl}
+            existingKeys={apiKeys}
+          />
+        )}
+
         <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
             Instance Details
