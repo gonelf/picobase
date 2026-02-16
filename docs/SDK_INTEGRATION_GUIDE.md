@@ -802,11 +802,46 @@ console.log(posts.items) // [{ id: '...', title: '...' }, ...]
 
 ### Environment variables not loading
 
+**Common causes:**
+
 - **Vite**: Variables must start with `VITE_`. Restart the dev server after
   changing `.env` files.
 - **Next.js**: Variables must start with `NEXT_PUBLIC_` to be available in the
   browser. Restart the dev server after changes.
 - **Create React App**: Variables must start with `REACT_APP_`.
+
+**Using the wrong variable names:**
+
+```bash
+# ❌ WRONG - These don't exist
+PICOBASE_ADMIN_EMAIL=your-admin-email
+PICOBASE_ADMIN_PASSWORD=your-admin-password
+PICOBASE_SECRET=pbk_abc12345_xxxxxxxxxxxxxxxx
+picobase_url=https://myapp.picobase.com
+picobase_secret=pbk_abc12345_xxxxxxxxxxxxxxxx
+
+# ✅ CORRECT
+PICOBASE_URL=https://myapp.picobase.com
+PICOBASE_API_KEY=pbk_abc12345_xxxxxxxxxxxxxxxx
+# or for Next.js
+NEXT_PUBLIC_PICOBASE_URL=https://myapp.picobase.com
+NEXT_PUBLIC_PICOBASE_API_KEY=pbk_abc12345_xxxxxxxxxxxxxxxx
+# or for Vite
+VITE_PICOBASE_URL=https://myapp.picobase.com
+VITE_PICOBASE_API_KEY=pbk_abc12345_xxxxxxxxxxxxxxxx
+```
+
+**Using platform URL instead of instance URL:**
+
+```bash
+# ❌ WRONG - Platform URL (where you manage instances)
+NEXT_PUBLIC_PICOBASE_URL=https://picobase.app
+
+# ✅ CORRECT - Instance URL (where your data lives)
+NEXT_PUBLIC_PICOBASE_URL=https://myapp.picobase.com
+```
+
+See the complete [Environment Variables Guide](./ENVIRONMENT_VARIABLES.md) for more details.
 
 ---
 

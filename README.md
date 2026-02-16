@@ -203,6 +203,15 @@ try {
 
 ---
 
+## Documentation
+
+- **[SDK Integration Guide](docs/SDK_INTEGRATION_GUIDE.md)** — Step-by-step setup guide
+- **[Environment Variables](docs/ENVIRONMENT_VARIABLES.md)** — Complete reference for all env vars
+- **[Migration Guide](docs/MIGRATION_GUIDE.md)** — Switch from Supabase or Firebase
+- **[Filter Syntax](docs/FILTER_SYNTAX.md)** — Query language reference with examples
+
+---
+
 ## Architecture
 
 PicoBase provides managed PocketBase instances with automatic storage backup:

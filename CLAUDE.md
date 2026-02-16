@@ -72,6 +72,7 @@ const { data: posts, loading } = useCollection('posts')
 - `PICOBASE_API_KEY` — API key starting with `pbk_`
 - Next.js client-side: prefix with `NEXT_PUBLIC_`
 - Vite client-side: prefix with `VITE_`
+- See [Environment Variables Guide](docs/ENVIRONMENT_VARIABLES.md) for complete reference and common mistakes
 
 ### Filter syntax (PocketBase query language)
 ```
