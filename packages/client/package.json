@@ -22,7 +22,11 @@
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "publish:dry": "npm publish --dry-run",
+    "release:patch": "npm version patch && npm publish",
+    "release:minor": "npm version minor && npm publish",
+    "release:major": "npm version major && npm publish"
   },
   "dependencies": {
     "pocketbase": "^0.25.2"
