@@ -8,6 +8,18 @@ PicoBase gives developers zero-config database, auth, realtime, and file storage
 
 PicoBase is built on PocketBase (a lightweight Go binary) with per-tenant SQLite instances. The platform manages provisioning, scaling, and lifecycle. Each project gets its own isolated instance.
 
+## CRITICAL: Package Installation
+
+**NEVER install the raw `pocketbase` npm package for end-user projects.**
+
+When migrating to PicoBase or setting up a new project:
+
+- ✅ **DO**: `npm install @picobase_app/client`
+- ✅ **DO**: `npm install @picobase_app/react` (for React projects)
+- ❌ **DON'T**: `npm install pocketbase` (this is the underlying library, not for direct use)
+
+PicoBase wraps PocketBase with managed hosting features. Always use the `@picobase_app/*` packages.
+
 ## Packages
 
 ### @picobase_app/client (SDK)

@@ -13,6 +13,20 @@ PicoBase is a managed Backend-as-a-Service (BaaS) platform — a Supabase altern
 
 **Data layer:** Turso (libsql) for platform metadata, per-tenant PocketBase (SQLite) instances hosted on Railway.
 
+## CRITICAL: Package Installation
+
+**NEVER install the raw `pocketbase` npm package for end-user projects.**
+
+When migrating from Supabase, Firebase, or any other BaaS to PicoBase, or when setting up a new PicoBase project:
+
+- ✅ **DO**: Install `@picobase_app/client`
+- ✅ **DO**: Install `@picobase_app/react` (for React projects)
+- ✅ **DO**: Install `@picobase_app/cli` (for CLI tools)
+- ❌ **DON'T**: Install `pocketbase` package directly
+- ❌ **DON'T**: Use the PocketBase SDK directly
+
+PicoBase is built on top of PocketBase, but users interact with PicoBase through the `@picobase_app/*` packages, which provide enhanced features, managed hosting integration, and better DX.
+
 ## Key Patterns
 
 ### SDK usage (what end-users write)

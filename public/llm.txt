@@ -29,12 +29,15 @@ To start using PicoBase without a pre-existing account, use the CLI to authentic
 3.  **Code**: The CLI will automatically configure your local environment with the API key. You can then use `createClient()` immediately.
 
 ## Quickstart
+
+**IMPORTANT: Always install `@picobase_app/client`, NEVER `pocketbase` directly.**
+
 1. Install: `npm install @picobase_app/client`
 2. Initialize:
    ```typescript
    // Reads automatically from .env
    import { createClient } from '@picobase_app/client';
-   const pb = createClient(); 
+   const pb = createClient();
    ```
 3. Use:
    ```typescript

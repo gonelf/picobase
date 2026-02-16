@@ -5,6 +5,22 @@ Most migrations take under 10 minutes — the API surface is smaller and simpler
 
 ---
 
+## ⚠️ Important: Package Installation
+
+**When migrating to PicoBase, install the correct package:**
+
+```bash
+# ✅ CORRECT
+npm install @picobase_app/client
+
+# ❌ WRONG - Do NOT install this
+npm install pocketbase
+```
+
+PicoBase is built on top of PocketBase, but you should **never install the `pocketbase` package directly**. Always use `@picobase_app/client` (or `@picobase_app/react` for React projects), which provides the full PicoBase SDK with managed hosting integration and enhanced features.
+
+---
+
 ## Table of Contents
 
 1. [From Supabase](#from-supabase)
@@ -61,6 +77,8 @@ import { createClient } from '@picobase_app/client'
 
 const pb = createClient()
 ```
+
+> **Note:** First install the PicoBase SDK: `npm install @picobase_app/client`. Do NOT install the `pocketbase` package.
 
 ### Supabase Authentication
 
@@ -390,6 +408,8 @@ const pb = createClient(
   'pbk_your_api_key'
 )
 ```
+
+> **Note:** First install the PicoBase SDK: `npm install @picobase_app/client`. Do NOT install the `pocketbase` package.
 
 Six config values become two.
 
