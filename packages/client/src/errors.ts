@@ -114,6 +114,42 @@ export class ConfigurationError extends PicoBaseError {
   }
 }
 
+/**
+ * Thrown when an RPC (remote procedure call) fails.
+ */
+export class RpcError extends PicoBaseError {
+  constructor(functionName: string, status: number, details?: unknown) {
+    const fix = rpcErrorFix(functionName, status)
+    super(
+      `RPC function "${functionName}" failed.`,
+      'RPC_ERROR',
+      status,
+      details,
+      fix,
+    )
+    this.name = 'RpcError'
+  }
+}
+
+/** Generate fix suggestions for RPC errors. */
+function rpcErrorFix(functionName: string, status: number): string {
+  if (status === 404) {
+    return `The RPC endpoint "/api/rpc/${functionName}" does not exist. ` +
+      'Create a custom route in your PocketBase instance to handle this RPC call. ' +
+      'See: https://pocketbase.io/docs/js-routing/'
+  }
+  if (status === 400) {
+    return 'Check the parameters you are passing to this RPC function. ' +
+      'The function may be expecting different parameters or types.'
+  }
+  if (status === 403) {
+    return 'You don\'t have permission to call this RPC function. ' +
+      'Check the authentication requirements for this endpoint in your PocketBase routes.'
+  }
+  return 'Check your PicoBase instance logs for details about this RPC error. ' +
+    'Ensure the custom route is correctly implemented in your PocketBase setup.'
+}
+
 /** Map common HTTP statuses to actionable fixes. */
 function requestErrorFix(status: number, message: string): string {
   switch (status) {

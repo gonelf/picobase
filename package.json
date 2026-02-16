@@ -8,7 +8,13 @@
     "start": "next start",
     "lint": "next lint",
     "db:migrate": "node scripts/migrate.js",
-    "db:migrate:admin": "node scripts/add-admin-credentials.js"
+    "db:migrate:admin": "node scripts/add-admin-credentials.js",
+    "client:build": "cd packages/client && npm run build",
+    "client:check-version": "node scripts/check-version.js",
+    "client:publish:dry": "cd packages/client && npm run publish:dry",
+    "client:release:patch": "cd packages/client && npm run release:patch",
+    "client:release:minor": "cd packages/client && npm run release:minor",
+    "client:release:major": "cd packages/client && npm run release:major"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.490.0",

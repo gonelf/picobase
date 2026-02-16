@@ -145,6 +145,39 @@ const unsub = await pb.realtime.subscribe('posts', (event) => {
 await pb.realtime.disconnectAll()
 ```
 
+## RPC (Remote Procedure Calls)
+
+Call custom server-side functions using the `.rpc()` method. This is especially useful for Supabase migrations.
+
+```typescript
+// Simple RPC call
+const result = await pb.rpc('calculate_cart_total', {
+  cart_id: '123'
+})
+
+// Complex RPC with typed response
+interface DashboardStats {
+  posts: number
+  comments: number
+  followers: number
+}
+
+const stats = await pb.rpc<DashboardStats>('get_dashboard_stats', {
+  user_id: currentUser.id
+})
+// stats.posts, stats.comments, stats.followers are typed!
+
+// Common patterns
+await pb.rpc('increment_views', { post_id: '123' })
+const results = await pb.rpc('search_products', {
+  query: 'laptop',
+  min_price: 500,
+  category: 'electronics'
+})
+```
+
+RPC calls are mapped to custom PocketBase endpoints at `/api/rpc/{functionName}`. You'll need to implement these routes in your PocketBase instance. See the [PocketBase routing docs](https://pocketbase.io/docs/js-routing/) for details.
+
 ## File Storage
 
 PocketBase stores files as fields on records. Use the storage module to get URLs.
@@ -207,6 +240,7 @@ import {
   CollectionNotFoundError,
   RecordNotFoundError,
   ConfigurationError,
+  RpcError,
 } from '@picobase_app/client'
 
 try {
@@ -229,6 +263,7 @@ try {
 | `CollectionNotFoundError` | `COLLECTION_NOT_FOUND` | Collection doesn't exist |
 | `RecordNotFoundError` | `RECORD_NOT_FOUND` | Record ID not found |
 | `InstanceUnavailableError` | `INSTANCE_UNAVAILABLE` | Instance down after retries |
+| `RpcError` | `RPC_ERROR` | RPC function call failed (includes endpoint-specific fix hints) |
 | `RequestError` | `REQUEST_FAILED` | Generic HTTP error (includes status-specific fix hints) |
 
 ### Typed collections with `picobase typegen`

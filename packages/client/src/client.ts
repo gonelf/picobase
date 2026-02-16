@@ -3,7 +3,7 @@ import { PicoBaseAuth } from './auth'
 import { PicoBaseCollection } from './collection'
 import { PicoBaseRealtime } from './realtime'
 import { PicoBaseStorage } from './storage'
-import { InstanceUnavailableError, AuthorizationError, CollectionNotFoundError, RecordNotFoundError, ConfigurationError } from './errors'
+import { InstanceUnavailableError, AuthorizationError, CollectionNotFoundError, RecordNotFoundError, ConfigurationError, RpcError } from './errors'
 import type { PicoBaseClientOptions, RecordModel, SendOptions } from './types'
 
 const DEFAULT_OPTIONS: Required<Omit<PicoBaseClientOptions, 'fetch'>> & { fetch?: typeof globalThis.fetch } = {
@@ -96,6 +96,46 @@ export class PicoBaseClient {
    */
   async send<T = unknown>(path: string, options?: SendOptions): Promise<T> {
     return this.pb.send<T>(path, options ?? {})
+  }
+
+  /**
+   * Call a remote procedure (RPC) - a convenience method for calling custom API endpoints.
+   *
+   * Maps Supabase-style RPC calls to PicoBase custom endpoints:
+   * - `pb.rpc('my_function', params)` → `POST /api/rpc/my_function` with params as body
+   *
+   * @example
+   * ```ts
+   * // Simple RPC call
+   * const result = await pb.rpc('calculate_total', { cart_id: '123' })
+   *
+   * // Complex RPC with typed response
+   * interface DashboardStats {
+   *   posts: number
+   *   comments: number
+   *   followers: number
+   * }
+   * const stats = await pb.rpc<DashboardStats>('get_dashboard_stats', {
+   *   user_id: currentUser.id
+   * })
+   * ```
+   *
+   * @param functionName The name of the RPC function to call
+   * @param params Optional parameters to pass to the function
+   * @returns The function result
+   */
+  async rpc<T = unknown>(functionName: string, params?: Record<string, unknown>): Promise<T> {
+    try {
+      return await this.send<T>(`/api/rpc/${functionName}`, {
+        method: 'POST',
+        body: params ?? {},
+      })
+    } catch (err: unknown) {
+      // Wrap errors with RpcError for better error messages
+      const status = (err as { status?: number })?.status ?? 500
+      const details = (err as { data?: unknown })?.data
+      throw new RpcError(functionName, status, details)
+    }
   }
 
   /**
