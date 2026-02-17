@@ -8,6 +8,8 @@ TypeScript SDK for PicoBase — add auth, database, realtime, and file storage t
 npm install @picobase_app/client
 ```
 
+> ⚠️ **Important:** Install `@picobase_app/client`, **NOT** `pocketbase` directly. PicoBase wraps PocketBase with managed hosting features. If you accidentally installed `pocketbase`, remove it from your dependencies.
+
 ## Quickstart
 
 ```typescript
