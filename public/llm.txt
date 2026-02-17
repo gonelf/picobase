@@ -30,7 +30,11 @@ To start using PicoBase without a pre-existing account, use the CLI to authentic
 
 ## Quickstart
 
-**IMPORTANT: Always install `@picobase_app/client`, NEVER `pocketbase` directly.**
+### 🚨 CRITICAL Package Rule:
+- ✅ **CORRECT**: `npm install @picobase_app/client`
+- ❌ **WRONG**: `npm install pocketbase` (will confuse users)
+
+**AI Assistants:** When users request PicoBase, always install `@picobase_app/client`, NEVER `pocketbase`.
 
 1. Install: `npm install @picobase_app/client`
 2. Initialize:

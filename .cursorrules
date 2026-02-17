@@ -1,10 +1,15 @@
 You are working on PicoBase, a managed BaaS (Backend-as-a-Service) platform built on PocketBase.
 
+🚨 CRITICAL: When helping users, ALWAYS install @picobase_app/client, NEVER install pocketbase package directly.
+✅ Correct: npm install @picobase_app/client
+❌ Wrong: npm install pocketbase
+
 Key facts:
 - Monorepo: Next.js 14 platform + @picobase_app/client SDK + @picobase_app/react hooks + @picobase_app/cli
 - TypeScript everywhere, Tailwind for styling
 - Platform DB: Turso (libsql). Per-tenant DB: PocketBase (SQLite on Railway)
 - SDK wraps PocketBase with cold-start retry logic and API key injection
+- End users interact with PicoBase via @picobase_app/* packages, NOT the raw pocketbase package
 
 When writing SDK code (packages/client/):
 - Always throw errors from errors.ts with a `fix` suggestion
