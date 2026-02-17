@@ -65,10 +65,44 @@ VITE_PICOBASE_API_KEY=${displayKey}`,
 PICOBASE_API_KEY=${displayKey}`,
   }
 
-  function copyToClipboard() {
-    navigator.clipboard.writeText(envVars[selectedTab])
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+  async function copyToClipboard() {
+    const text = envVars[selectedTab]
+
+    try {
+      // Try modern clipboard API first (works on HTTPS and localhost)
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(text)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+        return
+      }
+    } catch (err) {
+      console.log('Clipboard API failed, trying fallback method')
+    }
+
+    // Fallback for mobile browsers and older browsers
+    try {
+      const textArea = document.createElement('textarea')
+      textArea.value = text
+      textArea.style.position = 'fixed'
+      textArea.style.left = '-999999px'
+      textArea.style.top = '-999999px'
+      document.body.appendChild(textArea)
+      textArea.focus()
+      textArea.select()
+
+      const successful = document.execCommand('copy')
+      textArea.remove()
+
+      if (successful) {
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      } else {
+        console.error('Copy command failed')
+      }
+    } catch (err) {
+      console.error('Fallback copy failed:', err)
+    }
   }
 
   return (
@@ -83,7 +117,7 @@ PICOBASE_API_KEY=${displayKey}`,
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">
             Quick Start — Copy & Paste to Get Started
           </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-gray-700 dark:text-gray-300">
             Add these to your <code className="px-1.5 py-0.5 bg-white dark:bg-gray-900 rounded text-xs border border-gray-200 dark:border-gray-700">.env.local</code> file and you're ready to code! 🚀
           </p>
         </div>
@@ -96,7 +130,7 @@ PICOBASE_API_KEY=${displayKey}`,
           className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
             selectedTab === 'next'
               ? 'bg-primary-600 text-white shadow-sm'
-              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+              : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
           }`}
         >
           Next.js
@@ -106,7 +140,7 @@ PICOBASE_API_KEY=${displayKey}`,
           className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
             selectedTab === 'vite'
               ? 'bg-primary-600 text-white shadow-sm'
-              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+              : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
           }`}
         >
           Vite
@@ -116,7 +150,7 @@ PICOBASE_API_KEY=${displayKey}`,
           className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
             selectedTab === 'node'
               ? 'bg-primary-600 text-white shadow-sm'
-              : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+              : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
           }`}
         >
           Node.js
@@ -127,7 +161,7 @@ PICOBASE_API_KEY=${displayKey}`,
       <div className="relative">
         <div className="bg-gray-900 rounded-lg p-4 border border-gray-700">
           <div className="flex items-start justify-between gap-4 mb-2">
-            <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+            <span className="text-xs font-semibold text-gray-300 uppercase tracking-wider">
               Your .env.local file
             </span>
             <button
@@ -171,7 +205,7 @@ PICOBASE_API_KEY=${displayKey}`,
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div className="flex-1">
-                <p className="text-sm text-blue-200 mb-2">
+                <p className="text-sm text-blue-100 font-medium mb-2">
                   You have an existing API key. For security reasons, we only show the full key once when it's created.
                 </p>
                 <div className="flex gap-2">
@@ -196,7 +230,7 @@ PICOBASE_API_KEY=${displayKey}`,
         {/* Create new key confirmation */}
         {showCreateNew && (
           <div className="mt-3 p-3 bg-yellow-900/20 border border-yellow-800 rounded-lg">
-            <p className="text-sm text-yellow-200 mb-3">
+            <p className="text-sm text-yellow-100 font-medium mb-3">
               Create a new API key? Your existing keys will remain active.
             </p>
             <div className="flex gap-2">
@@ -290,7 +324,7 @@ PICOBASE_API_KEY=${displayKey}`,
             <svg className="flex-shrink-0 w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p className="text-xs text-blue-800 dark:text-blue-200">
+            <p className="text-sm text-blue-900 dark:text-blue-100">
               <strong>Keep your API key safe!</strong> Never commit your <code className="px-1 py-0.5 bg-blue-100 dark:bg-blue-900 rounded">.env.local</code> file to git. Add it to your <code className="px-1 py-0.5 bg-blue-100 dark:bg-blue-900 rounded">.gitignore</code> to keep it private.
             </p>
           </div>
