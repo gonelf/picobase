@@ -228,46 +228,57 @@ PICOBASE_API_KEY=${displayKey}`,
       </div>
 
       {/* Next Steps */}
-      <div className="mt-5 pt-5 border-t border-primary-200 dark:border-primary-800">
-        <p className="text-sm font-medium text-gray-900 dark:text-white mb-3">
-          What to do next:
-        </p>
-        <ol className="space-y-2 text-sm text-gray-700 dark:text-gray-300">
-          <li className="flex items-start gap-2">
-            <span className="flex-shrink-0 w-5 h-5 bg-primary-600 dark:bg-primary-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
+      <div className="mt-6 pt-6 border-t border-primary-200 dark:border-primary-800">
+        <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-4">
+          Next Steps
+        </h3>
+        <ol className="space-y-4">
+          <li className="flex items-start gap-3">
+            <span className="flex-shrink-0 w-7 h-7 bg-primary-600 dark:bg-primary-500 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-sm">
               1
             </span>
-            <span>
-              Create a <code className="px-1.5 py-0.5 bg-white dark:bg-gray-900 rounded text-xs border border-gray-200 dark:border-gray-700">.env.local</code> file in your project root
-            </span>
+            <div className="flex-1 pt-0.5">
+              <p className="text-sm font-medium text-gray-900 dark:text-white leading-relaxed">
+                Create a <code className="px-2 py-1 bg-white dark:bg-gray-900 rounded text-xs font-mono border border-gray-300 dark:border-gray-700 text-primary-600 dark:text-primary-400">.env.local</code> file in your project root
+              </p>
+            </div>
           </li>
-          <li className="flex items-start gap-2">
-            <span className="flex-shrink-0 w-5 h-5 bg-primary-600 dark:bg-primary-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
+          <li className="flex items-start gap-3">
+            <span className="flex-shrink-0 w-7 h-7 bg-primary-600 dark:bg-primary-500 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-sm">
               2
             </span>
-            <span>
-              Click "Copy" above and paste the variables into your file
-            </span>
+            <div className="flex-1 pt-0.5">
+              <p className="text-sm font-medium text-gray-900 dark:text-white leading-relaxed">
+                Click "Copy" above and paste the variables into your file
+              </p>
+            </div>
           </li>
-          <li className="flex items-start gap-2">
-            <span className="flex-shrink-0 w-5 h-5 bg-primary-600 dark:bg-primary-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
+          <li className="flex items-start gap-3">
+            <span className="flex-shrink-0 w-7 h-7 bg-primary-600 dark:bg-primary-500 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-sm">
               3
             </span>
-            <span>
-              Install the SDK: <code className="px-1.5 py-0.5 bg-white dark:bg-gray-900 rounded text-xs border border-gray-200 dark:border-gray-700">npm install @picobase_app/client</code>
-            </span>
+            <div className="flex-1 pt-0.5">
+              <p className="text-sm font-medium text-gray-900 dark:text-white leading-relaxed mb-2">
+                Install the SDK:
+              </p>
+              <code className="block px-3 py-2 bg-gray-900 dark:bg-black rounded text-sm font-mono border border-gray-700 dark:border-gray-800 text-green-400">
+                npm install @picobase_app/client
+              </code>
+            </div>
           </li>
-          <li className="flex items-start gap-2">
-            <span className="flex-shrink-0 w-5 h-5 bg-primary-600 dark:bg-primary-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
+          <li className="flex items-start gap-3">
+            <span className="flex-shrink-0 w-7 h-7 bg-primary-600 dark:bg-primary-500 text-white rounded-full flex items-center justify-center text-sm font-bold shadow-sm">
               4
             </span>
-            <span>
-              Start coding! Check out the{' '}
-              <a href="/docs" className="text-primary-600 dark:text-primary-400 hover:underline font-medium">
-                docs
-              </a>{' '}
-              for examples
-            </span>
+            <div className="flex-1 pt-0.5">
+              <p className="text-sm font-medium text-gray-900 dark:text-white leading-relaxed">
+                Start coding! Check out the{' '}
+                <a href="/docs" className="text-primary-600 dark:text-primary-400 hover:underline font-semibold">
+                  documentation
+                </a>{' '}
+                for examples
+              </p>
+            </div>
           </li>
         </ol>
       </div>
