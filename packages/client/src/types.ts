@@ -83,6 +83,38 @@ export interface FileOptions {
   download?: boolean
 }
 
+// ── Collection types ────────────────────────────────────────────────────────
+
+export type CollectionType = 'base' | 'auth' | 'view'
+
+export interface CollectionModel {
+  id: string
+  created: string
+  updated: string
+  name: string
+  type: CollectionType
+  system: boolean
+  schema: SchemaField[]
+  indexes: string[]
+  listRule: string | null
+  viewRule: string | null
+  createRule: string | null
+  updateRule: string | null
+  deleteRule: string | null
+  options: Record<string, unknown>
+}
+
+export interface SchemaField {
+  system: boolean
+  id: string
+  name: string
+  type: string
+  required: boolean
+  presentable: boolean
+  unique: boolean
+  options: Record<string, unknown>
+}
+
 // ── Re-exports for convenience ──────────────────────────────────────────────
 
 export type { RecordModel, RecordSubscription, SendOptions, PocketBase }

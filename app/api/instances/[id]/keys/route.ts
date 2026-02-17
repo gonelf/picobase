@@ -6,6 +6,7 @@ import { z } from 'zod'
 
 const createKeySchema = z.object({
   name: z.string().min(1).max(100),
+  type: z.enum(['standard', 'admin']).optional(),
 })
 
 export async function POST(
@@ -31,9 +32,9 @@ export async function POST(
     }
 
     const body = await request.json()
-    const { name } = createKeySchema.parse(body)
+    const { name, type } = createKeySchema.parse(body)
 
-    const apiKey = await createApiKey(id, name)
+    const apiKey = await createApiKey(id, name, type)
 
     return NextResponse.json(apiKey, { status: 201 })
   } catch (error) {

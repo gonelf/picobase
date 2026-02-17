@@ -7,6 +7,7 @@ import { validateApiKey } from '@/lib/api-keys'
 import { checkRateLimit } from '@/lib/rate-limit'
 import { logApiRequest } from '@/lib/usage-log'
 import { wakeInstance } from '@/lib/instance-wake'
+import { authenticatedPocketBaseRequest } from '@/lib/pocketbase-auth'
 
 const RAILWAY_API_URL = process.env.RAILWAY_API_URL
 const RAILWAY_API_KEY = process.env.RAILWAY_API_KEY
@@ -100,8 +101,18 @@ async function handleProxyRequest(request: NextRequest) {
 
         // Validate API key if provided (SDK clients send X-PicoBase-Key)
         const picobaseKey = request.headers.get('x-picobase-key')
+        let isCollectionRequest = false
+        const urlObj = new URL(request.url)
+        const pathToProxy = urlObj.pathname.replace('/api/proxy', '') || '/'
+        const search = urlObj.search
+
+        if (pathToProxy.startsWith('/api/collections')) {
+            isCollectionRequest = true
+        }
+
         if (picobaseKey) {
             const keyResult = await validateApiKey(picobaseKey)
+
             if (!keyResult) {
                 return errorResponse(request, 'INVALID_API_KEY', 'Invalid or expired API key', 401)
             }
@@ -110,6 +121,47 @@ async function handleProxyRequest(request: NextRequest) {
                 return errorResponse(request, 'INVALID_API_KEY', 'API key does not match instance', 401)
             }
             apiKeyId = keyResult.apiKeyId
+
+            // Special handling for Admin Collection Operations
+            if (isCollectionRequest && keyResult.type === 'admin') {
+                try {
+                    // Use authenticatedPocketBaseRequest to handle admin auth
+                    const response = await authenticatedPocketBaseRequest(
+                        instance.id,
+                        instance.admin_email as string,
+                        instance.admin_password as string,
+                        `${pathToProxy}${search}`.replace(/^\//, ''), // remove leading slash as authenticatedPocketBaseRequest might add it or expect path
+                        {
+                            method: request.method,
+                            body: request.method !== 'GET' && request.method !== 'HEAD' ? await request.text() : undefined,
+                            headers: {
+                                'Content-Type': request.headers.get('content-type') || 'application/json',
+                            }
+                        }
+                    )
+
+                    // Forward response
+                    // For 204 No Content, body must be null
+                    const responseBody = response.status === 204 ? null : await response.arrayBuffer()
+                    const responseHeaders = new Headers(response.headers)
+
+                    // Add CORS headers
+                    const cors = corsHeaders(request)
+                    for (const [key, value] of Object.entries(cors)) {
+                        responseHeaders.set(key, value)
+                    }
+
+                    return new NextResponse(responseBody, {
+                        status: response.status,
+                        statusText: response.statusText,
+                        headers: responseHeaders,
+                    })
+
+                } catch (error: any) {
+                    console.error('[Proxy] Admin request failed:', error)
+                    return errorResponse(request, 'PROXY_ERROR', error.message || 'Admin request failed', 500)
+                }
+            }
 
             // Rate limit per API key (100 requests/minute)
             const rateResult = checkRateLimit(`key:${apiKeyId}`, 100, 60_000)
@@ -145,12 +197,7 @@ async function handleProxyRequest(request: NextRequest) {
             await new Promise(resolve => setTimeout(resolve, 5000))
         }
 
-        // Extract the path that should be forwarded to PocketBase
-        // The middleware rewrote /some/path to /api/proxy/some/path
-        // So we need to extract everything after /api/proxy
-        const url = new URL(request.url)
-        const pathToProxy = url.pathname.replace('/api/proxy', '') || '/'
-        const search = url.search
+
 
         // Health check endpoint — responds without hitting the PocketBase instance
         if (pathToProxy === '/api/picobase/health') {
@@ -242,7 +289,7 @@ async function handleProxyRequest(request: NextRequest) {
                         if (errorBody.error === 'Instance not running') {
                             console.log(`[Proxy] Instance ${instance.id} reported not running (attempt ${attempt + 1}). Waking...`)
                             // Also trigger a full wake (updates DB status + port)
-                            wakeInstance(instance.id).catch(() => {})
+                            wakeInstance(instance.id).catch(() => { })
                             lastError = new Error('Instance not running')
                             continue // Retry loop will trigger start
                         }
@@ -304,7 +351,7 @@ async function handleProxyRequest(request: NextRequest) {
         }
 
         // Record activity (non-blocking, debounced)
-        touchInstanceActivity(instance.id).catch(() => {})
+        touchInstanceActivity(instance.id).catch(() => { })
 
         // Log usage (non-blocking)
         logApiRequest({

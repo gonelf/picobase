@@ -3,6 +3,7 @@ import { PicoBaseAuth } from './auth'
 import { PicoBaseCollection } from './collection'
 import { PicoBaseRealtime } from './realtime'
 import { PicoBaseStorage } from './storage'
+import { PicoBaseAdmin } from './admin'
 import { InstanceUnavailableError, AuthorizationError, CollectionNotFoundError, RecordNotFoundError, ConfigurationError, RpcError } from './errors'
 import type { PicoBaseClientOptions, RecordModel, SendOptions } from './types'
 
@@ -21,6 +22,8 @@ export class PicoBaseClient {
   readonly realtime: PicoBaseRealtime
   /** Storage module — get file URLs and tokens. */
   readonly storage: PicoBaseStorage
+  /** Admin module — manage collections (requires admin API key). */
+  readonly admin: PicoBaseAdmin
 
   private readonly apiKey: string
   private readonly options: typeof DEFAULT_OPTIONS
@@ -76,6 +79,7 @@ export class PicoBaseClient {
     this.auth = new PicoBaseAuth(this.pb)
     this.realtime = new PicoBaseRealtime(this.pb)
     this.storage = new PicoBaseStorage(this.pb)
+    this.admin = new PicoBaseAdmin(this.pb)
   }
 
   /**

@@ -18,15 +18,20 @@ export async function verifyApiKey(key: string, hash: string): Promise<boolean> 
   return bcrypt.compare(key, hash)
 }
 
-export async function createApiKey(instanceId: string, name: string, expiresAt?: string) {
+export async function createApiKey(
+  instanceId: string,
+  name: string,
+  type: 'standard' | 'admin' = 'standard',
+  expiresAt?: string
+) {
   const id = nanoid()
   const { key, prefix } = await generateApiKey()
   const keyHash = await hashApiKey(key)
   const now = new Date().toISOString()
 
   await db.execute({
-    sql: 'INSERT INTO api_keys (id, instance_id, key_hash, key_prefix, name, created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-    args: [id, instanceId, keyHash, prefix, name, now, expiresAt || null],
+    sql: 'INSERT INTO api_keys (id, instance_id, key_hash, key_prefix, name, type, created_at, expires_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+    args: [id, instanceId, keyHash, prefix, name, type, now, expiresAt || null],
   })
 
   return {
@@ -34,15 +39,18 @@ export async function createApiKey(instanceId: string, name: string, expiresAt?:
     key,
     prefix,
     name,
+    type,
     created_at: now,
   }
 }
 
-export async function validateApiKey(key: string): Promise<{ instanceId: string; apiKeyId: string } | null> {
+export async function validateApiKey(
+  key: string
+): Promise<{ instanceId: string; apiKeyId: string; type: 'standard' | 'admin' } | null> {
   const prefix = key.split('_').slice(0, 2).join('_')
 
   const result = await db.execute({
-    sql: 'SELECT id, instance_id, key_hash, expires_at FROM api_keys WHERE key_prefix = ?',
+    sql: 'SELECT id, instance_id, key_hash, type, expires_at FROM api_keys WHERE key_prefix = ?',
     args: [prefix],
   })
 
@@ -70,12 +78,13 @@ export async function validateApiKey(key: string): Promise<{ instanceId: string;
   return {
     instanceId: apiKey.instance_id as string,
     apiKeyId: apiKey.id as string,
+    type: (apiKey.type as 'standard' | 'admin') || 'standard',
   }
 }
 
 export async function listApiKeys(instanceId: string) {
   const result = await db.execute({
-    sql: 'SELECT id, key_prefix, name, last_used_at, created_at, expires_at FROM api_keys WHERE instance_id = ? ORDER BY created_at DESC',
+    sql: 'SELECT id, key_prefix, name, type, last_used_at, created_at, expires_at FROM api_keys WHERE instance_id = ? ORDER BY created_at DESC',
     args: [instanceId],
   })
   return result.rows

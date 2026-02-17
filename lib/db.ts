@@ -46,6 +46,7 @@ export interface ApiKey {
   key_hash: string
   key_prefix: string
   name: string
+  type: 'standard' | 'admin'
   last_used_at: string | null
   created_at: string
   expires_at: string | null
@@ -83,7 +84,7 @@ export interface Webhook {
 // Helper function to lookup instance by subdomain
 export async function getInstanceBySubdomain(subdomain: string) {
   const result = await db.execute({
-    sql: 'SELECT id, user_id, name, subdomain, status, port FROM instances WHERE subdomain = ?',
+    sql: 'SELECT id, user_id, name, subdomain, status, port, admin_email, admin_password FROM instances WHERE subdomain = ?',
     args: [subdomain],
   })
 
@@ -91,5 +92,5 @@ export async function getInstanceBySubdomain(subdomain: string) {
     return null
   }
 
-  return result.rows[0] as unknown as Pick<Instance, 'id' | 'user_id' | 'name' | 'subdomain' | 'status' | 'port'>
+  return result.rows[0] as unknown as Pick<Instance, 'id' | 'user_id' | 'name' | 'subdomain' | 'status' | 'port' | 'admin_email' | 'admin_password'>
 }

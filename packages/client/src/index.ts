@@ -3,6 +3,7 @@ export { PicoBaseAuth } from './auth'
 export { PicoBaseCollection } from './collection'
 export { PicoBaseRealtime } from './realtime'
 export { PicoBaseStorage } from './storage'
+export { PicoBaseAdmin } from './admin'
 export {
   PicoBaseError,
   InstanceUnavailableError,

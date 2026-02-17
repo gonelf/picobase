@@ -976,3 +976,55 @@ try { ... } catch (err) {
   }
 }
 ```
+
+---
+
+## Step 8 — Admin Operations (Advanced)
+
+If you have an **Admin API Key**, you can manage collections programmatically.
+This is useful for migration scripts, CI/CD pipelines, or dynamic schema
+generation.
+
+> **Warning:** Admin API keys have full access to modify your instance's
+> structure. **Never** expose them in client-side code (browsers). Use them only in
+> server-side environments (Node.js, edge functions, etc.).
+
+### Create a Collection
+
+```typescript
+import { createClient } from '@picobase_app/client'
+
+// Initialize with an Admin API Key
+const pb = createClient('https://myapp.picobase.com', 'pbk_admin_secret...')
+
+// Define a new "products" collection
+await pb.admin.createCollection({
+  name: 'products',
+  type: 'base',
+  schema: [
+    { name: 'name', type: 'text', required: true },
+    { name: 'price', type: 'number', required: true },
+    { name: 'in_stock', type: 'bool', options: {} },
+  ],
+})
+
+console.log('Collection created!')
+```
+
+### List & Update
+
+```typescript
+// List all collections
+const collections = await pb.admin.listCollections()
+
+// Update schema
+await pb.admin.updateCollection('products', {
+  schema: [
+    { name: 'name', type: 'text', required: true },
+    { name: 'price', type: 'number', required: true },
+    { name: 'in_stock', type: 'bool', options: {} },
+    { name: 'description', type: 'text', options: {} }, // New field
+  ],
+})
+```
+
