@@ -26,6 +26,7 @@
     "nanoid": "^5.0.4",
     "next": "^16.1.6",
     "next-auth": "^4.24.13",
+    "pocketbase": "^0.26.8",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "supertokens-auth-react": "^0.51.1",
