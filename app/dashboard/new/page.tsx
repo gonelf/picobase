@@ -31,7 +31,8 @@ export default function NewProject() {
         return
       }
 
-      router.push('/dashboard')
+      // Redirect to Quick Start page to show the new API key
+      router.push(`/dashboard/instances/${data.id}`)
       router.refresh()
     } catch (error) {
       setError('An error occurred. Please try again.')

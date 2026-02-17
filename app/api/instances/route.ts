@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthSession } from '@/lib/auth-provider'
 import { createInstance } from '@/lib/pocketbase'
+import { createApiKey } from '@/lib/api-keys'
 import { z } from 'zod'
 import { nanoid } from 'nanoid'
 
@@ -34,11 +35,16 @@ export async function POST(request: NextRequest) {
       finalAdminPassword
     )
 
+    // Auto-create first API key for Quick Start
+    const apiKey = await createApiKey(instance.id, 'Default')
+
     return NextResponse.json({
       ...instance,
       adminEmail: finalAdminEmail,
       // Only return password on creation (for user to save)
       adminPassword: adminPassword ? undefined : finalAdminPassword,
+      // Return the API key so users can immediately use it
+      apiKey: apiKey.key,
     }, { status: 201 })
   } catch (error: any) {
     if (error instanceof z.ZodError) {

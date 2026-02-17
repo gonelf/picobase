@@ -484,6 +484,26 @@ pb.storage.getFileUrl(record, filename, { thumb: '100x100' })
                   Most SDK calls are asynchronous. If you forget <code>await</code>, you get a Promise instead of data.
                 </p>
               </div>
+              <div className="bg-red-50 dark:bg-red-900/10 border-l-4 border-red-500 p-4 rounded-r-lg">
+                <h4 className="text-red-800 dark:text-red-200 font-bold m-0 text-base">Wrong environment variable names</h4>
+                <p className="text-red-700 dark:text-red-300 text-sm mt-2 mb-2">
+                  Use <code>PICOBASE_URL</code> and <code>PICOBASE_API_KEY</code> (with framework prefixes like <code>NEXT_PUBLIC_</code> or <code>VITE_</code> for client-side code).
+                </p>
+                <p className="text-red-700 dark:text-red-300 text-sm font-mono text-xs">
+                  ❌ PICOBASE_SECRET, PICOBASE_ADMIN_EMAIL, picobase_url<br/>
+                  ✅ PICOBASE_URL, PICOBASE_API_KEY
+                </p>
+              </div>
+              <div className="bg-red-50 dark:bg-red-900/10 border-l-4 border-red-500 p-4 rounded-r-lg">
+                <h4 className="text-red-800 dark:text-red-200 font-bold m-0 text-base">Using platform URL instead of instance URL</h4>
+                <p className="text-red-700 dark:text-red-300 text-sm mt-2 mb-2">
+                  The URL should point to <strong>your instance</strong>, not the platform dashboard.
+                </p>
+                <p className="text-red-700 dark:text-red-300 text-sm font-mono text-xs">
+                  ❌ https://picobase.app<br/>
+                  ✅ https://myapp.picobase.com or https://myapp.picobase.app
+                </p>
+              </div>
             </div>
           </section>
 

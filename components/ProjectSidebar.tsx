@@ -10,7 +10,24 @@ interface ProjectSidebarProps {
   projectStatus: string
 }
 
-const navItems = [
+interface NavItem {
+  label: string
+  href: string
+  icon: JSX.Element
+  badge?: string
+}
+
+const navItems: NavItem[] = [
+  {
+    label: 'Quick Start',
+    href: '/quick-start',
+    icon: (
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+      </svg>
+    ),
+    badge: 'NEW',
+  },
   {
     label: 'Table Editor',
     href: '/editor',
@@ -133,7 +150,7 @@ export default function ProjectSidebar({ projectId, projectName, projectStatus }
 
       {/* Navigation */}
       <nav className={`flex-1 py-3 space-y-0.5 ${collapsed ? 'px-1.5' : 'px-2'}`}>
-        {navItems.map((item) => {
+        {navItems.map((item: NavItem) => {
           const fullHref = `${basePath}${item.href}`
           const isActive = pathname === fullHref || (item.href === '/editor' && pathname === basePath)
 
@@ -148,7 +165,16 @@ export default function ProjectSidebar({ projectId, projectName, projectStatus }
                 }`}
             >
               <span className={`shrink-0 ${isActive ? 'text-primary-400' : ''}`}>{item.icon}</span>
-              {!collapsed && item.label}
+              {!collapsed && (
+                <span className="flex items-center gap-2 flex-1">
+                  <span>{item.label}</span>
+                  {item.badge && (
+                    <span className="px-1.5 py-0.5 text-[10px] font-bold bg-primary-600 text-white rounded uppercase">
+                      {item.badge}
+                    </span>
+                  )}
+                </span>
+              )}
             </Link>
           )
         })}
