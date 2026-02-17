@@ -8,7 +8,7 @@ TypeScript SDK for PicoBase — add auth, database, realtime, and file storage t
 npm install @picobase_app/client
 ```
 
-> ⚠️ **Important:** Install `@picobase_app/client`, **NOT** `pocketbase` directly. PicoBase wraps PocketBase with managed hosting features. If you accidentally installed `pocketbase`, remove it from your dependencies.
+> ⚠️ **Important:** Always install `@picobase_app/client`. If you accidentally installed `pocketbase`, remove it — that's an internal dependency, not the user-facing SDK.
 
 ## Quickstart
 
@@ -178,11 +178,11 @@ const results = await pb.rpc('search_products', {
 })
 ```
 
-RPC calls are mapped to custom PocketBase endpoints at `/api/rpc/{functionName}`. You'll need to implement these routes in your PocketBase instance. See the [PocketBase routing docs](https://pocketbase.io/docs/js-routing/) for details.
+RPC calls are mapped to custom endpoints at `/api/rpc/{functionName}`. You can implement these routes in your PicoBase instance.
 
 ## File Storage
 
-PocketBase stores files as fields on records. Use the storage module to get URLs.
+PicoBase stores files as fields on records. Use the storage module to get URLs.
 
 ```typescript
 const user = await pb.collection('users').getOne('USER_ID')
@@ -208,12 +208,12 @@ pb.auth.setCollection('members')
 await pb.auth.signIn({ email: 'member@example.com', password: 'pass' })
 ```
 
-### Raw PocketBase access
+### Raw access (advanced)
 
-The underlying PocketBase SDK instance is exposed for advanced use cases.
+The underlying client instance is exposed for advanced use cases.
 
 ```typescript
-// Access the PocketBase client directly
+// Access the internal client directly
 const health = await pb.pb.health.check()
 
 // Custom API endpoint
@@ -299,4 +299,4 @@ result.items[0].title  // string — fully typed!
 | `pb.collection(name)` | `PicoBaseCollection` | CRUD operations on a collection |
 | `pb.realtime` | `PicoBaseRealtime` | Realtime subscriptions |
 | `pb.storage` | `PicoBaseStorage` | File URLs and tokens |
-| `pb.pb` | `PocketBase` | Underlying PocketBase SDK instance |
+| `pb.pb` | `PocketBase` | Underlying internal client instance |

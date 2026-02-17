@@ -16,8 +16,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
-    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "build": "tsup",
+    "dev": "tsup --watch",
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
@@ -31,19 +31,18 @@
   "devDependencies": {
     "@types/node": "^25.2.3",
     "@vitest/ui": "^2.1.8",
-    "pocketbase": "^0.25.2",
     "tsup": "^8.4.0",
     "typescript": "^5.7.3",
     "vitest": "^2.1.8"
   },
   "keywords": [
     "picobase",
-    "pocketbase",
     "baas",
     "backend",
     "auth",
     "database",
-    "realtime"
+    "realtime",
+    "supabase-alternative"
   ],
   "license": "MIT",
   "repository": {
