@@ -19,8 +19,9 @@ export default function QuickStartSection({
   const [apiKey, setApiKey] = useState<string | null>(null)
   const [creating, setCreating] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [showCreateNew, setShowCreateNew] = useState(false)
 
-  // Auto-create an API key if none exist
+  // Use existing key if available, otherwise auto-create
   useEffect(() => {
     if (existingKeys.length === 0 && !creating && !apiKey) {
       handleAutoCreateKey()
@@ -41,6 +42,7 @@ export default function QuickStartSection({
 
       if (response.ok) {
         setApiKey(data.key)
+        setShowCreateNew(false)
         router.refresh()
       }
     } catch (error) {
@@ -50,13 +52,17 @@ export default function QuickStartSection({
     }
   }
 
+  // Use the newly created key, or show placeholder that references existing keys
+  const displayKey = apiKey || (existingKeys.length > 0 ? `${existingKeys[0].key_prefix}...` : 'pbk_your_api_key_here')
+  const hasExistingKeys = existingKeys.length > 0
+
   const envVars = {
     next: `NEXT_PUBLIC_PICOBASE_URL=${instanceUrl}
-NEXT_PUBLIC_PICOBASE_API_KEY=${apiKey || 'pbk_your_api_key_here'}`,
+NEXT_PUBLIC_PICOBASE_API_KEY=${displayKey}`,
     vite: `VITE_PICOBASE_URL=${instanceUrl}
-VITE_PICOBASE_API_KEY=${apiKey || 'pbk_your_api_key_here'}`,
+VITE_PICOBASE_API_KEY=${displayKey}`,
     node: `PICOBASE_URL=${instanceUrl}
-PICOBASE_API_KEY=${apiKey || 'pbk_your_api_key_here'}`,
+PICOBASE_API_KEY=${displayKey}`,
   }
 
   function copyToClipboard() {
@@ -126,9 +132,12 @@ PICOBASE_API_KEY=${apiKey || 'pbk_your_api_key_here'}`,
             </span>
             <button
               onClick={copyToClipboard}
+              disabled={hasExistingKeys && !apiKey}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
                 copied
                   ? 'bg-green-600 text-white'
+                  : hasExistingKeys && !apiKey
+                  ? 'bg-gray-800 text-gray-500 cursor-not-allowed'
                   : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'
               }`}
             >
@@ -153,6 +162,60 @@ PICOBASE_API_KEY=${apiKey || 'pbk_your_api_key_here'}`,
             {envVars[selectedTab]}
           </pre>
         </div>
+
+        {/* Info message for existing keys */}
+        {hasExistingKeys && !apiKey && !creating && (
+          <div className="mt-3 p-3 bg-blue-900/20 border border-blue-800 rounded-lg">
+            <div className="flex gap-2 items-start">
+              <svg className="flex-shrink-0 w-5 h-5 text-blue-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="flex-1">
+                <p className="text-sm text-blue-200 mb-2">
+                  You have an existing API key. For security reasons, we only show the full key once when it's created.
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setShowCreateNew(true)}
+                    className="text-xs px-3 py-1.5 bg-blue-600 text-white rounded hover:bg-blue-500 transition-colors font-medium"
+                  >
+                    Create New Key
+                  </button>
+                  <a
+                    href={`/dashboard/projects/${instanceId}/api-keys`}
+                    className="text-xs px-3 py-1.5 bg-gray-800 text-gray-300 rounded hover:bg-gray-700 transition-colors font-medium"
+                  >
+                    View All Keys
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Create new key confirmation */}
+        {showCreateNew && (
+          <div className="mt-3 p-3 bg-yellow-900/20 border border-yellow-800 rounded-lg">
+            <p className="text-sm text-yellow-200 mb-3">
+              Create a new API key? Your existing keys will remain active.
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={handleAutoCreateKey}
+                disabled={creating}
+                className="text-xs px-3 py-1.5 bg-primary-600 text-white rounded hover:bg-primary-500 transition-colors font-medium disabled:opacity-50"
+              >
+                {creating ? 'Creating...' : 'Yes, Create Key'}
+              </button>
+              <button
+                onClick={() => setShowCreateNew(false)}
+                className="text-xs px-3 py-1.5 bg-gray-800 text-gray-300 rounded hover:bg-gray-700 transition-colors font-medium"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
 
         {creating && (
           <div className="absolute inset-0 bg-gray-900/50 rounded-lg flex items-center justify-center">
@@ -209,17 +272,19 @@ PICOBASE_API_KEY=${apiKey || 'pbk_your_api_key_here'}`,
         </ol>
       </div>
 
-      {/* Info Box */}
-      <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
-        <div className="flex gap-2">
-          <svg className="flex-shrink-0 w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          <p className="text-xs text-blue-800 dark:text-blue-200">
-            <strong>Keep your API key safe!</strong> Never commit your <code className="px-1 py-0.5 bg-blue-100 dark:bg-blue-900 rounded">.env.local</code> file to git. Add it to your <code className="px-1 py-0.5 bg-blue-100 dark:bg-blue-900 rounded">.gitignore</code> to keep it private.
-          </p>
+      {/* Info Box - only show if we have a full key to display */}
+      {(apiKey || !hasExistingKeys) && (
+        <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg">
+          <div className="flex gap-2">
+            <svg className="flex-shrink-0 w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-xs text-blue-800 dark:text-blue-200">
+              <strong>Keep your API key safe!</strong> Never commit your <code className="px-1 py-0.5 bg-blue-100 dark:bg-blue-900 rounded">.env.local</code> file to git. Add it to your <code className="px-1 py-0.5 bg-blue-100 dark:bg-blue-900 rounded">.gitignore</code> to keep it private.
+            </p>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
