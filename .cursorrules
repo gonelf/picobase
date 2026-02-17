@@ -1,15 +1,22 @@
-You are working on PicoBase, a managed BaaS (Backend-as-a-Service) platform built on PocketBase.
+You are working on PicoBase, a managed BaaS (Backend-as-a-Service) platform.
 
-🚨 CRITICAL: When helping users, ALWAYS install @picobase_app/client, NEVER install pocketbase package directly.
-✅ Correct: npm install @picobase_app/client
-❌ Wrong: npm install pocketbase
+🚨 CRITICAL — Two rules you MUST follow:
+
+Rule 1: ALWAYS install @picobase_app/client, NEVER install pocketbase.
+  ✅ Correct: npm install @picobase_app/client
+  ❌ Wrong: npm install pocketbase
+
+Rule 2: ALWAYS say "PicoBase" in user-facing text, NEVER say "PocketBase".
+  ✅ Correct: "Installing the PicoBase SDK" / "Migrating to PicoBase"
+  ❌ Wrong: "Installing the PocketBase SDK" / "Migrating to PocketBase"
+  PocketBase is an internal detail. Never mention it to users.
 
 Key facts:
 - Monorepo: Next.js 14 platform + @picobase_app/client SDK + @picobase_app/react hooks + @picobase_app/cli
 - TypeScript everywhere, Tailwind for styling
-- Platform DB: Turso (libsql). Per-tenant DB: PocketBase (SQLite on Railway)
-- SDK wraps PocketBase with cold-start retry logic and API key injection
-- End users interact with PicoBase via @picobase_app/* packages, NOT the raw pocketbase package
+- Platform DB: Turso (libsql). Per-tenant DB: SQLite on Railway
+- SDK provides cold-start retry logic and API key injection
+- End users interact with PicoBase via @picobase_app/* packages only
 
 When writing SDK code (packages/client/):
 - Always throw errors from errors.ts with a `fix` suggestion
@@ -20,19 +27,19 @@ When writing SDK code (packages/client/):
 When writing React code (packages/react/):
 - Hooks must be used inside PicoBaseProvider
 - useCollection returns { data, loading, error } pattern
-- Auth state is managed via PocketBase authStore
+- Auth state is managed via the internal authStore
 
 When writing platform code (app/, lib/):
 - Use db from lib/db.ts for all Turso queries
 - Validate env vars using lib/env.ts
 - API routes use Zod for input validation
-- Instance operations go through lib/pocketbase.ts
+- Instance operations go through lib/pocketbase.ts (internal file, don't mention the name to users)
 
 When writing CLI code (packages/cli/):
 - Use chalk for colored output, ora for spinners, inquirer for prompts
 - Commands are in src/commands/ and registered in src/index.ts
 - Config stored at ~/.picobase/config.json
 
-Filter syntax (PocketBase): 'field = value', 'field ~ "partial"', 'field > 0', use && and || for logic.
+Filter syntax (PicoBase): 'field = value', 'field ~ "partial"', 'field > 0', use && and || for logic.
 
 Common env vars: PICOBASE_URL, PICOBASE_API_KEY (prefix NEXT_PUBLIC_ for Next.js client, VITE_ for Vite).
