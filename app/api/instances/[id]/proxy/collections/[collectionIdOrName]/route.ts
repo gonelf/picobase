@@ -41,9 +41,10 @@ async function validateRequest(req: NextRequest, instanceIdParam: string) {
 
 export async function GET(
     req: NextRequest,
-    { params }: { params: { id: string; collectionIdOrName: string } }
+    { params }: { params: Promise<{ id: string; collectionIdOrName: string }> }
 ) {
-    const validation = await validateRequest(req, params.id)
+    const resolvedParams = await params
+    const validation = await validateRequest(req, resolvedParams.id)
     if (validation.error) {
         return NextResponse.json({ error: validation.error }, { status: validation.status })
     }
@@ -52,7 +53,7 @@ export async function GET(
 
     try {
         const searchParams = req.nextUrl.searchParams.toString()
-        const path = `api/collections/${params.collectionIdOrName}${searchParams ? `?${searchParams}` : ''}`
+        const path = `api/collections/${resolvedParams.collectionIdOrName}${searchParams ? `?${searchParams}` : ''}`
 
         const response = await authenticatedPocketBaseRequest(
             validation.keyValidation!.instanceId,
@@ -73,9 +74,10 @@ export async function GET(
 
 export async function PATCH(
     req: NextRequest,
-    { params }: { params: { id: string; collectionIdOrName: string } }
+    { params }: { params: Promise<{ id: string; collectionIdOrName: string }> }
 ) {
-    const validation = await validateRequest(req, params.id)
+    const resolvedParams = await params
+    const validation = await validateRequest(req, resolvedParams.id)
     if (validation.error) {
         return NextResponse.json({ error: validation.error }, { status: validation.status })
     }
@@ -89,7 +91,7 @@ export async function PATCH(
             validation.keyValidation!.instanceId,
             instance!.admin_email as string,
             instance!.admin_password as string,
-            `api/collections/${params.collectionIdOrName}`,
+            `api/collections/${resolvedParams.collectionIdOrName}`,
             {
                 method: 'PATCH',
                 body: JSON.stringify(body),
@@ -105,9 +107,10 @@ export async function PATCH(
 
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: { id: string; collectionIdOrName: string } }
+    { params }: { params: Promise<{ id: string; collectionIdOrName: string }> }
 ) {
-    const validation = await validateRequest(req, params.id)
+    const resolvedParams = await params
+    const validation = await validateRequest(req, resolvedParams.id)
     if (validation.error) {
         return NextResponse.json({ error: validation.error }, { status: validation.status })
     }
@@ -119,7 +122,7 @@ export async function DELETE(
             validation.keyValidation!.instanceId,
             instance!.admin_email as string,
             instance!.admin_password as string,
-            `api/collections/${params.collectionIdOrName}`,
+            `api/collections/${resolvedParams.collectionIdOrName}`,
             {
                 method: 'DELETE',
             }

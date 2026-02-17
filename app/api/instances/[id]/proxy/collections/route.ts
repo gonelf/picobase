@@ -6,8 +6,9 @@ import { authenticatedPocketBaseRequest } from '@/lib/pocketbase-auth'
 // List collections or Create collection
 export async function GET(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const resolvedParams = await params
     const authHeader = req.headers.get('authorization')
     if (!authHeader?.startsWith('Bearer ')) {
         return NextResponse.json({ error: 'Missing or invalid authorization header' }, { status: 401 })
@@ -30,7 +31,7 @@ export async function GET(
     // We should verify they match if possible, or just rely on the key's instanceId.
     // Since the middleware does the routing based on subdomain, params.id should be the instance ID.
 
-    if (keyValidation.instanceId !== params.id) {
+    if (keyValidation.instanceId !== resolvedParams.id) {
         return NextResponse.json({ error: 'API key does not match instance' }, { status: 403 })
     }
 
@@ -73,8 +74,9 @@ export async function GET(
 
 export async function POST(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
+    const resolvedParams = await params
     const authHeader = req.headers.get('authorization')
     if (!authHeader?.startsWith('Bearer ')) {
         return NextResponse.json({ error: 'Missing or invalid authorization header' }, { status: 401 })
@@ -87,7 +89,7 @@ export async function POST(
         return NextResponse.json({ error: 'Invalid API key' }, { status: 401 })
     }
 
-    if (keyValidation.instanceId !== params.id) {
+    if (keyValidation.instanceId !== resolvedParams.id) {
         return NextResponse.json({ error: 'API key does not match instance' }, { status: 403 })
     }
 
