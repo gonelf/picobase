@@ -67,17 +67,23 @@ export default function QuickStartSection({
     }
   }
 
-  async function createKey(name: string, type: 'standard' | 'admin', setter: (key: string) => void) {
-    const response = await fetch(`/api/instances/${instanceId}/keys`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, type }),
-    })
+  async function createKey(name: string, type: 'standard' | 'admin', setter: (key: string) => void): Promise<string | null> {
+    try {
+      const response = await fetch(`/api/instances/${instanceId}/keys`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, type }),
+      })
 
-    const data = await response.json()
-    if (response.ok) {
-      setter(data.key)
+      const data = await response.json()
+      if (response.ok) {
+        setter(data.key)
+        return data.key
+      }
+    } catch (error) {
+      console.error('Failed to create API key:', error)
     }
+    return null
   }
 
   // Determine display values
@@ -105,8 +111,48 @@ PICOBASE_API_KEY=${displayStandardKey}
 PICOBASE_ADMIN_API_KEY=${displayAdminKey}`,
   }
 
+  const getEnvVars = (stdKey: string, admKey: string) => ({
+    next: `NEXT_PUBLIC_PICOBASE_URL=${instanceUrl}
+NEXT_PUBLIC_PICOBASE_API_KEY=${stdKey}
+
+# Admin API Key (Keep this secret! Do not expose to client)
+PICOBASE_ADMIN_API_KEY=${admKey}`,
+    vite: `VITE_PICOBASE_URL=${instanceUrl}
+VITE_PICOBASE_API_KEY=${stdKey}
+
+# Admin API Key (Keep this secret! Do not expose to client)
+PICOBASE_ADMIN_API_KEY=${admKey}`,
+    node: `PICOBASE_URL=${instanceUrl}
+PICOBASE_API_KEY=${stdKey}
+
+# Admin API Key (Keep this secret! Do not expose to client)
+PICOBASE_ADMIN_API_KEY=${admKey}`,
+  })
+
   async function copyToClipboard() {
-    const text = envVars[selectedTab]
+    let currentStandardKey = standardKey
+    let currentAdminKey = adminKey
+
+    // If keys are masked or missing, generate new ones
+    if (!currentStandardKey && hasStandardKey) {
+      setCreating(true)
+      currentStandardKey = await createKey('Quick Start Key', 'standard', setStandardKey)
+    }
+    if (!currentAdminKey && hasAdminKey) {
+      setCreating(true)
+      currentAdminKey = await createKey('Quick Start Admin Key', 'admin', setAdminKey)
+    }
+    setCreating(false)
+
+    // Fallback if generation failed or keys still missing (shouldn't happen often)
+    const finalStandardKey = currentStandardKey ||
+      (hasStandardKey ? `${typedExistingKeys.find(k => k.type === 'standard' || !k.type)?.key_prefix}...` : 'pbk_standard_key')
+
+    const finalAdminKey = currentAdminKey ||
+      (hasAdminKey ? `${typedExistingKeys.find(k => k.type === 'admin')?.key_prefix}...` : 'pbk_admin_key')
+
+    const vars = getEnvVars(finalStandardKey, finalAdminKey)
+    const text = vars[selectedTab]
 
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -164,8 +210,8 @@ PICOBASE_ADMIN_API_KEY=${displayAdminKey}`,
         <button
           onClick={() => setSelectedTab('next')}
           className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${selectedTab === 'next'
-              ? 'bg-primary-600 text-white shadow-sm'
-              : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+            ? 'bg-primary-600 text-white shadow-sm'
+            : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
             }`}
         >
           Next.js
@@ -173,8 +219,8 @@ PICOBASE_ADMIN_API_KEY=${displayAdminKey}`,
         <button
           onClick={() => setSelectedTab('vite')}
           className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${selectedTab === 'vite'
-              ? 'bg-primary-600 text-white shadow-sm'
-              : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+            ? 'bg-primary-600 text-white shadow-sm'
+            : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
             }`}
         >
           Vite
@@ -182,8 +228,8 @@ PICOBASE_ADMIN_API_KEY=${displayAdminKey}`,
         <button
           onClick={() => setSelectedTab('node')}
           className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${selectedTab === 'node'
-              ? 'bg-primary-600 text-white shadow-sm'
-              : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+            ? 'bg-primary-600 text-white shadow-sm'
+            : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
             }`}
         >
           Node.js
@@ -200,8 +246,8 @@ PICOBASE_ADMIN_API_KEY=${displayAdminKey}`,
             <button
               onClick={copyToClipboard}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-all ${copied
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'
+                ? 'bg-green-600 text-white'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700 border border-gray-700'
                 }`}
             >
               {copied ? (
